@@ -1,21 +1,43 @@
+
+/*=================== Movie Card ========================*/
+
 .movie-card {
+    position: relative;
+    z-index: 1;
+
     height: 100%;
     overflow: hidden;
+
     background: #ffffff;
     border-radius: 12px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+    transform: scale(1);
+    transform-origin: center center;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
 }
 
-.movie-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+/*=================== Hover Effect ========================*/
+
+.movie-card:hover,
+.movie-card--preview {
+    z-index: 10;
+
+    transform: translateY(-8px) scale(1.05);
+
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.22);
 }
 
-/* Poster */
+/*=================== Poster ========================*/
+
 .movie-card__poster-wrapper {
     position: relative;
+
     width: 100%;
     aspect-ratio: 2 / 3;
+
     overflow: hidden;
     background: #eeeeee;
 }
@@ -23,47 +45,109 @@
 .movie-card__poster {
     width: 100%;
     height: 100%;
+
     object-fit: cover;
+
     transition: transform 0.35s ease;
 }
 
 .movie-card:hover .movie-card__poster {
-    transform: scale(1.05);
+    transform: scale(1.04);
 }
 
-/* Age rating */
+/*=================== Video Preview ========================*/
+
+.movie-card__preview-video {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    background: #171717;
+
+    pointer-events: none;
+    animation: moviePreviewFade 0.3s ease;
+}
+
+@keyframes moviePreviewFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/*=================== Preview Label ========================*/
+
+.movie-card__preview-label {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+
+    padding: 5px 9px;
+
+    border-radius: 4px;
+    background: rgba(229, 57, 69, 0.95);
+
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+/*=================== Age Rating ========================*/
+
 .movie-card__age {
     position: absolute;
     top: 10px;
     left: 10px;
+    z-index: 2;
+
     padding: 5px 9px;
+
     color: #ffffff;
     background: #d92332;
+
     border-radius: 5px;
+
     font-size: 12px;
     font-weight: 700;
 }
 
-/* Status */
+/*=================== Status ========================*/
+
 .movie-card__status {
     position: absolute;
     right: 10px;
     bottom: 10px;
+    z-index: 2;
+
     padding: 5px 9px;
+
     color: #ffffff;
     background: rgba(20, 20, 20, 0.85);
+
     border-radius: 5px;
+
     font-size: 11px;
     font-weight: 600;
 }
 
-/* Content */
+/*=================== Content ========================*/
+
 .movie-card__content {
     padding: 14px;
 }
 
 .movie-card__title {
     margin-bottom: 8px;
+
     color: #222222;
     font-size: 16px;
     font-weight: 700;
@@ -78,6 +162,7 @@
 .movie-card__genres {
     min-height: 20px;
     margin-bottom: 12px;
+
     color: #777777;
     font-size: 12px;
 }
@@ -86,7 +171,9 @@
     display: flex;
     justify-content: space-between;
     gap: 8px;
+
     margin-bottom: 14px;
+
     color: #666666;
     font-size: 12px;
 }
@@ -95,22 +182,51 @@
     color: #f5a623;
 }
 
-/* Button */
+/*=================== Detail Button ========================*/
+
 .movie-card__button {
     display: block;
     width: 100%;
+
     padding: 9px 12px;
+
     color: #ffffff;
     background: #d92332;
+
     border-radius: 6px;
+
     text-align: center;
     text-decoration: none;
+
     font-size: 13px;
     font-weight: 600;
+
     transition: background 0.2s ease;
 }
 
 .movie-card__button:hover {
     color: #ffffff;
     background: #b91c2a;
+}
+
+/*=================== Responsive ========================*/
+
+@media (max-width: 576px) {
+    .movie-card:hover,
+    .movie-card--preview {
+        transform: translateY(-3px) scale(1.015);
+    }
+}
+
+/*=================== Reduced Motion ========================*/
+
+@media (prefers-reduced-motion: reduce) {
+    .movie-card,
+    .movie-card__poster {
+        transition: none;
+    }
+
+    .movie-card__preview-video {
+        animation: none;
+    }
 }
