@@ -211,266 +211,216 @@ function MovieReviews({ movieId }) {
     //=================== Hiển thị MovieReviews ========================
 
     return (
-        <div className="movie-reviews">
+      <div className="movie-reviews">
+        {/*=================== Tiêu đề ========================*/}
 
-            {/*=================== Tiêu đề ========================*/}
+        <div className="movie-reviews-header">
+          <div>
+            <span className="movie-reviews-subtitle">ĐÁNH GIÁ TỪ KHÁN GIẢ</span>
 
-            <div className="movie-reviews-header">
-                <div>
-                    <span className="movie-reviews-subtitle">
-                        ĐÁNH GIÁ TỪ KHÁN GIẢ
-                    </span>
+            <h2>Đánh giá phim</h2>
 
-                    <h2>Đánh giá phim</h2>
-
-                    <p>
-                        Chia sẻ cảm nhận của bạn về bộ phim.
-                    </p>
-                </div>
-            </div>
-
-            {/*=================== Tổng quan đánh giá ========================*/}
-
-            <div className="movie-reviews-overview">
-
-                <div className="movie-reviews-average">
-                    <strong>
-                        {reviews.length > 0
-                            ? averageRating.toFixed(1)
-                            : "0.0"}
-                    </strong>
-
-                    <div className="movie-reviews-average-stars">
-                        {"★".repeat(
-                            Math.round(averageRating)
-                        )}
-                        {"☆".repeat(
-                            5 - Math.round(averageRating)
-                        )}
-                    </div>
-
-                    <span>
-                        {reviews.length} lượt đánh giá
-                    </span>
-                </div>
-
-                {/*=================== Thống kê số sao ========================*/}
-
-                <div className="movie-reviews-statistics">
-                    {ratingStatistics.map((item) => (
-                        <div
-                            className="movie-reviews-stat-row"
-                            key={item.score}
-                        >
-                            <span className="movie-reviews-stat-label">
-                                {item.score} <span>★</span>
-                            </span>
-
-                            <div className="movie-reviews-stat-track">
-                                <div
-                                    className="movie-reviews-stat-fill"
-                                    style={{
-                                        width: `${item.percentage}%`
-                                    }}
-                                />
-                            </div>
-
-                            <span className="movie-reviews-stat-count">
-                                {item.count}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/*=================== Form đánh giá ========================*/}
-
-            <div
-                className="movie-review-form-wrapper"
-                id="movie-review-form"
-            >
-                <div className="movie-review-form-heading">
-                    <h3>
-                        {editingReviewId !== null
-                            ? "Chỉnh sửa đánh giá"
-                            : myReview
-                                ? "Đánh giá của bạn"
-                                : "Viết đánh giá của bạn"}
-                    </h3>
-
-                    <p>
-                        {editingReviewId !== null
-                            ? "Cập nhật số sao và nội dung đánh giá."
-                            : "Hãy chia sẻ trải nghiệm của bạn sau khi xem phim."}
-                    </p>
-                </div>
-
-                <form onSubmit={handleSubmitReview}>
-
-                    {/*=================== Chọn số sao ========================*/}
-
-                    <div className="movie-review-rating-input">
-                        <label>Đánh giá của bạn</label>
-
-                        <div className="movie-review-star-picker">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                    type="button"
-                                    key={star}
-                                    className={
-                                        star <= (hoverRating || rating)
-                                            ? "active"
-                                            : ""
-                                    }
-                                    onClick={() => setRating(star)}
-                                    onMouseEnter={() => setHoverRating(star)}
-                                    onMouseLeave={() => setHoverRating(0)}
-                                    aria-label={`${star} sao`}
-                                    title={`${star} sao`}
-                                >
-                                    ★
-                                </button>
-                            ))}
-
-                            <span>
-                                {rating}/5 sao
-                            </span>
-                        </div>
-                    </div>
-
-                    {/*=================== Nội dung đánh giá ========================*/}
-
-                    <div className="movie-review-content-input">
-                        <label htmlFor="movieReviewContent">
-                            Nội dung đánh giá
-                        </label>
-
-                        <textarea
-                            id="movieReviewContent"
-                            rows="4"
-                            maxLength="1000"
-                            placeholder="Hãy chia sẻ cảm nhận của bạn về bộ phim..."
-                            value={content}
-                            onChange={(event) => setContent(event.target.value)}
-                        />
-
-                        <span className="movie-review-character-count">
-                            {content.length}/1000 ký tự
-                        </span>
-                    </div>
-
-                    {/*=================== Thông báo ========================*/}
-
-                    {errorMessage && (
-                        <p className="movie-review-message error">
-                            {errorMessage}
-                        </p>
-                    )}
-
-                    {successMessage && (
-                        <p className="movie-review-message success">
-                            {successMessage}
-                        </p>
-                    )}
-
-                    {/*=================== Nút thao tác ========================*/}
-
-                    <div className="movie-review-form-actions">
-                        <button
-                            type="submit"
-                            className="movie-review-submit"
-                        >
-                            {editingReviewId !== null
-                                ? "Lưu thay đổi"
-                                : "Gửi đánh giá"}
-                        </button>
-
-                        {editingReviewId !== null && (
-                            <button
-                                type="button"
-                                className="movie-review-cancel"
-                                onClick={handleCancelEdit}
-                            >
-                                Hủy
-                            </button>
-                        )}
-                    </div>
-                </form>
-            </div>
-
-            {/*=================== Danh sách đánh giá ========================*/}
-
-            <div className="movie-reviews-list">
-
-                <div className="movie-reviews-list-heading">
-                    <h3>Nhận xét từ khán giả</h3>
-
-                    <span>{reviews.length} đánh giá</span>
-                </div>
-
-                {sortedReviews.length > 0 ? (
-                    sortedReviews.map((review) => (
-                        <article
-                            className="movie-review-item"
-                            key={review.id}
-                        >
-                            {/*=================== Thông tin người đánh giá ========================*/}
-
-                            <div className="movie-review-item-header">
-
-                                <div className="movie-review-user">
-                                    <div className="movie-review-avatar">
-                                        {review.userName.charAt(0).toUpperCase()}
-                                    </div>
-
-                                    <div>
-                                        <h4>{review.userName}</h4>
-
-                                        <span>
-                                            {formatDate(review.createdAt)}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="movie-review-item-rating">
-                                    {"★".repeat(review.rating)}
-                                    {"☆".repeat(5 - review.rating)}
-                                </div>
-                            </div>
-
-                            {/*=================== Nội dung đánh giá ========================*/}
-
-                            <p className="movie-review-item-content">
-                                {review.content}
-                            </p>
-
-                            {/*=================== Chỉnh sửa đánh giá của mình ========================*/}
-
-                            {review.authorId === DEMO_USER_ID && (
-                                <button
-                                    type="button"
-                                    className="movie-review-edit"
-                                    onClick={() => handleEditReview(review)}
-                                >
-                                    <i className="bi bi-pencil-square"></i>
-                                    Chỉnh sửa đánh giá
-                                </button>
-                            )}
-                        </article>
-                    ))
-                ) : (
-                    <div className="movie-reviews-empty">
-                        <i className="bi bi-chat-square-text"></i>
-
-                        <h4>Chưa có đánh giá nào</h4>
-
-                        <p>
-                            Hãy là người đầu tiên chia sẻ cảm nhận về bộ phim này.
-                        </p>
-                    </div>
-                )}
-            </div>
+            <p>Chia sẻ cảm nhận của bạn về bộ phim.</p>
+          </div>
         </div>
+
+        {/*=================== Tổng quan đánh giá ========================*/}
+
+        <div className="movie-reviews-overview">
+          <div className="movie-reviews-average">
+            <strong>
+              {reviews.length > 0 ? averageRating.toFixed(1) : "0.0"}
+            </strong>
+
+            <div className="movie-reviews-average-stars">
+              {"★".repeat(Math.round(averageRating))}
+              {"☆".repeat(5 - Math.round(averageRating))}
+            </div>
+
+            <span>{reviews.length} lượt đánh giá</span>
+          </div>
+
+          {/*=================== Thống kê số sao ========================*/}
+
+          <div className="movie-reviews-statistics">
+            {ratingStatistics.map((item) => (
+              <div className="movie-reviews-stat-row" key={item.score}>
+                <span className="movie-reviews-stat-label">
+                  {item.score} <span>★</span>
+                </span>
+
+                <div className="movie-reviews-stat-track">
+                  <div
+                    className="movie-reviews-stat-fill"
+                    style={{
+                      width: `${item.percentage}%`,
+                    }}
+                  />
+                </div>
+
+                <span className="movie-reviews-stat-count">{item.count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/*=================== Form đánh giá ========================*/}
+
+        <div className="movie-review-form-wrapper" id="movie-review-form">
+          <div className="movie-review-form-heading">
+            <h3>
+              {editingReviewId !== null
+                ? "Chỉnh sửa đánh giá"
+                : myReview
+                  ? "Đánh giá của bạn"
+                  : "Viết đánh giá của bạn"}
+            </h3>
+
+            <p>
+              {editingReviewId !== null
+                ? "Cập nhật số sao và nội dung đánh giá."
+                : "Hãy chia sẻ trải nghiệm của bạn sau khi xem phim."}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmitReview}>
+            {/*=================== Chọn số sao ========================*/}
+
+            <div className="movie-review-rating-input">
+              <label>Đánh giá của bạn</label>
+
+              <div className="movie-review-star-picker">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    type="button"
+                    key={star}
+                    className={star <= (hoverRating || rating) ? "active" : ""}
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    aria-label={`${star} sao`}
+                    title={`${star} sao`}
+                  >
+                    ★
+                  </button>
+                ))}
+
+                <span>{rating}/5 sao</span>
+              </div>
+            </div>
+
+            {/*=================== Nội dung đánh giá ========================*/}
+
+            <div className="movie-review-content-input">
+              <label htmlFor="movieReviewContent">Nội dung đánh giá</label>
+
+              <textarea
+                id="movieReviewContent"
+                rows="4"
+                maxLength="1000"
+                placeholder="Hãy chia sẻ cảm nhận của bạn về bộ phim..."
+                value={content}
+                onChange={(event) => setContent(event.target.value)}
+              />
+
+              <span className="movie-review-character-count">
+                {content.length}/1000 ký tự
+              </span>
+            </div>
+
+            {/*=================== Thông báo ========================*/}
+
+            {errorMessage && (
+              <p className="movie-review-message error">{errorMessage}</p>
+            )}
+
+            {successMessage && (
+              <p className="movie-review-message success">{successMessage}</p>
+            )}
+
+            {/*=================== Nút thao tác ========================*/}
+
+            <button type="submit" className="movie-review-submit">
+              <i
+                className={`bi ${
+                  editingReviewId !== null ? "bi-check2-circle" : "bi-send-fill"
+                }`}
+              ></i>
+
+              {editingReviewId !== null ? "Lưu thay đổi" : "Gửi đánh giá"}
+            </button>
+          </form>
+        </div>
+
+        {/*=================== Danh sách đánh giá ========================*/}
+
+        <div className="movie-reviews-list">
+          <div className="movie-reviews-list-heading">
+            <h3>Nhận xét từ khán giả</h3>
+
+            <span>{reviews.length} đánh giá</span>
+          </div>
+
+          {sortedReviews.length > 0 ? (
+            sortedReviews.map((review) => (
+              <article
+                className={`movie-review-item ${
+                  review.authorId === DEMO_USER_ID
+                    ? "movie-review-item--mine"
+                    : ""
+                }`}
+                key={review.id}
+              >
+                {/*=================== Thông tin người đánh giá ========================*/}
+
+                <div className="movie-review-item-header">
+                  <div className="movie-review-user">
+                    <div className="movie-review-avatar">
+                      {review.userName.charAt(0).toUpperCase()}
+                    </div>
+
+                    <div>
+                      <h4>{review.userName}</h4>
+
+                      <span>{formatDate(review.createdAt)}</span>
+                    </div>
+                  </div>
+
+                  <div className="movie-review-item-rating">
+                    {"★".repeat(review.rating)}
+                    {"☆".repeat(5 - review.rating)}
+                  </div>
+                </div>
+
+                {/*=================== Nội dung đánh giá ========================*/}
+
+                <p className="movie-review-item-content">{review.content}</p>
+
+                {/*=================== Chỉnh sửa đánh giá của mình ========================*/}
+
+                {review.authorId === DEMO_USER_ID && (
+                  <button
+                    type="button"
+                    className="movie-review-edit"
+                    onClick={() => handleEditReview(review)}
+                  >
+                    <i className="bi bi-pencil-square"></i>
+                    Chỉnh sửa đánh giá
+                  </button>
+                )}
+              </article>
+            ))
+          ) : (
+            <div className="movie-reviews-empty">
+              <i className="bi bi-chat-square-text"></i>
+
+              <h4>Chưa có đánh giá nào</h4>
+
+              <p>Hãy là người đầu tiên chia sẻ cảm nhận về bộ phim này.</p>
+            </div>
+          )}
+        </div>
+      </div>
     );
 }
 

@@ -127,19 +127,20 @@
     margin-bottom: 35px;
     background: var(--vbc-bg-card);
     border: 1px solid var(--vbc-border);
-    border-radius: 12px;
-    scroll-margin-top: 100px;
+    border-radius: 4px;
 }
 
-.movie-review-form-heading {
-    margin-bottom: 22px;
+/*=================== Ô nhập nội dung ========================*/
+
+.movie-review-content-input textarea {
+    border-radius: 3px;
 }
 
-.movie-review-form-heading h3 {
-    margin-bottom: 7px;
-    color: var(--vbc-text);
-    font-size: 20px;
-    font-weight: 800;
+/*=================== Nút thao tác ========================*/
+
+.movie-review-submit,
+.movie-review-cancel {
+    border-radius: 4px;
 }
 
 /*=================== Chọn số sao ========================*/
@@ -244,46 +245,30 @@
     color: #20A464;
 }
 
-/*=================== Nút thao tác ========================*/
+/*=================== Nút gửi đánh giá ========================*/
 
-.movie-review-form-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 18px;
-}
-
-.movie-review-submit,
-.movie-review-cancel {
-    min-height: 43px;
-    padding: 0 22px;
-    border-radius: 7px;
-    font-size: 13px;
+.movie-review-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 0 24px;
+    background: #FF737D;
+    border: 1px solid #FF737D;
+    border-radius: 4px;
+    color: #FFFFFF;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.movie-review-submit {
-    background: var(--vbc-primary);
-    border: 1px solid var(--vbc-primary);
-    color: #FFFFFF;
-}
-
 .movie-review-submit:hover {
-    filter: brightness(0.9);
-    transform: translateY(-1px);
-}
-
-.movie-review-cancel {
-    background: transparent;
-    border: 1px solid var(--vbc-border);
-    color: var(--vbc-text-secondary);
-}
-
-.movie-review-cancel:hover {
-    background: var(--vbc-bg-secondary);
-    color: var(--vbc-text);
+    background: #E53945;
+    border-color: #E53945;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 57, 69, 0.2);
 }
 
 /*=================== Danh sách đánh giá ========================*/
@@ -473,4 +458,29 @@
     .movie-review-form-actions > button {
         flex: 1;
     }
+}
+
+/*=================== Đánh giá của tài khoản hiện tại ========================*/
+
+.movie-review-item--mine {
+    padding: 22px 18px;
+    margin: 12px 0;
+    background: var(--vbc-bg-secondary);
+    border: 1px solid var(--vbc-border);
+    border-left: 3px solid var(--vbc-primary);
+}
+
+.movie-review-item--mine .movie-review-user h4 {
+    color: var(--vbc-primary);
+}
+
+/*=================== Nhãn đánh giá của bạn ========================*/
+
+.movie-review-item--mine::after {
+    content: "Đánh giá của bạn";
+    display: inline-block;
+    margin-top: 8px;
+    color: var(--vbc-text-muted);
+    font-size: 11px;
+    font-weight: 700;
 }
