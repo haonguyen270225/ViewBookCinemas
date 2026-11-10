@@ -49,7 +49,7 @@ const movies = [
         status: "Đang chiếu"
     },
     {
-        id: 4,
+        id: 5,
         title: "Thành Phố Tương Lai",
         poster: "https://i.pinimg.com/736x/b4/a4/8f/b4a48fd735425954e0d1c145c1443f99.jpg",
         trailerUrl: "",
