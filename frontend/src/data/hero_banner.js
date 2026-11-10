@@ -10,8 +10,8 @@
 export const featuredMovies = [
     {
         id: 1,
-        title: "Hành Trình Ánh Sáng",
-        slug: "hanh-trinh-anh-sang",
+        title: "Người Nhện: Trở Về Nhà",
+        slug: "nguoi-nhen-tro-ve-nha",
         description:
             "Một hành trình khám phá những bí mật bị chôn giấu, nơi lòng dũng cảm và niềm tin quyết định số phận của tất cả.",
 
@@ -19,12 +19,12 @@ export const featuredMovies = [
             "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=85",
 
         backdropUrl:
-            "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=1920&q=85",
+            "https://upload.wikimedia.org/wikipedia/vi/d/d0/Spider-Man-_Homecoming.JPG?utm_source=vi.wikipedia.org&utm_campaign=index&utm_content=original",
 
         trailerUrl: null,
 
         trailerPageUrl:
-            "https://www.pexels.com/video/people-watching-movie-on-movie-theater-7986777/",
+            "/trailers/Nguoi_Nhen_Tro_Ve_Nha.mp4",
 
         releaseDate: "2026-10-15",
         durationMinutes: 125,
@@ -44,16 +44,16 @@ export const featuredMovies = [
 
     {
         id: 2,
-        title: "Thành Phố Trong Sương",
-        slug: "thanh-pho-trong-suong",
+        title: "Nobita và nước Nhật thời nguyên thủy",
+        slug: "nobita-va-nuoc-nhat-thoi-nguyen-thuy",
         description:
             "Giữa thành phố rộng lớn, một câu chuyện bí ẩn dần được hé lộ qua những cuộc gặp gỡ tưởng chừng như ngẫu nhiên.",
 
         posterUrl:
-            "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=800&q=85",
+            "https://down-vn.img.susercontent.com/file/vn-11134207-7ras8-m26wlcsx1ub6db_tn",
 
         backdropUrl:
-            "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1920&q=85",
+            "https://down-vn.img.susercontent.com/file/vn-11134207-7ras8-m26wlcsx1ub6db_tn",
 
         trailerUrl: null,
 
