@@ -1,6 +1,8 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 //=================== Import Components ========================
 
@@ -14,6 +16,14 @@ import "./Login.css";
 //=================== Component Login ========================
 
 function Login() {
+    //========================= Khởi tạo xác thực ========================
+
+    const navigate = useNavigate();
+
+    const {
+        login,
+        showNotification
+    } = useAuth();
     const [formData, setFormData] = useState({
         account: "",
         password: "",
@@ -59,7 +69,7 @@ function Login() {
         return newErrors;
     };
 
-    //=================== Xử lý đăng nhập ========================
+    //========================= Xử lý đăng nhập ========================
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -72,19 +82,28 @@ function Login() {
             return;
         }
 
-        //=================== Chưa kết nối Backend ========================
+        try {
+            login(
+                formData.account,
+                formData.password
+            );
 
-        setNotice(
-            "Thông tin hợp lệ. Chức năng đăng nhập sẽ hoạt động sau khi kết nối Backend."
-        );
+            showNotification(
+                "Đăng nhập thành công! Chào mừng bạn đến với ViewBookCinemas.",
+                "success"
+            );
 
-        console.log("Login form:", {
-            account: formData.account,
-            rememberMe: formData.rememberMe
-        });
+            navigate("/");
+
+        } catch (error) {
+            showNotification(
+                error.message || "Đăng nhập thất bại. Vui lòng thử lại.",
+                "danger"
+            );
+        }
     };
 
-    //=================== Giao diện Login ========================
+    //========================= Giao diện Login ========================
 
     return (
         <>

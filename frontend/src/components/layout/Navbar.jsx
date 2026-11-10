@@ -1,5 +1,8 @@
+
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+
+import { useAuth } from "../../contexts/AuthContext";
 
 import logo from "../../assets/images/ViewBookCinemas_Logo.svg";
 import "./Navbar.css";
@@ -14,16 +17,28 @@ const LOGIN_HINT_KEY = "vbc_login_hint_dismissed";
 function Navbar() {
     const navigate = useNavigate();
 
+    //=================== Lấy trạng thái xác thực ========================
+
+    const {
+        user,
+        isAuthenticated,
+        logout,
+        showNotification
+    } = useAuth();
+
     //=================== Khởi tạo trạng thái ========================
 
     const [searchTerm, setSearchTerm] = useState("");
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+
     const [theme, setTheme] = useState(() =>
-      localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light",
+        localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light"
     );
+
     const [isHintDismissed, setIsHintDismissed] = useState(
         () => localStorage.getItem(LOGIN_HINT_KEY) === "true"
     );
+
     const [showLoginHint, setShowLoginHint] = useState(false);
 
     const searchWrapperRef = useRef(null);
@@ -39,7 +54,9 @@ function Navbar() {
     //=================== Focus ô tìm kiếm khi mở ========================
 
     useEffect(() => {
-        if (isSearchOpen) searchInputRef.current?.focus();
+        if (isSearchOpen) {
+            searchInputRef.current?.focus();
+        }
     }, [isSearchOpen]);
 
     //=================== Đóng tìm kiếm khi nhấn ngoài hoặc Escape ========================
@@ -48,13 +65,18 @@ function Navbar() {
         if (!isSearchOpen) return;
 
         const handleOutsideClick = (event) => {
-            if (searchWrapperRef.current && !searchWrapperRef.current.contains(event.target)) {
+            if (
+                searchWrapperRef.current &&
+                !searchWrapperRef.current.contains(event.target)
+            ) {
                 setIsSearchOpen(false);
             }
         };
 
         const handleEscape = (event) => {
-            if (event.key === "Escape") setIsSearchOpen(false);
+            if (event.key === "Escape") {
+                setIsSearchOpen(false);
+            }
         };
 
         document.addEventListener("mousedown", handleOutsideClick);
@@ -69,13 +91,16 @@ function Navbar() {
     //=================== Chuyển đổi giao diện ========================
 
     const handleToggleTheme = () => {
-        setTheme((currentTheme) => currentTheme === "light" ? "dark" : "light");
+        setTheme((currentTheme) =>
+            currentTheme === "light" ? "dark" : "light"
+        );
     };
 
     //=================== Xử lý tìm kiếm ========================
 
     const handleSearch = (event) => {
         event.preventDefault();
+
         const keyword = searchTerm.trim();
 
         if (!keyword) {
@@ -84,6 +109,7 @@ function Navbar() {
         }
 
         navigate(`/movies?search=${encodeURIComponent(keyword)}`);
+
         setSearchTerm("");
         setIsSearchOpen(false);
     };
@@ -98,7 +124,9 @@ function Navbar() {
     //=================== Hiển thị thông báo đăng nhập ========================
 
     const handleShowLoginHint = () => {
-        if (!isHintDismissed) setShowLoginHint(true);
+        if (!isHintDismissed) {
+            setShowLoginHint(true);
+        }
     };
 
     //=================== Đóng thông báo đăng nhập ========================
@@ -107,6 +135,25 @@ function Navbar() {
         localStorage.setItem(LOGIN_HINT_KEY, "true");
         setIsHintDismissed(true);
         setShowLoginHint(false);
+    };
+
+    //=================== Xử lý đăng xuất ========================
+
+    const handleLogout = () => {
+        const isConfirmed = window.confirm(
+            "Bạn có chắc chắn muốn đăng xuất?"
+        );
+
+        if (!isConfirmed) return;
+
+        logout();
+
+        showNotification(
+            "Bạn đã đăng xuất khỏi ViewBookCinemas.",
+            "success"
+        );
+
+        navigate("/");
     };
 
     //=================== Giao diện Navbar ========================
@@ -118,8 +165,15 @@ function Navbar() {
                 {/*=================== Logo và thương hiệu ========================*/}
 
                 <Link to="/" className="navbar-brand vbc-brand">
-                    <img src={logo} alt="ViewBookCinemas Logo" className="vbc-navbar-logo" />
-                    <span className="vbc-brand-name">ViewBookCinemas</span>
+                    <img
+                        src={logo}
+                        alt="ViewBookCinemas Logo"
+                        className="vbc-navbar-logo"
+                    />
+
+                    <span className="vbc-brand-name">
+                        ViewBookCinemas
+                    </span>
                 </Link>
 
                 {/*=================== Nút menu điện thoại ========================*/}
@@ -142,27 +196,57 @@ function Navbar() {
 
                     <ul className="navbar-nav mx-auto vbc-nav-links">
                         <li className="nav-item">
-                            <NavLink to="/" end className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+                            <NavLink
+                                to="/"
+                                end
+                                className={({ isActive }) =>
+                                    `nav-link ${isActive ? "active" : ""}`
+                                }
+                            >
                                 Trang chủ
                             </NavLink>
                         </li>
+
                         <li className="nav-item">
-                            <NavLink to="/movies" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+                            <NavLink
+                                to="/movies"
+                                className={({ isActive }) =>
+                                    `nav-link ${isActive ? "active" : ""}`
+                                }
+                            >
                                 Phim
                             </NavLink>
                         </li>
+
                         <li className="nav-item">
-                            <NavLink to="/showtimes" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+                            <NavLink
+                                to="/showtimes"
+                                className={({ isActive }) =>
+                                    `nav-link ${isActive ? "active" : ""}`
+                                }
+                            >
                                 Lịch chiếu
                             </NavLink>
                         </li>
+
                         <li className="nav-item">
-                            <NavLink to="/cinemas" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+                            <NavLink
+                                to="/cinemas"
+                                className={({ isActive }) =>
+                                    `nav-link ${isActive ? "active" : ""}`
+                                }
+                            >
                                 Rạp chiếu
                             </NavLink>
                         </li>
+
                         <li className="nav-item">
-                            <NavLink to="/promotions" className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}>
+                            <NavLink
+                                to="/promotions"
+                                className={({ isActive }) =>
+                                    `nav-link ${isActive ? "active" : ""}`
+                                }
+                            >
                                 Khuyến mãi
                             </NavLink>
                         </li>
@@ -178,12 +262,24 @@ function Navbar() {
                             className={`vbc-search-box ${isSearchOpen ? "is-open" : ""}`}
                             ref={searchWrapperRef}
                         >
-                            <form className="vbc-search" onSubmit={handleSearch} role="search">
+                            <form
+                                className="vbc-search"
+                                onSubmit={handleSearch}
+                                role="search"
+                            >
                                 <button
                                     type={isSearchOpen ? "submit" : "button"}
                                     className="vbc-search-toggle"
-                                    onClick={!isSearchOpen ? () => setIsSearchOpen(true) : undefined}
-                                    aria-label={isSearchOpen ? "Tìm kiếm phim" : "Mở tìm kiếm phim"}
+                                    onClick={
+                                        !isSearchOpen
+                                            ? () => setIsSearchOpen(true)
+                                            : undefined
+                                    }
+                                    aria-label={
+                                        isSearchOpen
+                                            ? "Tìm kiếm phim"
+                                            : "Mở tìm kiếm phim"
+                                    }
                                     title="Tìm kiếm phim"
                                 >
                                     <i className="bi bi-search"></i>
@@ -196,7 +292,9 @@ function Navbar() {
                                     aria-label="Tìm kiếm phim"
                                     value={searchTerm}
                                     tabIndex={isSearchOpen ? 0 : -1}
-                                    onChange={(event) => setSearchTerm(event.target.value)}
+                                    onChange={(event) =>
+                                        setSearchTerm(event.target.value)
+                                    }
                                 />
 
                                 {isSearchOpen && (
@@ -219,64 +317,121 @@ function Navbar() {
                             type="button"
                             className="vbc-theme-toggle"
                             onClick={handleToggleTheme}
-                            aria-label={theme === "light" ? "Chuyển sang giao diện tối" : "Chuyển sang giao diện sáng"}
-                            title={theme === "light" ? "Bật giao diện tối" : "Bật giao diện sáng"}
+                            aria-label={
+                                theme === "light"
+                                    ? "Chuyển sang giao diện tối"
+                                    : "Chuyển sang giao diện sáng"
+                            }
+                            title={
+                                theme === "light"
+                                    ? "Bật giao diện tối"
+                                    : "Bật giao diện sáng"
+                            }
                         >
-                            <i className={`bi ${theme === "light" ? "bi-moon-stars-fill" : "bi-sun-fill"}`}></i>
+                            <i
+                                className={`bi ${
+                                    theme === "light"
+                                        ? "bi-moon-stars-fill"
+                                        : "bi-sun-fill"
+                                }`}
+                            ></i>
                         </button>
 
-                        {/*=================== Đăng nhập ========================*/}
+                        {/*=================== Trạng thái đã đăng nhập ========================*/}
 
-                        <div
-                            className="vbc-login-wrapper"
-                            onMouseEnter={handleShowLoginHint}
-                            onMouseLeave={() => setShowLoginHint(false)}
-                            onFocus={handleShowLoginHint}
-                            onBlur={(event) => {
-                                if (!event.currentTarget.contains(event.relatedTarget)) {
-                                    setShowLoginHint(false);
-                                }
-                            }}
-                        >
-                            <Link to="/login" className="vbc-login-button">
-                                Đăng nhập
-                            </Link>
+                        {isAuthenticated ? (
+                            <>
+                                <div
+                                    className="vbc-account-label"
+                                    title={user?.fullName || user?.username}
+                                >
+                                    <i className="bi bi-person-circle"></i>
 
-                            {/*=================== Thông báo đăng nhập ========================*/}
-
-                            {showLoginHint && !isHintDismissed && (
-                                <div className="vbc-login-hint">
-                                    <button
-                                        type="button"
-                                        className="vbc-login-hint__close"
-                                        onClick={handleDismissHint}
-                                        aria-label="Đóng thông báo"
-                                        title="Đóng thông báo"
-                                    >
-                                        <i className="bi bi-x-lg"></i>
-                                    </button>
-
-                                    <h6>Chào mừng bạn đến với VBC!</h6>
-
-                                    <p>
-                                        Đăng nhập để nhận ưu đãi thành viên,
-                                        hoặc đăng ký để trải nghiệm dịch vụ
-                                        đặt vé dễ dàng hơn.
-                                    </p>
-
-                                    <Link to="/register" className="vbc-login-hint__link">
-                                        Đăng ký ngay
-                                        <i className="bi bi-arrow-right"></i>
-                                    </Link>
+                                    <span>
+                                        Tài khoản
+                                    </span>
                                 </div>
-                            )}
-                        </div>
 
-                        {/*=================== Đăng ký ========================*/}
+                                <button
+                                    type="button"
+                                    className="vbc-logout-button"
+                                    onClick={handleLogout}
+                                >
+                                    <i className="bi bi-box-arrow-right"></i>
+                                    <span>Đăng xuất</span>
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                {/*=================== Đăng nhập ========================*/}
 
-                        <Link to="/register" className="vbc-register-button">
-                            Đăng ký
-                        </Link>
+                                <div
+                                    className="vbc-login-wrapper"
+                                    onMouseEnter={handleShowLoginHint}
+                                    onMouseLeave={() => setShowLoginHint(false)}
+                                    onFocus={handleShowLoginHint}
+                                    onBlur={(event) => {
+                                        if (
+                                            !event.currentTarget.contains(
+                                                event.relatedTarget
+                                            )
+                                        ) {
+                                            setShowLoginHint(false);
+                                        }
+                                    }}
+                                >
+                                    <Link
+                                        to="/login"
+                                        className="vbc-login-button"
+                                    >
+                                        Đăng nhập
+                                    </Link>
+
+                                    {/*=================== Thông báo đăng nhập ========================*/}
+
+                                    {showLoginHint && !isHintDismissed && (
+                                        <div className="vbc-login-hint">
+                                            <button
+                                                type="button"
+                                                className="vbc-login-hint__close"
+                                                onClick={handleDismissHint}
+                                                aria-label="Đóng thông báo"
+                                                title="Đóng thông báo"
+                                            >
+                                                <i className="bi bi-x-lg"></i>
+                                            </button>
+
+                                            <h6>
+                                                Chào mừng bạn đến với VBC!
+                                            </h6>
+
+                                            <p>
+                                                Đăng nhập để nhận ưu đãi thành viên,
+                                                hoặc đăng ký để trải nghiệm dịch vụ
+                                                đặt vé dễ dàng hơn.
+                                            </p>
+
+                                            <Link
+                                                to="/register"
+                                                className="vbc-login-hint__link"
+                                            >
+                                                Đăng ký ngay
+                                                <i className="bi bi-arrow-right"></i>
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/*=================== Đăng ký ========================*/}
+
+                                <Link
+                                    to="/register"
+                                    className="vbc-register-button"
+                                >
+                                    Đăng ký
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
