@@ -1,110 +1,107 @@
 
-/*=================== Movie Reviews Section ========================*/
+/*=================== Tổng thể MovieReviews ========================*/
 
 .movie-reviews {
-    width: 100%;
-    padding: 55px 0 35px;
+    padding: 45px 0 35px;
     color: var(--vbc-text);
 }
+
+/*=================== Tiêu đề ========================*/
 
 .movie-reviews-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 28px;
-}
-
-.movie-reviews-title {
-    margin: 0 0 8px;
-    font-family: "Oswald", sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--vbc-text);
+    margin-bottom: 25px;
 }
 
 .movie-reviews-subtitle {
+    color: var(--vbc-primary);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.movie-reviews-header h2 {
+    margin: 8px 0;
+    color: var(--vbc-text);
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.movie-reviews-header p,
+.movie-review-form-heading p {
     margin: 0;
     color: var(--vbc-text-secondary);
     font-size: 14px;
-    line-height: 1.6;
 }
 
-/*=================== Rating Overview ========================*/
+/*=================== Tổng quan đánh giá ========================*/
 
 .movie-reviews-overview {
     display: grid;
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 220px 1fr;
     gap: 35px;
     align-items: center;
-    padding: 28px 30px;
-    margin-bottom: 35px;
-    background: var(--vbc-bg-secondary);
+    padding: 28px;
+    margin-bottom: 30px;
+    background: var(--vbc-bg-card);
     border: 1px solid var(--vbc-border);
-    border-radius: 10px;
+    border-radius: 12px;
 }
 
 .movie-reviews-average {
     display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 3px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-right: 25px;
+    border-right: 1px solid var(--vbc-border);
 }
 
-.movie-reviews-average-score {
-    color: #FFC107;
+.movie-reviews-average strong {
+    color: var(--vbc-text);
     font-size: 55px;
     font-weight: 800;
-    line-height: 1;
-}
-
-.movie-reviews-average-max {
-    color: var(--vbc-text-secondary);
-    font-size: 17px;
-    font-weight: 600;
+    line-height: 1.1;
 }
 
 .movie-reviews-average-stars {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    width: 100%;
-    margin-top: 12px;
+    margin: 8px 0;
+    color: #FFC107;
+    font-size: 23px;
+    letter-spacing: 3px;
 }
 
-.movie-reviews-average-stars > span:first-child {
-    color: #FFB300;
-    font-size: 22px;
-}
-
-.movie-reviews-total {
+.movie-reviews-average > span {
     color: var(--vbc-text-secondary);
     font-size: 13px;
 }
 
-/*=================== Rating Statistics ========================*/
+/*=================== Thống kê số sao ========================*/
 
 .movie-reviews-statistics {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
 .movie-reviews-stat-row {
     display: grid;
-    grid-template-columns: 20px 1fr 25px;
-    align-items: center;
+    grid-template-columns: 45px 1fr 25px;
     gap: 12px;
+    align-items: center;
 }
 
-.movie-reviews-stat-score,
-.movie-reviews-stat-count {
-    color: var(--vbc-text-secondary);
-    font-size: 12px;
-    font-weight: 600;
+.movie-reviews-stat-label {
+    color: var(--vbc-text);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.movie-reviews-stat-label span {
+    color: #FFC107;
 }
 
 .movie-reviews-stat-track {
-    height: 7px;
+    height: 9px;
     overflow: hidden;
     background: var(--vbc-border);
     border-radius: 20px;
@@ -117,197 +114,216 @@
     transition: width 0.3s ease;
 }
 
-/*=================== Review Form ========================*/
+.movie-reviews-stat-count {
+    color: var(--vbc-text-secondary);
+    font-size: 13px;
+    text-align: right;
+}
+
+/*=================== Form đánh giá ========================*/
 
 .movie-review-form-wrapper {
-    padding: 28px 30px;
-    margin-bottom: 40px;
+    padding: 28px;
+    margin-bottom: 35px;
     background: var(--vbc-bg-card);
     border: 1px solid var(--vbc-border);
-    border-radius: 10px;
+    border-radius: 12px;
+    scroll-margin-top: 100px;
 }
 
-.movie-review-form-title {
-    margin: 0 0 24px;
-    font-size: 19px;
-    font-weight: 700;
-    color: var(--vbc-text);
+.movie-review-form-heading {
+    margin-bottom: 22px;
 }
+
+.movie-review-form-heading h3 {
+    margin-bottom: 7px;
+    color: var(--vbc-text);
+    font-size: 20px;
+    font-weight: 800;
+}
+
+/*=================== Chọn số sao ========================*/
 
 .movie-review-rating-input {
-    margin-bottom: 25px;
+    margin-bottom: 22px;
 }
 
-.movie-review-label {
+.movie-review-rating-input > label,
+.movie-review-content-input > label {
     display: block;
-    margin-bottom: 11px;
+    margin-bottom: 10px;
     color: var(--vbc-text);
     font-size: 14px;
     font-weight: 700;
 }
 
-.movie-review-score-options {
+.movie-review-star-picker {
     display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
+    align-items: center;
+    gap: 5px;
 }
 
-.movie-review-score-btn {
-    width: 39px;
-    height: 39px;
+.movie-review-star-picker button {
     padding: 0;
-    color: var(--vbc-text-secondary);
-    background: var(--vbc-bg-secondary);
-    border: 1px solid var(--vbc-border);
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 700;
+    background: transparent;
+    border: none;
+    color: var(--vbc-border-hover);
+    font-size: 34px;
+    line-height: 1;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: color 0.15s ease, transform 0.15s ease;
 }
 
-.movie-review-score-btn:hover {
+.movie-review-star-picker button.active {
     color: #FFC107;
-    border-color: #FFC107;
 }
 
-.movie-review-score-btn.active {
-    color: #171717;
-    background: #FFC107;
-    border-color: #FFC107;
+.movie-review-star-picker button:hover {
+    transform: scale(1.15);
 }
 
-.movie-review-selected-score {
-    display: inline-block;
-    margin-top: 11px;
-    color: #FFC107;
+.movie-review-star-picker > span {
+    margin-left: 12px;
+    color: var(--vbc-text-secondary);
     font-size: 13px;
     font-weight: 700;
 }
 
-.movie-review-input-group {
-    margin-bottom: 20px;
+/*=================== Nội dung đánh giá ========================*/
+
+.movie-review-content-input {
+    position: relative;
 }
 
-.movie-review-input,
-.movie-review-textarea {
+.movie-review-content-input textarea {
     display: block;
     width: 100%;
-    padding: 12px 14px;
-    color: var(--vbc-text);
+    min-height: 115px;
+    padding: 13px 15px;
+    resize: vertical;
     background: var(--vbc-bg-input);
     border: 1px solid var(--vbc-border);
-    border-radius: 7px;
-    outline: none;
-    font-family: "Plus Jakarta Sans", sans-serif;
+    border-radius: 8px;
+    color: var(--vbc-text);
+    font-family: inherit;
     font-size: 14px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    line-height: 1.6;
+    outline: none;
+    transition: border-color 0.2s ease;
 }
 
-.movie-review-input {
-    height: 46px;
-}
-
-.movie-review-textarea {
-    min-height: 115px;
-    resize: vertical;
-    line-height: 1.7;
-}
-
-.movie-review-input::placeholder,
-.movie-review-textarea::placeholder {
+.movie-review-content-input textarea::placeholder {
     color: var(--vbc-text-muted);
 }
 
-.movie-review-input:focus,
-.movie-review-textarea:focus {
+.movie-review-content-input textarea:focus {
     border-color: var(--vbc-primary);
-    box-shadow: 0 0 0 3px rgba(229, 57, 69, 0.12);
 }
 
 .movie-review-character-count {
+    display: block;
     margin-top: 7px;
     color: var(--vbc-text-muted);
     font-size: 12px;
     text-align: right;
 }
 
-.movie-review-error {
-    margin-bottom: 15px;
-    color: #FF737D;
+/*=================== Thông báo ========================*/
+
+.movie-review-message {
+    margin: 15px 0 0;
     font-size: 13px;
     font-weight: 600;
 }
 
-.movie-review-submit {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    min-width: 155px;
-    padding: 12px 20px;
-    color: #FFFFFF;
-    background: #E53945;
-    border: none;
+.movie-review-message.error {
+    color: #E53945;
+}
+
+.movie-review-message.success {
+    color: #20A464;
+}
+
+/*=================== Nút thao tác ========================*/
+
+.movie-review-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.movie-review-submit,
+.movie-review-cancel {
+    min-height: 43px;
+    padding: 0 22px;
     border-radius: 7px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
+.movie-review-submit {
+    background: var(--vbc-primary);
+    border: 1px solid var(--vbc-primary);
+    color: #FFFFFF;
+}
+
 .movie-review-submit:hover {
-    background: #C62835;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(229, 57, 69, 0.25);
+    filter: brightness(0.9);
+    transform: translateY(-1px);
 }
 
-.movie-review-submit-icon {
-    font-size: 15px;
+.movie-review-cancel {
+    background: transparent;
+    border: 1px solid var(--vbc-border);
+    color: var(--vbc-text-secondary);
 }
 
-/*=================== Review List ========================*/
+.movie-review-cancel:hover {
+    background: var(--vbc-bg-secondary);
+    color: var(--vbc-text);
+}
 
-.movie-reviews-list-header {
+/*=================== Danh sách đánh giá ========================*/
+
+.movie-reviews-list-heading {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     gap: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
-.movie-reviews-list-title {
+.movie-reviews-list-heading h3 {
     margin: 0;
     color: var(--vbc-text);
-    font-size: 19px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 800;
 }
 
-.movie-reviews-list-count {
+.movie-reviews-list-heading > span {
     color: var(--vbc-text-secondary);
     font-size: 13px;
 }
 
-.movie-reviews-list {
-    display: flex;
-    flex-direction: column;
-}
+/*=================== Từng đánh giá ========================*/
 
 .movie-review-item {
-    padding: 23px 0;
+    padding: 22px 0;
     border-bottom: 1px solid var(--vbc-border);
 }
 
 .movie-review-item:first-child {
-    padding-top: 5px;
+    border-top: 1px solid var(--vbc-border);
 }
 
 .movie-review-item-header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     gap: 15px;
-    margin-bottom: 14px;
 }
 
 .movie-review-user {
@@ -318,80 +334,81 @@
 
 .movie-review-avatar {
     display: flex;
-    align-items: center;
-    justify-content: center;
     width: 43px;
     height: 43px;
     flex-shrink: 0;
-    color: #FFFFFF;
-    background: linear-gradient(135deg, #E53945, #8E2430);
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #E53945, #A71929);
     border-radius: 50%;
+    color: #FFFFFF;
     font-size: 17px;
     font-weight: 800;
 }
 
-.movie-review-user-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.movie-review-user-name {
-    margin: 0;
+.movie-review-user h4 {
+    margin: 0 0 4px;
     color: var(--vbc-text);
     font-size: 14px;
     font-weight: 700;
 }
 
-.movie-review-date {
+.movie-review-user > div:last-child > span {
     color: var(--vbc-text-muted);
     font-size: 12px;
 }
 
-.movie-review-rating-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 10px;
+.movie-review-item-rating {
+    flex-shrink: 0;
     color: #FFC107;
-    background: rgba(255, 193, 7, 0.1);
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 800;
-    white-space: nowrap;
+    font-size: 17px;
+    letter-spacing: 2px;
 }
 
-.movie-review-rating-badge span {
-    font-size: 15px;
-}
-
-.movie-review-content {
-    margin: 0;
-    padding-left: 55px;
+.movie-review-item-content {
+    margin: 16px 0 12px;
     color: var(--vbc-text-secondary);
     font-size: 14px;
-    line-height: 1.8;
+    line-height: 1.7;
     overflow-wrap: anywhere;
 }
 
-/*=================== Empty State ========================*/
+/*=================== Nút sửa đánh giá ========================*/
+
+.movie-review-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 0;
+    background: transparent;
+    border: none;
+    color: var(--vbc-primary);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.movie-review-edit:hover {
+    text-decoration: underline;
+}
+
+/*=================== Trạng thái chưa có đánh giá ========================*/
 
 .movie-reviews-empty {
     padding: 45px 20px;
-    background: var(--vbc-bg-secondary);
-    border: 1px solid var(--vbc-border);
-    border-radius: 9px;
     text-align: center;
+    background: var(--vbc-bg-card);
+    border: 1px dashed var(--vbc-border);
+    border-radius: 10px;
 }
 
-.movie-reviews-empty-icon {
-    margin-bottom: 10px;
-    color: #FFC107;
+.movie-reviews-empty > i {
+    color: var(--vbc-text-muted);
     font-size: 35px;
 }
 
 .movie-reviews-empty h4 {
-    margin-bottom: 8px;
+    margin: 13px 0 7px;
     color: var(--vbc-text);
     font-size: 17px;
     font-weight: 700;
@@ -401,81 +418,59 @@
     margin: 0;
     color: var(--vbc-text-secondary);
     font-size: 13px;
-    line-height: 1.6;
 }
 
 /*=================== Responsive ========================*/
 
 @media (max-width: 768px) {
-
     .movie-reviews {
-        padding: 40px 0 25px;
-    }
-
-    .movie-reviews-title {
-        font-size: 24px;
+        padding-top: 30px;
     }
 
     .movie-reviews-overview {
         grid-template-columns: 1fr;
         gap: 25px;
-        padding: 23px 20px;
+        padding: 22px;
     }
 
-    .movie-reviews-average-score {
-        font-size: 47px;
+    .movie-reviews-average {
+        padding: 0 0 20px;
+        border-right: none;
+        border-bottom: 1px solid var(--vbc-border);
+    }
+
+    .movie-reviews-average strong {
+        font-size: 48px;
     }
 
     .movie-review-form-wrapper {
-        padding: 23px 20px;
+        padding: 22px;
     }
-
-    .movie-review-content {
-        padding-left: 0;
-    }
-
 }
 
 @media (max-width: 480px) {
-
-    .movie-reviews-header {
-        margin-bottom: 20px;
+    .movie-reviews-header h2 {
+        font-size: 24px;
     }
 
-    .movie-reviews-title {
-        font-size: 22px;
+    .movie-reviews-list-heading h3 {
+        font-size: 17px;
     }
 
-    .movie-reviews-subtitle {
-        font-size: 12px;
-    }
-
-    .movie-review-score-options {
-        gap: 6px;
-    }
-
-    .movie-review-score-btn {
-        width: 34px;
-        height: 36px;
-        font-size: 12px;
+    .movie-review-star-picker button {
+        font-size: 30px;
     }
 
     .movie-review-item-header {
         align-items: flex-start;
     }
 
-    .movie-review-avatar {
-        width: 38px;
-        height: 38px;
+    .movie-review-item-rating {
+        font-size: 14px;
+        letter-spacing: 0;
     }
 
-    .movie-review-user-name {
-        font-size: 13px;
+    .movie-review-form-actions > button {
+        flex: 1;
     }
-
-    .movie-review-rating-badge {
-        padding: 5px 7px;
-        font-size: 12px;
-    }
-
 }

@@ -1,82 +1,119 @@
 
+//=================== Dữ liệu đánh giá phim mẫu ========================
+
 const reviews = [
-    //=================== Movie ID 1 ========================
+    //=================== Movie 1 ========================
 
     {
         id: 1,
         movieId: 1,
-        userName: "Nguyễn Văn An",
-        rating: 9,
-        content: "Một bộ phim rất đáng xem. Nội dung hấp dẫn, hình ảnh đẹp và các phân cảnh hành động được thực hiện rất tốt.",
-        createdAt: "2026-11-09T14:30:00"
+        authorId: "demo-user",
+        userName: "Bạn",
+        rating: 5,
+        content: "Một bộ phim rất đáng xem. Nội dung hấp dẫn, diễn xuất tốt và các cảnh hành động được đầu tư.",
+        createdAt: "2026-11-05T10:30:00"
     },
     {
         id: 2,
         movieId: 1,
-        userName: "Trần Minh Tuấn",
-        rating: 8,
-        content: "Phim có nội dung thú vị, diễn xuất tốt. Một vài đoạn hơi dài nhưng nhìn chung mình vẫn rất thích.",
-        createdAt: "2026-11-08T19:20:00"
+        authorId: "user-002",
+        userName: "Minh Anh",
+        rating: 4,
+        content: "Phim có nhịp độ tốt, nhiều phân cảnh thú vị. Mình khá hài lòng với trải nghiệm xem phim.",
+        createdAt: "2026-11-06T14:20:00"
     },
     {
         id: 3,
         movieId: 1,
-        userName: "Lê Hoàng Nam",
-        rating: 10,
-        content: "Quá tuyệt vời! Đây là một trong những bộ phim mình yêu thích nhất.",
-        createdAt: "2026-11-07T20:15:00"
+        authorId: "user-003",
+        userName: "Hoàng Nam",
+        rating: 5,
+        content: "Hình ảnh đẹp, âm thanh tốt và nội dung cuốn hút từ đầu đến cuối.",
+        createdAt: "2026-11-07T19:15:00"
     },
 
-    //=================== Movie ID 2 ========================
+    //=================== Movie 2 ========================
 
     {
         id: 4,
         movieId: 2,
-        userName: "Phạm Ngọc Mai",
-        rating: 9,
-        content: "Phim hoạt hình rất dễ thương, phù hợp để xem cùng gia đình.",
-        createdAt: "2026-11-09T10:00:00"
+        authorId: "user-004",
+        userName: "Thu Hà",
+        rating: 5,
+        content: "Một bộ phim hoạt hình rất dễ thương, phù hợp để xem cùng gia đình.",
+        createdAt: "2026-11-06T09:00:00"
     },
     {
         id: 5,
         movieId: 2,
-        userName: "Đỗ Minh Khang",
-        rating: 8,
-        content: "Hình ảnh đẹp, câu chuyện thú vị và mang lại nhiều cảm xúc.",
-        createdAt: "2026-11-06T16:45:00"
+        authorId: "user-005",
+        userName: "Đức Anh",
+        rating: 4,
+        content: "Cốt truyện thú vị, hình ảnh đẹp. Một vài phân đoạn hơi dài nhưng nhìn chung rất ổn.",
+        createdAt: "2026-11-08T16:40:00"
     },
 
-    //=================== Movie ID 3 ========================
+    //=================== Movie 3 ========================
 
     {
         id: 6,
         movieId: 3,
-        userName: "Nguyễn Thảo Vy",
-        rating: 9,
-        content: "Mình rất mong chờ bộ phim này. Phần giới thiệu và trailer khá hấp dẫn.",
-        createdAt: "2026-11-05T12:00:00"
+        authorId: "user-006",
+        userName: "Ngọc Mai",
+        rating: 4,
+        content: "Ý tưởng phim khá mới lạ, cách xây dựng câu chuyện tạo được sự tò mò.",
+        createdAt: "2026-11-07T11:25:00"
     },
-
-    //=================== Movie ID 4 ========================
-
     {
         id: 7,
-        movieId: 4,
-        userName: "Trần Quốc Bảo",
-        rating: 8,
-        content: "Không khí phim khá đáng sợ, có nhiều phân cảnh tạo cảm giác hồi hộp.",
-        createdAt: "2026-11-09T21:00:00"
+        movieId: 3,
+        authorId: "user-007",
+        userName: "Quốc Bảo",
+        rating: 5,
+        content: "Một bộ phim có nhiều điểm thú vị. Mình rất mong chờ những phần tiếp theo.",
+        createdAt: "2026-11-09T20:10:00"
     },
 
-    //=================== Movie ID 5 ========================
+    //=================== Movie 4 ========================
 
     {
         id: 8,
+        movieId: 4,
+        authorId: "user-008",
+        userName: "Tuấn Kiệt",
+        rating: 4,
+        content: "Không khí phim tốt, có nhiều phân đoạn gây hồi hộp. Phù hợp với người thích thể loại kinh dị.",
+        createdAt: "2026-11-08T21:00:00"
+    },
+    {
+        id: 9,
+        movieId: 4,
+        authorId: "user-009",
+        userName: "Bảo Trân",
+        rating: 3,
+        content: "Phim có một số cảnh ấn tượng nhưng nội dung chưa thực sự khiến mình bất ngờ.",
+        createdAt: "2026-11-09T15:30:00"
+    },
+
+    //=================== Movie 5 ========================
+
+    {
+        id: 10,
         movieId: 5,
-        userName: "Lê Thanh Tâm",
-        rating: 9,
-        content: "Ý tưởng phim rất thú vị. Mình thích cách xây dựng thế giới tương lai.",
-        createdAt: "2026-11-08T15:30:00"
+        authorId: "user-010",
+        userName: "Phương Linh",
+        rating: 5,
+        content: "Phần hình ảnh rất đẹp, thế giới trong phim được xây dựng ấn tượng.",
+        createdAt: "2026-11-09T13:10:00"
+    },
+    {
+        id: 11,
+        movieId: 5,
+        authorId: "user-011",
+        userName: "Gia Huy",
+        rating: 4,
+        content: "Nội dung dễ theo dõi, phần hình ảnh và âm thanh đều tốt.",
+        createdAt: "2026-11-10T18:45:00"
     }
 ];
 
