@@ -1,0 +1,677 @@
+
+/*=================== NAVBAR ========================*/
+
+.vbc-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    min-height: 76px;
+    padding: 10px 0;
+    background-color: #171717;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.vbc-navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+/*=================== BRAND ========================*/
+
+.vbc-brand {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 2px;
+    text-decoration: none;
+}
+
+.vbc-navbar-logo {
+    display: block;
+    width: 132px;
+    height: 52px;
+    object-fit: contain;
+}
+
+.vbc-brand-name {
+    color: #ffffff;
+    font-family: "Oswald", sans-serif;
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/*=================== NAVIGATION LINKS ========================*/
+
+.vbc-nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 21px;
+    margin: 0 auto;
+}
+
+.vbc-nav-links a {
+    position: relative;
+    padding: 8px 0;
+    color: #d4d4d4;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.25s ease;
+}
+
+.vbc-nav-links a::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #e53945;
+    content: "";
+    transition: width 0.25s ease;
+}
+
+.vbc-nav-links a:hover,
+.vbc-nav-links a.active {
+    color: #ffffff;
+}
+
+.vbc-nav-links a:hover::after,
+.vbc-nav-links a.active::after {
+    width: 100%;
+}
+
+/*=================== NAVBAR ACTIONS ========================*/
+
+.vbc-navbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/*=================== SEARCH ICON + EXPANDING SEARCH ========================*/
+
+.vbc-search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    transition: width 0.28s ease, flex-basis 0.28s ease;
+}
+
+.vbc-search-box.is-open {
+    flex-basis: 225px;
+    width: 225px;
+}
+
+.vbc-search {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    padding: 0 8px;
+    overflow: hidden;
+    background-color: #292929;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.vbc-search-box:not(.is-open) .vbc-search {
+    justify-content: center;
+    padding: 0;
+    background: transparent;
+}
+
+.vbc-search:focus-within,
+.vbc-search-box.is-open .vbc-search {
+    background-color: #303030;
+    border-color: #e53945;
+    box-shadow: 0 0 0 3px rgba(229, 57, 69, 0.12);
+}
+
+.vbc-search-toggle,
+.vbc-search-close {
+    display: inline-flex;
+    flex: 0 0 30px;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 32px;
+    padding: 0;
+    color: #d4d4d4;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.vbc-search-toggle:hover,
+.vbc-search-close:hover {
+    color: #ffffff;
+    background-color: rgba(229, 57, 69, 0.2);
+}
+
+.vbc-search-toggle i { font-size: 17px; }
+.vbc-search-close i { font-size: 12px; }
+
+.vbc-search input {
+    flex: 1 1 auto;
+    width: 0;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    color: #ffffff;
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    font-size: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+}
+
+.vbc-search-box.is-open .vbc-search input {
+    width: auto;
+    padding: 0 7px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.vbc-search input::placeholder { color: #a3a3a3; }
+.vbc-search input:focus {
+    color: #ffffff;
+    background: transparent;
+    box-shadow: none;
+}
+
+/*=================== LOGIN / REGISTER BUTTONS ========================*/
+
+.vbc-login-button,
+.vbc-register-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+}
+
+.vbc-login-button {
+    color: #ffffff;
+    background-color: transparent;
+    border-color: #555555;
+}
+
+.vbc-login-button:hover {
+    color: #ffffff;
+    background-color: #303030;
+    border-color: #888888;
+}
+
+.vbc-register-button {
+    color: #ffffff;
+    background-color: #e53945;
+    border-color: #e53945;
+}
+
+.vbc-register-button:hover {
+    color: #ffffff;
+    background-color: #c92d39;
+    border-color: #c92d39;
+    transform: translateY(-1px);
+}
+
+/*=================== LOGIN HINT ========================*/
+
+.vbc-login-hint {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1100;
+    width: 230px;
+    padding: 12px 14px;
+    color: #ffffff;
+    background-color: #292929;
+    border: 1px solid #484848;
+    border-radius: 7px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-5px);
+    transition: all 0.2s ease;
+}
+
+.vbc-login-hint::before {
+    position: absolute;
+    top: -7px;
+    right: 25px;
+    width: 12px;
+    height: 12px;
+    background-color: #292929;
+    border-top: 1px solid #484848;
+    border-left: 1px solid #484848;
+    content: "";
+    transform: rotate(45deg);
+}
+
+/* Hiển thị gợi ý khi hover hoặc focus nút đăng nhập */
+
+.vbc-login-wrapper {
+    position: relative;
+}
+
+.vbc-login-wrapper:hover .vbc-login-hint,
+.vbc-login-wrapper:focus-within .vbc-login-hint,
+.vbc-login-hint:hover {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+/*=================== LOGIN HINT CONTENT ========================*/
+
+.vbc-login-hint__close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    padding: 0;
+    color: #bdbdbd;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.vbc-login-hint__close:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.vbc-login-hint h6 {
+    margin: 0 24px 7px 0;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.vbc-login-hint p {
+    margin: 0 0 10px;
+    color: #d0d0d0;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.vbc-login-hint__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #ff737d;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.vbc-login-hint__link:hover { color: #ffffff; }
+
+/*=================== THEME TOGGLE ========================*/
+
+.vbc-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    color: #facc15;
+    background-color: #292929;
+    border: 1px solid #414141;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.vbc-theme-toggle i {
+    font-size: 17px;
+}
+
+.vbc-theme-toggle:hover {
+    color: #ffffff;
+    background-color: #e53945;
+    border-color: #e53945;
+    transform: translateY(-1px);
+}
+
+.vbc-theme-toggle:focus-visible {
+    outline: 3px solid rgba(229, 57, 69, 0.3);
+    outline-offset: 2px;
+}
+
+/*=================== LIGHT THEME ========================*/
+
+[data-theme="light"] .vbc-navbar {
+    background-color: #ffffff;
+    border-bottom-color: #e5e5e5;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .vbc-brand-name {
+    color: #171717;
+}
+
+[data-theme="light"] .vbc-nav-links a {
+    color: #555555;
+}
+
+[data-theme="light"] .vbc-nav-links a:hover,
+[data-theme="light"] .vbc-nav-links a.active {
+    color: #171717;
+}
+
+[data-theme="light"] .vbc-search {
+    background-color: #f5f5f5;
+    border-color: #dedede;
+}
+
+[data-theme="light"] .vbc-search:focus-within {
+    background-color: #ffffff;
+    border-color: #e53945;
+}
+
+[data-theme="light"] .vbc-search i {
+    color: #777777;
+}
+
+[data-theme="light"] .vbc-search input {
+    color: #222222;
+}
+
+[data-theme="light"] .vbc-search input::placeholder {
+    color: #888888;
+}
+
+[data-theme="light"] .vbc-search input:focus {
+    color: #222222;
+}
+
+[data-theme="light"] .vbc-login-button {
+    color: #222222;
+    border-color: #d5d5d5;
+}
+
+[data-theme="light"] .vbc-login-button:hover {
+    color: #e53945;
+    background-color: #fff5f5;
+    border-color: #e53945;
+}
+
+[data-theme="light"] .vbc-theme-toggle {
+    color: #555555;
+    background-color: #f3f3f3;
+    border-color: #dedede;
+}
+
+[data-theme="light"] .vbc-theme-toggle:hover {
+    color: #ffffff;
+    background-color: #e53945;
+    border-color: #e53945;
+}
+
+[data-theme="light"] .vbc-login-hint {
+    color: #222222;
+    background-color: #ffffff;
+    border-color: #e5e5e5;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .vbc-login-hint::before {
+    background-color: #ffffff;
+    border-color: #e5e5e5;
+}
+
+/*=================== DARK THEME ========================*/
+
+[data-theme="dark"] .vbc-navbar {
+    background-color: #171717;
+    border-bottom-color: #303030;
+}
+
+[data-theme="dark"] .vbc-brand-name {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .vbc-nav-links a {
+    color: #d4d4d4;
+}
+
+[data-theme="dark"] .vbc-nav-links a:hover,
+[data-theme="dark"] .vbc-nav-links a.active {
+    color: #ffffff;
+}
+
+/*=================== ANIMATION ========================*/
+
+@keyframes vbc-navbar-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/*=================== RESPONSIVE ========================*/
+
+@media (max-width: 1200px) {
+    .vbc-navbar .container {
+        gap: 16px;
+    }
+
+    .vbc-nav-links {
+        gap: 17px;
+    }
+
+    .vbc-search-box.is-open {
+        flex-basis: 200px;
+        width: 200px;
+    }
+
+    .vbc-navbar-actions {
+        gap: 8px;
+    }
+}
+
+@media (max-width: 991px) {
+    .vbc-navbar {
+        padding: 10px 0;
+    }
+
+    .vbc-navbar .container {
+        flex-wrap: wrap;
+    }
+
+    .vbc-brand {
+        margin-right: auto;
+    }
+
+    .vbc-nav-links {
+        order: 3;
+        justify-content: flex-start;
+        width: 100%;
+        margin: 8px 0 0;
+        padding: 10px 0 2px;
+        overflow-x: auto;
+        gap: 24px;
+    }
+
+    .vbc-navbar-actions {
+        margin-left: auto;
+    }
+
+    .vbc-search-box.is-open {
+        flex-basis: 205px;
+        width: 205px;
+    }
+}
+
+@media (max-width: 576px) {
+    .vbc-navbar .container {
+        gap: 10px;
+    }
+
+    .vbc-navbar-logo {
+        width: 112px;
+        height: 43px;
+    }
+
+    .vbc-brand-name {
+        font-size: 19px;
+    }
+
+    .vbc-navbar-actions {
+        gap: 6px;
+    }
+
+    .vbc-search-box {
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .vbc-search-box.is-open {
+        flex-basis: 155px;
+        width: 155px;
+    }
+
+    .vbc-search { height: 36px; }
+
+    .vbc-search-toggle,
+    .vbc-search-close {
+        flex-basis: 28px;
+        width: 28px;
+        height: 30px;
+    }
+
+    .vbc-search-toggle i { font-size: 15px; }
+    .vbc-search input { font-size: 10px; }
+
+    .vbc-theme-toggle {
+        width: 36px;
+        height: 36px;
+    }
+
+    .vbc-theme-toggle i {
+        font-size: 15px;
+    }
+
+    .vbc-login-button,
+    .vbc-register-button {
+        min-height: 36px;
+        padding: 0 10px;
+        font-size: 11px;
+    }
+
+    .vbc-nav-links {
+        gap: 20px;
+    }
+
+    .vbc-nav-links a {
+        font-size: 12px;
+    }
+
+    .vbc-login-hint {
+        right: -20px;
+        width: 210px;
+    }
+}
+
+@media (max-width: 400px) {
+    .vbc-navbar-logo {
+        width: 105px;
+    }
+
+    .vbc-search-box.is-open {
+        flex-basis: 135px;
+        width: 135px;
+    }
+
+    .vbc-login-button,
+    .vbc-register-button {
+        padding: 0 8px;
+    }
+}
+
+/*=================== SEARCH + HINT ACCESSIBILITY ========================*/
+
+.vbc-search-toggle:focus-visible,
+.vbc-search-close:focus-visible,
+.vbc-login-hint__close:focus-visible {
+    outline: 2px solid #ff737d;
+    outline-offset: 2px;
+}
+
+/*=================== LIGHT THEME SEARCH AND HINT ========================*/
+
+[data-theme="light"] .vbc-search-box:not(.is-open) .vbc-search {
+    background: transparent;
+}
+
+[data-theme="light"] .vbc-search-toggle,
+[data-theme="light"] .vbc-search-close {
+    color: #555555;
+}
+
+[data-theme="light"] .vbc-search-toggle:hover,
+[data-theme="light"] .vbc-search-close:hover {
+    color: #e53945;
+    background-color: #fff0f1;
+}
+
+[data-theme="light"] .vbc-search-box.is-open .vbc-search {
+    background-color: #ffffff;
+}
+
+[data-theme="light"] .vbc-search input { color: #222222; }
+[data-theme="light"] .vbc-search input::placeholder { color: #888888; }
+
+[data-theme="light"] .vbc-login-hint h6 { color: #222222; }
+[data-theme="light"] .vbc-login-hint p { color: #555555; }
+
+[data-theme="light"] .vbc-login-hint__close { color: #666666; }
+
+[data-theme="light"] .vbc-login-hint__close:hover {
+    color: #222222;
+    background: rgba(0, 0, 0, 0.07);
+}

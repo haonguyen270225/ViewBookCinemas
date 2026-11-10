@@ -1,0 +1,173 @@
+
+.vbc-footer {
+    background: #171717;
+    color: #bdbdbd;
+    padding: 55px 0 0;
+    margin-top: 60px;
+}
+
+/* Thương hiệu */
+.vbc-footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+
+.vbc-footer-brand:hover {
+    color: #ff646e;
+}
+
+.vbc-footer-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.vbc-footer-description {
+    max-width: 350px;
+    color: #a9a9a9;
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 22px;
+}
+
+/* Tiêu đề các cột */
+.vbc-footer-heading {
+    position: relative;
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 23px;
+    padding-bottom: 12px;
+}
+
+.vbc-footer-heading::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 38px;
+    height: 3px;
+    background: #e53945;
+    border-radius: 5px;
+}
+
+/* Liên kết */
+.vbc-footer-links,
+.vbc-footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.vbc-footer-links li {
+    margin-bottom: 13px;
+}
+
+.vbc-footer-links a,
+.vbc-footer-contact a {
+    color: #bdbdbd;
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+}
+
+.vbc-footer-links a:hover,
+.vbc-footer-contact a:hover {
+    color: #ff646e;
+}
+
+.vbc-footer-links a:hover {
+    padding-left: 5px;
+}
+
+/* Thông tin liên hệ */
+.vbc-footer-contact li {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.vbc-footer-contact i {
+    color: #ff646e;
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+/* Mạng xã hội */
+.vbc-footer-social {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.vbc-social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid #444444;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 18px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.vbc-social-link:hover {
+    color: #ffffff;
+    border-color: #e53945;
+    background: #e53945;
+    transform: translateY(-4px);
+}
+
+.vbc-social-link.zalo {
+    font-size: 12px;
+    font-weight: 800;
+}
+
+/* Bản quyền */
+.vbc-footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 45px;
+    padding: 20px 0;
+    border-top: 1px solid #353535;
+}
+
+.vbc-footer-bottom p {
+    margin: 0;
+    color: #888888;
+    font-size: 13px;
+}
+
+.vbc-footer-bottom i {
+    color: #e53945;
+    margin: 0 3px;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .vbc-footer {
+        padding-top: 40px;
+        margin-top: 40px;
+    }
+
+    .vbc-footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        margin-top: 30px;
+    }
+}

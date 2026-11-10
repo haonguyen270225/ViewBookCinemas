@@ -1,0 +1,116 @@
+.movie-card {
+    height: 100%;
+    overflow: hidden;
+    background: #ffffff;
+    border-radius: 12px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.movie-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Poster */
+.movie-card__poster-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background: #eeeeee;
+}
+
+.movie-card__poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.movie-card:hover .movie-card__poster {
+    transform: scale(1.05);
+}
+
+/* Age rating */
+.movie-card__age {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 9px;
+    color: #ffffff;
+    background: #d92332;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Status */
+.movie-card__status {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding: 5px 9px;
+    color: #ffffff;
+    background: rgba(20, 20, 20, 0.85);
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Content */
+.movie-card__content {
+    padding: 14px;
+}
+
+.movie-card__title {
+    margin-bottom: 8px;
+    color: #222222;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.movie-card__genres {
+    min-height: 20px;
+    margin-bottom: 12px;
+    color: #777777;
+    font-size: 12px;
+}
+
+.movie-card__info {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 14px;
+    color: #666666;
+    font-size: 12px;
+}
+
+.movie-card__info .bi-star-fill {
+    color: #f5a623;
+}
+
+/* Button */
+.movie-card__button {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    color: #ffffff;
+    background: #d92332;
+    border-radius: 6px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.movie-card__button:hover {
+    color: #ffffff;
+    background: #b91c2a;
+}

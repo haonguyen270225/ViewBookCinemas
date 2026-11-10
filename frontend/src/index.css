@@ -1,0 +1,306 @@
+
+/*=================== Light Mode - Màu mặc định ========================*/
+
+:root,
+[data-theme="light"] {
+    color-scheme: light;
+
+    --vbc-bg: #ffffff;
+    --vbc-bg-secondary: #f7f7f7;
+    --vbc-bg-card: #ffffff;
+    --vbc-bg-input: #ffffff;
+
+    --vbc-text: #222222;
+    --vbc-text-secondary: #666666;
+    --vbc-text-muted: #888888;
+
+    --vbc-border: #e5e5e5;
+    --vbc-border-hover: #cccccc;
+
+    --vbc-primary: #e53945;
+    --vbc-primary-light: #fff1f2;
+
+    --vbc-shadow: rgba(0, 0, 0, 0.06);
+}
+
+/*=================== Dark Mode - Màu tối ========================*/
+
+[data-theme="dark"] {
+    color-scheme: dark;
+
+    --vbc-bg: #171717;
+    --vbc-bg-secondary: #202020;
+    --vbc-bg-card: #242424;
+    --vbc-bg-input: #2b2b2b;
+
+    --vbc-text: #f1f1f1;
+    --vbc-text-secondary: #c2c2c2;
+    --vbc-text-muted: #999999;
+
+    --vbc-border: #3a3a3a;
+    --vbc-border-hover: #555555;
+
+    --vbc-primary: #ff737d;
+    --vbc-primary-light: #382326;
+
+    --vbc-shadow: rgba(0, 0, 0, 0.2);
+}
+
+/*=================== Reset và thiết lập chung ========================*/
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--vbc-text);
+    background: var(--vbc-bg);
+    line-height: 1.6;
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease;
+}
+
+#root {
+    min-height: 100vh;
+    background: var(--vbc-bg);
+}
+
+a {
+    text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/*=================== Heading Font ========================*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Oswald", sans-serif;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/*=================== Button ========================*/
+
+button {
+    font-weight: 600;
+}
+
+/*=================== Selection ========================*/
+
+::selection {
+    color: #ffffff;
+    background: #e53945;
+}
+
+/*=================== Dark Mode - Trang Lịch chiếu ========================*/
+
+[data-theme="dark"] .showtimes-page {
+    background: var(--vbc-bg);
+}
+
+[data-theme="dark"] .showtimes-section h2,
+[data-theme="dark"] .showtimes-list-heading h2,
+[data-theme="dark"] .showtimes-movie-info h3,
+[data-theme="dark"] .showtimes-empty h3 {
+    color: var(--vbc-text);
+}
+
+[data-theme="dark"] .showtimes-list-heading {
+    border-color: var(--vbc-border);
+}
+
+[data-theme="dark"] .showtimes-list-heading p,
+[data-theme="dark"] .showtimes-movie-meta,
+[data-theme="dark"] .showtimes-empty p {
+    color: var(--vbc-text-muted);
+}
+
+[data-theme="dark"] .cinema-select-wrapper select {
+    border-color: var(--vbc-border);
+    background: var(--vbc-bg-input);
+    color: var(--vbc-text);
+}
+
+[data-theme="dark"] .cinema-select-icon {
+    color: #ff737d;
+}
+
+[data-theme="dark"] .cinema-select-arrow {
+    color: #cccccc;
+}
+
+[data-theme="dark"] .cinema-address {
+    color: var(--vbc-text-secondary);
+}
+
+[data-theme="dark"] .cinema-direction-link {
+    color: #ff858e;
+}
+
+[data-theme="dark"] .cinema-location-info {
+    border-color: var(--vbc-border);
+    background: var(--vbc-bg-card);
+}
+
+[data-theme="dark"] .cinema-location-info h3,
+[data-theme="dark"] .cinema-location-name {
+    color: var(--vbc-text);
+}
+
+[data-theme="dark"] .cinema-location-info .cinema-direction-link {
+    background: #383838;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .cinema-location-info .cinema-direction-link:hover {
+    background: #e53945;
+}
+
+[data-theme="dark"] .showtimes-date-item {
+    border-color: var(--vbc-border);
+    background: var(--vbc-bg-card);
+    color: var(--vbc-text-secondary);
+}
+
+[data-theme="dark"] .showtimes-date-item:hover {
+    border-color: #ff737d;
+    background: #303030;
+    color: #ff858e;
+}
+
+[data-theme="dark"] .showtimes-date-item.active {
+    border-color: #ff737d;
+    background: #171717;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .showtimes-date-item.active:hover {
+    background: #292929;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .showtimes-count {
+    background: #382326;
+    color: #ff858e;
+}
+
+[data-theme="dark"] .showtimes-movie-card {
+    border-color: var(--vbc-border);
+    background: var(--vbc-bg-card);
+}
+
+[data-theme="dark"] .showtimes-movie-card:hover {
+    border-color: var(--vbc-border-hover);
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .showtimes-movie-poster {
+    background: #333333;
+}
+
+[data-theme="dark"] .showtime-session {
+    border-color: var(--vbc-border);
+    background: #292929;
+    color: var(--vbc-text);
+}
+
+[data-theme="dark"] .showtime-session strong {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .showtime-session span {
+    color: #cccccc;
+}
+
+[data-theme="dark"] .showtime-session small {
+    color: #aaaaaa;
+}
+
+[data-theme="dark"] .showtime-session:hover {
+    border-color: #ff737d;
+    background: #171717;
+}
+
+[data-theme="dark"] .showtime-session:hover strong,
+[data-theme="dark"] .showtime-session:hover span,
+[data-theme="dark"] .showtime-session:hover small {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .showtimes-empty {
+    border-color: var(--vbc-border);
+    background: var(--vbc-bg-secondary);
+}
+
+[data-theme="dark"] .showtimes-empty > i {
+    color: #ff737d;
+}
+
+/*=================== Dark Mode - Thành phần Bootstrap ========================*/
+
+[data-theme="dark"] .dropdown-menu {
+    border-color: var(--vbc-border);
+    background: var(--vbc-bg-card);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--vbc-text);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background: #383838;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    border-color: var(--vbc-border);
+    background-color: var(--vbc-bg-input);
+    color: var(--vbc-text);
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: var(--vbc-text-muted);
+}
+
+[data-theme="dark"] .modal-content {
+    border-color: var(--vbc-border);
+    background: var(--vbc-bg-card);
+    color: var(--vbc-text);
+}
+
+/*=================== Chuyển đổi giao diện mượt mà ========================*/
+
+body,
+.vbc-navbar,
+.showtimes-page,
+.showtimes-movie-card,
+.showtimes-date-item,
+.showtime-session,
+.cinema-location-info {
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease,
+        box-shadow 0.25s ease;
+}

@@ -1,0 +1,685 @@
+
+/*=================== Trang Lịch chiếu ========================*/
+
+.showtimes-page {
+    min-height: 70vh;
+    background: #ffffff;
+}
+
+/*=================== Banner ========================*/
+
+.showtimes-hero {
+    padding: 55px 0;
+    background:
+        linear-gradient(90deg, rgba(15, 15, 15, 0.96), rgba(35, 20, 23, 0.88)),
+        #171717;
+}
+
+.showtimes-hero span {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: #ff737d;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+.showtimes-hero h1 {
+    margin-bottom: 12px;
+    color: #ffffff;
+    font-size: clamp(32px, 5vw, 46px);
+    font-weight: 700;
+}
+
+.showtimes-hero p {
+    max-width: 550px;
+    margin: 0;
+    color: #c5c5c5;
+    font-size: 15px;
+}
+
+/*=================== Nội dung chính ========================*/
+
+.showtimes-content {
+    padding-top: 42px;
+    padding-bottom: 65px;
+}
+
+.showtimes-section {
+    margin-bottom: 48px;
+}
+
+.showtimes-section h2 {
+    margin-bottom: 18px;
+    color: #252525;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.showtimes-section h2 i {
+    margin-right: 10px;
+    color: #e53945;
+}
+
+/*=================== Chọn rạp ========================*/
+
+.cinema-section {
+    margin-bottom: 55px;
+}
+
+.cinema-select-wrapper {
+    position: relative;
+    max-width: 560px;
+}
+
+.cinema-select-wrapper select {
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 48px 12px 45px;
+    appearance: none;
+    border: 1px solid #dedede;
+    border-radius: 7px;
+    outline: none;
+    background: #ffffff;
+    color: #252525;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cinema-select-wrapper select:hover {
+    border-color: #bcbcbc;
+}
+
+.cinema-select-wrapper select:focus {
+    border-color: #e53945;
+    box-shadow: 0 0 0 3px rgba(229, 57, 69, 0.1);
+}
+
+.cinema-select-icon,
+.cinema-select-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.cinema-select-icon {
+    left: 15px;
+    color: #e53945;
+    font-size: 17px;
+}
+
+.cinema-select-arrow {
+    right: 16px;
+    color: #777777;
+    font-size: 13px;
+}
+
+/*=================== Địa chỉ và chỉ đường ========================*/
+
+.cinema-address {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 14px;
+    color: #777777;
+    font-size: 13px;
+}
+
+.cinema-address > i {
+    color: #e53945;
+    font-size: 15px;
+}
+
+.cinema-direction-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 5px;
+    color: #252525;
+    font-size: 12px;
+    font-weight: 800;
+    transition: color 0.2s ease;
+}
+
+.cinema-direction-link:hover {
+    color: #e53945;
+}
+
+/*=================== Google Maps ========================*/
+
+.cinema-map {
+    position: relative;
+    margin-top: 20px;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+.cinema-map iframe {
+    display: block;
+    width: 100%;
+    height: 290px;
+    border: 0;
+}
+
+.cinema-map-button {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    background: #171717;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.cinema-map-button:hover {
+    background: #e53945;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+
+/*=================== Bố cục thông tin rạp và bản đồ ========================*/
+
+.cinema-location-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+    align-items: stretch;
+    margin-top: 20px;
+}
+
+.cinema-location-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 22px;
+    border: 1px solid #eeeeee;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.cinema-location-info h3 {
+    margin-bottom: 18px;
+    color: #252525;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.cinema-location-info h3 i {
+    margin-right: 8px;
+    color: #e53945;
+}
+
+.cinema-location-name {
+    margin-bottom: 12px;
+    color: #252525;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.cinema-location-info .cinema-address {
+    align-items: flex-start;
+    margin: 0 0 20px;
+    line-height: 1.7;
+}
+
+.cinema-location-info .cinema-address > i {
+    margin-top: 3px;
+}
+
+.cinema-location-info .cinema-direction-link {
+    margin-left: 0;
+    padding: 9px 13px;
+    border-radius: 5px;
+    background: #171717;
+    color: #ffffff;
+}
+
+.cinema-location-info .cinema-direction-link:hover {
+    background: #e53945;
+    color: #ffffff;
+}
+
+/*=================== Google Maps ========================*/
+
+.cinema-map {
+    position: relative;
+    min-width: 0;
+    margin-top: 0;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+.cinema-map iframe {
+    display: block;
+    width: 100%;
+    height: 260px;
+    border: 0;
+}
+
+/*=================== Responsive bản đồ ========================*/
+
+@media (max-width: 767px) {
+    .cinema-location-layout {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .cinema-location-info {
+        padding: 18px;
+    }
+
+    .cinema-map iframe {
+        height: 230px;
+    }
+}
+
+
+/*=================== Chọn ngày chiếu ========================*/
+
+.date-section {
+    margin-bottom: 48px;
+}
+
+.showtimes-date-list {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.showtimes-date-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 82px;
+    padding: 12px 5px;
+    border: 1px solid #e1e1e1;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #555555;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.showtimes-date-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.showtimes-date-label i {
+    font-size: 12px;
+}
+
+.showtimes-date-item strong {
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.showtimes-date-item:hover {
+    border-color: #171717;
+    background: #f5f5f5;
+    color: #171717;
+    transform: translateY(-2px);
+}
+
+.showtimes-date-item.active {
+    border-color: #171717;
+    background: #171717;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.13);
+}
+
+.showtimes-date-item.active:hover {
+    border-color: #333333;
+    background: #292929;
+    color: #ffffff;
+}
+
+.date-selected-icon {
+    position: absolute;
+    top: 7px;
+    right: 8px;
+    color: #ff737d;
+    font-size: 12px;
+}
+
+/*=================== Tiêu đề danh sách suất chiếu ========================*/
+
+.showtimes-list-section {
+    margin-top: 48px;
+}
+
+.showtimes-list-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.showtimes-list-heading h2 {
+    margin-bottom: 6px;
+    color: #252525;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.showtimes-list-heading p {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    color: #888888;
+    font-size: 13px;
+}
+
+.showtimes-list-heading p i {
+    color: #e53945;
+}
+
+.showtimes-count {
+    padding: 7px 12px;
+    border-radius: 5px;
+    background: #fff1f2;
+    color: #e53945;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/*=================== Thẻ phim và suất chiếu ========================*/
+
+.showtimes-movie-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.showtimes-movie-card {
+    display: flex;
+    gap: 22px;
+    padding: 19px;
+    border: 1px solid #eeeeee;
+    border-radius: 8px;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.showtimes-movie-card:hover {
+    border-color: #dddddd;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+}
+
+.showtimes-movie-poster {
+    flex-shrink: 0;
+    width: 120px;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #eeeeee;
+}
+
+.showtimes-movie-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.showtimes-movie-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.showtimes-movie-info h3 {
+    margin: 2px 0 10px;
+    color: #252525;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.showtimes-movie-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px 16px;
+    margin-bottom: 17px;
+    color: #777777;
+    font-size: 12px;
+}
+
+.showtimes-movie-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.showtimes-movie-meta span:first-child {
+    color: #e53945;
+    font-weight: 800;
+}
+
+/*=================== Danh sách giờ chiếu ========================*/
+
+.showtimes-session-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.showtime-session {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 132px;
+    padding: 8px 11px;
+    border: 1px solid #dedede;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #333333;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.showtime-session strong {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    color: #252525;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.showtime-session strong i {
+    color: #e53945;
+    font-size: 12px;
+}
+
+.showtime-session span {
+    margin-bottom: 4px;
+    color: #666666;
+    font-size: 10px;
+}
+
+.showtime-session small {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    color: #888888;
+    font-size: 10px;
+}
+
+.showtime-session small i {
+    font-size: 11px;
+}
+
+.session-dot {
+    margin: 0 2px;
+}
+
+.showtime-session:hover {
+    border-color: #171717;
+    background: #171717;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.showtime-session:hover strong,
+.showtime-session:hover span,
+.showtime-session:hover small {
+    color: #ffffff;
+}
+
+.showtime-session:hover strong i {
+    color: #ff737d;
+}
+
+/*=================== Không có lịch chiếu ========================*/
+
+.showtimes-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 260px;
+    padding: 30px 15px;
+    border: 1px dashed #dddddd;
+    border-radius: 9px;
+    background: #fafafa;
+    text-align: center;
+}
+
+.showtimes-empty > i {
+    margin-bottom: 15px;
+    color: #e53945;
+    font-size: 42px;
+}
+
+.showtimes-empty h3 {
+    margin-bottom: 8px;
+    color: #252525;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.showtimes-empty p {
+    margin: 0;
+    color: #888888;
+    font-size: 14px;
+}
+
+/*=================== Responsive ========================*/
+
+@media (max-width: 767px) {
+    .showtimes-hero {
+        padding: 40px 0;
+    }
+
+    .showtimes-content {
+        padding-top: 30px;
+    }
+
+    .showtimes-section {
+        margin-bottom: 38px;
+    }
+
+    .cinema-section {
+        margin-bottom: 42px;
+    }
+
+    .cinema-map iframe {
+        height: 240px;
+    }
+
+    .showtimes-date-list {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .showtimes-movie-card {
+        gap: 15px;
+        padding: 14px;
+    }
+
+    .showtimes-movie-poster {
+        width: 95px;
+    }
+
+    .showtimes-movie-info h3 {
+        font-size: 18px;
+    }
+
+    .showtimes-session-list {
+        gap: 8px;
+    }
+
+    .showtime-session {
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .showtimes-date-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .showtimes-movie-card {
+        flex-direction: column;
+    }
+
+    .showtimes-movie-poster {
+        width: 110px;
+    }
+
+    .showtimes-list-heading h2 {
+        font-size: 20px;
+    }
+
+    .cinema-map iframe {
+        height: 210px;
+    }
+
+    .cinema-map-button {
+        right: 9px;
+        bottom: 9px;
+        padding: 8px 10px;
+        font-size: 10px;
+    }
+}

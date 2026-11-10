@@ -1,0 +1,414 @@
+
+/*=================== MOVIES PAGE ========================*/
+
+.movies-page {
+    min-height: 70vh;
+    background: var(--vbc-bg);
+    color: var(--vbc-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/*=================== HERO BANNER ========================*/
+
+.movies-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 250px;
+    background:
+        linear-gradient(90deg, rgba(15, 15, 15, 0.96), rgba(35, 20, 23, 0.85)),
+        #171717;
+    overflow: hidden;
+}
+
+.movies-hero::after {
+    content: "";
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    right: 10%;
+    top: -100px;
+    border: 35px solid rgba(229, 57, 69, 0.12);
+    border-radius: 50%;
+}
+
+.movies-hero-content {
+    position: relative;
+    z-index: 1;
+    padding: 45px 0;
+}
+
+.movies-hero-label {
+    display: inline-block;
+    color: #ff737d;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+}
+
+.movies-hero-content h1 {
+    color: #ffffff;
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.movies-hero-content p {
+    max-width: 550px;
+    color: #c5c5c5;
+    font-size: 15px;
+    margin: 0;
+}
+
+/*=================== MAIN CONTENT ========================*/
+
+.movies-content {
+    padding-top: 45px;
+    padding-bottom: 65px;
+}
+
+.movies-heading {
+    margin-bottom: 25px;
+}
+
+.movies-heading h2 {
+    color: var(--vbc-text);
+    font-size: 27px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.movies-heading p {
+    color: var(--vbc-text-secondary);
+    font-size: 14px;
+    margin: 0;
+}
+
+/*=================== SEARCH AND FILTER TOOLBAR ========================*/
+
+.movies-toolbar {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    width: 100%;
+    margin-bottom: 22px;
+}
+
+/*=================== SEARCH BAR ========================*/
+
+.movies-search {
+    display: flex;
+    align-items: center;
+    flex: 1 1 420px;
+    min-width: 260px;
+    min-height: 46px;
+    padding: 4px 5px 4px 15px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 7px;
+    background: var(--vbc-bg-input);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+}
+
+.movies-search:focus-within {
+    border-color: #e53945;
+    box-shadow: 0 0 0 3px rgba(229, 57, 69, 0.1);
+}
+
+.movies-search > i {
+    flex-shrink: 0;
+    color: var(--vbc-text-muted);
+    font-size: 17px;
+}
+
+.movies-search input {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    padding: 9px 12px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--vbc-text);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 14px;
+}
+
+.movies-search input::placeholder {
+    color: var(--vbc-text-muted);
+}
+
+.movies-search input:focus {
+    background: transparent;
+    color: var(--vbc-text);
+    box-shadow: none;
+}
+
+.movies-search button {
+    flex-shrink: 0;
+    padding: 9px 18px;
+    border: none;
+    border-radius: 5px;
+    background: #e53945;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    transition: background 0.2s ease;
+}
+
+.movies-search button:hover {
+    background: #c92734;
+}
+
+/*=================== FILTER CONTROLS ========================*/
+
+.movies-filter-control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 0 0 145px;
+}
+
+.movies-filter-control label {
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.movies-filter-control select {
+    width: 100%;
+    height: 46px;
+    padding: 0 28px 0 11px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 7px;
+    outline: none;
+    background-color: var(--vbc-bg-input);
+    color: var(--vbc-text);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.3s ease;
+}
+
+.movies-filter-control select:hover,
+.movies-filter-control select:focus {
+    border-color: #e53945;
+}
+
+.movies-filter-control select option {
+    background-color: var(--vbc-bg-card);
+    color: var(--vbc-text);
+}
+
+/*=================== STATUS FILTER ========================*/
+
+.movies-status-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 17px 0;
+    margin-bottom: 28px;
+    border-top: 1px solid var(--vbc-border);
+    border-bottom: 1px solid var(--vbc-border);
+}
+
+.movies-status-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.movies-status-label {
+    color: var(--vbc-text-secondary);
+    font-size: 14px;
+    font-weight: 700;
+    margin-right: 5px;
+}
+
+.movies-filter-button {
+    padding: 8px 15px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 6px;
+    background: var(--vbc-bg-card);
+    color: var(--vbc-text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.movies-filter-button:hover {
+    border-color: #e53945;
+    color: #e53945;
+}
+
+.movies-filter-button.active {
+    border-color: #e53945;
+    background: #e53945;
+    color: #ffffff;
+}
+
+.movies-clear-button {
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--vbc-text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.movies-clear-button:hover {
+    color: #e53945;
+}
+
+.movies-clear-button i {
+    margin-right: 6px;
+}
+
+/*=================== RESULT HEADER ========================*/
+
+.movies-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.movies-result-header h3 {
+    color: var(--vbc-text);
+    font-size: 21px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.movies-result-header span {
+    color: var(--vbc-text-muted);
+    font-size: 13px;
+}
+
+.movies-result-header strong {
+    color: #e53945;
+}
+
+/*=================== MOVIE GRID ========================*/
+
+.movies-grid {
+    row-gap: 28px;
+}
+
+/*=================== EMPTY STATE ========================*/
+
+.movies-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    padding: 30px 15px;
+    text-align: center;
+    border: 1px dashed var(--vbc-border);
+    border-radius: 8px;
+    background: var(--vbc-bg-secondary);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.movies-empty > i {
+    color: #e53945;
+    font-size: 45px;
+    margin-bottom: 15px;
+}
+
+.movies-empty h4 {
+    color: var(--vbc-text);
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.movies-empty p {
+    color: var(--vbc-text-secondary);
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.movies-empty button {
+    padding: 10px 17px;
+    border: none;
+    border-radius: 6px;
+    background: #e53945;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.movies-empty button:hover {
+    background: #c92734;
+}
+
+/*=================== RESPONSIVE ========================*/
+
+@media (max-width: 1199px) {
+    .movies-toolbar {
+        flex-wrap: wrap;
+    }
+
+    .movies-search {
+        flex: 1 1 100%;
+    }
+
+    .movies-filter-control {
+        flex: 1 1 0;
+        min-width: 130px;
+    }
+}
+
+@media (max-width: 767px) {
+    .movies-hero {
+        min-height: 210px;
+    }
+
+    .movies-content {
+        padding-top: 30px;
+        padding-bottom: 45px;
+    }
+
+    .movies-heading h2 {
+        font-size: 24px;
+    }
+
+    .movies-search {
+        min-width: 100%;
+    }
+
+    .movies-filter-control {
+        flex: 1 1 calc(50% - 10px);
+    }
+
+    .movies-status-section {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .movies-result-header h3 {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .movies-filter-control {
+        flex: 1 1 100%;
+    }
+
+    .movies-search button {
+        padding: 9px 12px;
+    }
+
+    .movies-filter-button {
+        padding: 7px 11px;
+        font-size: 12px;
+    }
+}
