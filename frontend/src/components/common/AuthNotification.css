@@ -1,0 +1,167 @@
+
+/*=================== NOTIFICATION CONTAINER ========================*/
+
+.vbc-notification-container {
+    position: fixed;
+    top: 90px;
+    right: 24px;
+    z-index: 9999;
+    width: 100%;
+    max-width: 440px;
+    padding: 0 12px;
+    pointer-events: none;
+}
+
+/*=================== NOTIFICATION ========================*/
+
+.vbc-notification {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    width: 100%;
+    padding: 20px 42px 20px 18px;
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-left: 5px solid #16a34a;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+    pointer-events: auto;
+    animation: vbc-notification-show 0.3s ease;
+}
+
+/*=================== NOTIFICATION ICON ========================*/
+
+.vbc-notification__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 23px;
+}
+
+.vbc-notification--success {
+    border-left-color: #16a34a;
+}
+
+.vbc-notification--success .vbc-notification__icon {
+    color: #16a34a;
+    background-color: #dcfce7;
+}
+
+.vbc-notification--danger {
+    border-left-color: #dc2626;
+}
+
+.vbc-notification--danger .vbc-notification__icon {
+    color: #dc2626;
+    background-color: #fee2e2;
+}
+
+.vbc-notification--info {
+    border-left-color: #2563eb;
+}
+
+.vbc-notification--info .vbc-notification__icon {
+    color: #2563eb;
+    background-color: #dbeafe;
+}
+
+/*=================== NOTIFICATION CONTENT ========================*/
+
+.vbc-notification__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.vbc-notification__content h5 {
+    margin: 1px 0 6px;
+    color: #171717;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.vbc-notification__content p {
+    margin: 0;
+    color: #525252;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+/*=================== CLOSE BUTTON ========================*/
+
+.vbc-notification__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    color: #737373;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.vbc-notification__close:hover {
+    color: #171717;
+    background-color: #f0f0f0;
+}
+
+.vbc-notification__close:focus-visible {
+    outline: 2px solid #e53945;
+    outline-offset: 2px;
+}
+
+/*=================== ANIMATION ========================*/
+
+@keyframes vbc-notification-show {
+    from {
+        opacity: 0;
+        transform: translateX(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/*=================== RESPONSIVE ========================*/
+
+@media (max-width: 576px) {
+    .vbc-notification-container {
+        top: 82px;
+        right: 0;
+        max-width: 100%;
+        padding: 0 14px;
+    }
+
+    .vbc-notification {
+        gap: 12px;
+        padding: 16px 38px 16px 14px;
+    }
+
+    .vbc-notification__icon {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+
+    .vbc-notification__content h5 {
+        font-size: 15px;
+    }
+
+    .vbc-notification__content p {
+        font-size: 13px;
+    }
+}

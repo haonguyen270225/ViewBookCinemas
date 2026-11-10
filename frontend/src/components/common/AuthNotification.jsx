@@ -1,5 +1,8 @@
 
 import { useAuth } from "../../contexts/AuthContext";
+import "./AuthNotification.css";
+
+//=================== Component AuthNotification ========================
 
 function AuthNotification() {
     const {
@@ -11,33 +14,55 @@ function AuthNotification() {
         return null;
     }
 
-    const alertClass =
-        notification.type === "success"
-            ? "alert-success"
-            : notification.type === "danger"
-                ? "alert-danger"
-                : "alert-info";
+    //=================== Xác định loại thông báo ========================
+
+    const isSuccess = notification.type === "success";
+
+    const iconClass = isSuccess
+        ? "bi-check-circle-fill"
+        : notification.type === "danger"
+            ? "bi-exclamation-circle-fill"
+            : "bi-info-circle-fill";
+
+    const notificationClass = isSuccess
+        ? "success"
+        : notification.type === "danger"
+            ? "danger"
+            : "info";
+
+    const title = isSuccess
+        ? "Thành công"
+        : notification.type === "danger"
+            ? "Có lỗi xảy ra"
+            : "Thông báo";
+
+    //=================== Giao diện thông báo ========================
 
     return (
-        <div
-            className="position-fixed top-0 end-0 p-3"
-            style={{ zIndex: 9999, maxWidth: "420px", width: "100%" }}
-        >
+        <div className="vbc-notification-container">
             <div
-                className={`alert ${alertClass} alert-dismissible fade show shadow`}
+                className={`vbc-notification vbc-notification--${notificationClass}`}
                 role="alert"
+                aria-live="polite"
             >
-                <div className="d-flex align-items-center gap-2">
-                    <i className="bi bi-check-circle-fill"></i>
-                    <span>{notification.message}</span>
+                <div className="vbc-notification__icon">
+                    <i className={`bi ${iconClass}`}></i>
+                </div>
+
+                <div className="vbc-notification__content">
+                    <h5>{title}</h5>
+                    <p>{notification.message}</p>
                 </div>
 
                 <button
                     type="button"
-                    className="btn-close"
-                    aria-label="Đóng thông báo"
+                    className="vbc-notification__close"
                     onClick={clearNotification}
-                ></button>
+                    aria-label="Đóng thông báo"
+                    title="Đóng thông báo"
+                >
+                    <i className="bi bi-x-lg"></i>
+                </button>
             </div>
         </div>
     );
