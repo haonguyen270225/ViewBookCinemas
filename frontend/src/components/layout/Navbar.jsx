@@ -18,7 +18,9 @@ function Navbar() {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || "light");
+    const [theme, setTheme] = useState(() =>
+      localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light",
+    );
     const [isHintDismissed, setIsHintDismissed] = useState(
         () => localStorage.getItem(LOGIN_HINT_KEY) === "true"
     );

@@ -1,7 +1,12 @@
 
 import { Link, useParams } from "react-router-dom";
+
 import movies from "../../data/movies.js";
 import MovieReviews from "../../components/movie/MovieReviews/MovieReviews.jsx";
+
+import Navbar from "../../components/layout/Navbar.jsx";
+import Footer from "../../components/layout/Footer.jsx";
+
 import "./MovieDetail.css";
 
 //=================== Trang chi tiết phim ========================
@@ -19,127 +24,151 @@ function MovieDetail() {
 
     if (!movie) {
         return (
-            <div className="movie-detail-not-found">
-                <h2>Không tìm thấy phim!</h2>
+            <>
+                <Navbar />
 
-                <p>
-                    Phim bạn đang tìm kiếm không tồn tại.
-                </p>
+                <main className="movie-detail-not-found">
+                    <h2>Không tìm thấy phim!</h2>
 
-                <Link
-                    to="/movies"
-                    className="btn-back-movies"
-                >
-                    Quay lại danh sách phim
-                </Link>
-            </div>
+                    <p>
+                        Phim bạn đang tìm kiếm không tồn tại.
+                    </p>
+
+                    <Link
+                        to="/movies"
+                        className="btn-back-movies"
+                    >
+                        Quay lại danh sách phim
+                    </Link>
+                </main>
+
+                <Footer />
+            </>
         );
     }
 
     //=================== Hiển thị chi tiết phim ========================
 
     return (
-      <div className="movie-detail-page">
-        <div className="movie-detail-container">
-          {/*=================== Nút quay lại ========================*/}
+        <>
+            {/*=================== Navbar ========================*/}
 
-          <Link to="/movies" className="movie-detail-back">
-            <span className="movie-detail-back-arrow">←</span>
+            <Navbar />
 
-            <span>Quay lại danh sách phim</span>
-          </Link>
+            <main className="movie-detail-page">
+                <div className="movie-detail-container">
 
-          {/*=================== Thông tin phim ========================*/}
+                    {/*=================== Nút quay lại ========================*/}
 
-          <div className="movie-detail-content">
-            {/*=================== Poster phim ========================*/}
+                    <Link to="/movies" className="movie-detail-back">
+                        <span className="movie-detail-back-arrow">←</span>
 
-            <div className="movie-detail-poster">
-              <img src={movie.poster} alt={movie.title} />
-            </div>
+                        <span>Quay lại danh sách phim</span>
+                    </Link>
 
-            {/*=================== Nội dung thông tin ========================*/}
+                    {/*=================== Thông tin phim ========================*/}
 
-            <div className="movie-detail-info">
-              {/* Trạng thái phim */}
+                    <div className="movie-detail-content">
 
-              <span className="movie-detail-status">{movie.status}</span>
+                        {/*=================== Poster phim ========================*/}
 
-              {/* Tên phim */}
+                        <div className="movie-detail-poster">
+                            <img src={movie.poster} alt={movie.title} />
+                        </div>
 
-              <h1>{movie.title}</h1>
+                        {/*=================== Nội dung thông tin ========================*/}
 
-              {/* Thông tin cơ bản */}
+                        <div className="movie-detail-info">
 
-              <div className="movie-detail-meta">
-                {movie.ageRating && <span>{movie.ageRating}</span>}
+                            {/* Trạng thái phim */}
 
-                {movie.duration && <span>{movie.duration} phút</span>}
+                            <span className="movie-detail-status">
+                                {movie.status}
+                            </span>
 
-                {movie.rating != null && (
-                  <span className="movie-detail-rating">
-                    <span className="movie-detail-star">★</span>
-                    {movie.rating}/10
-                  </span>
-                )}
-              </div>
+                            {/* Tên phim */}
 
-              {/*=================== Thể loại ========================*/}
+                            <h1>{movie.title}</h1>
 
-              {Array.isArray(movie.genres) && movie.genres.length > 0 && (
-                <div className="movie-detail-genres">
-                  {movie.genres.map((genre, index) => (
-                    <span key={index}>{genre}</span>
-                  ))}
+                            {/* Thông tin cơ bản */}
+
+                            <div className="movie-detail-meta">
+                                {movie.ageRating && (
+                                    <span>{movie.ageRating}</span>
+                                )}
+
+                                {movie.duration && (
+                                    <span>{movie.duration} phút</span>
+                                )}
+
+                                {movie.rating != null && (
+                                    <span className="movie-detail-rating">
+                                        <span className="movie-detail-star">★</span>
+                                        {movie.rating}/10
+                                    </span>
+                                )}
+                            </div>
+
+                            {/*=================== Thể loại ========================*/}
+
+                            {Array.isArray(movie.genres) && movie.genres.length > 0 && (
+                                <div className="movie-detail-genres">
+                                    {movie.genres.map((genre, index) => (
+                                        <span key={index}>{genre}</span>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/*=================== Nội dung phim ========================*/}
+
+                            <div className="movie-detail-description">
+                                <h3>Nội dung phim</h3>
+
+                                <p>
+                                    {movie.description ||
+                                        "Thông tin nội dung phim đang được cập nhật."}
+                                </p>
+                            </div>
+
+                            {/*=================== Nút đặt vé ========================*/}
+
+                            <Link
+                                to="/showtimes"
+                                className="movie-detail-booking"
+                            >
+                                Đặt vé ngay
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/*=================== Trailer phim ========================*/}
+
+                    {movie.trailerUrl && (
+                        <div className="movie-detail-trailer">
+                            <h2>Trailer phim</h2>
+
+                            <video
+                                src={movie.trailerUrl}
+                                controls
+                                preload="metadata"
+                            />
+                        </div>
+                    )}
                 </div>
-              )}
 
-              {/*=================== Nội dung phim ========================*/}
+                {/*=================== Movie Reviews ========================*/}
 
-              <div className="movie-detail-description">
-                <h3>Nội dung phim</h3>
+                <section className="movie-detail-reviews-section">
+                    <div className="container">
+                        <MovieReviews movieId={movie.id} />
+                    </div>
+                </section>
+            </main>
 
-                <p>
-                  {movie.description ||
-                    "Thông tin nội dung phim đang được cập nhật."}
-                </p>
-              </div>
+            {/*=================== Footer ========================*/}
 
-              {/*=================== Nút đặt vé ========================*/}
-
-              <Link to="/showtimes" className="movie-detail-booking">
-                Đặt vé ngay
-              </Link>
-            </div>
-          </div>
-
-          {/*=================== Trailer phim ========================*/}
-
-          {movie.trailerUrl && (
-            <div className="movie-detail-trailer">
-              <h2>Trailer phim</h2>
-
-              <video src={movie.trailerUrl} controls preload="metadata" />
-            </div>
-          )}
-
-          {/*=================== Movie Detail ========================*/}
-
-          <section className="movie-detail-section">
-            <div className="container">
-              {/* Giữ nguyên toàn bộ JSX chi tiết phim hiện tại */}
-            </div>
-          </section>
-
-          {/*=================== Movie Reviews ========================*/}
-
-          <section className="movie-detail-reviews-section">
-            <div className="container">
-              <MovieReviews movieId={movie.id} />
-            </div>
-          </section>
-        </div>
-      </div>
+            <Footer />
+        </>
     );
 }
 
