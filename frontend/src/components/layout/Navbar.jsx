@@ -337,101 +337,105 @@ function Navbar() {
                             ></i>
                         </button>
 
-                        {/*=================== Trạng thái đã đăng nhập ========================*/}
+                                                    
+                            
+{/*=================== Trạng thái tài khoản ========================*/}
 
-                        {isAuthenticated ? (
-                            <>
-                                <div
-                                    className="vbc-account-label"
-                                    title={user?.fullName || user?.username}
-                                >
-                                    <i className="bi bi-person-circle"></i>
+{isAuthenticated ? (
+    <>
+        {/*=================== Tài khoản ========================*/}
 
-                                    <span>
-                                        Tài khoản
-                                    </span>
-                                </div>
+        <Link
+            to="/account"
+            className="vbc-account-label"
+            title={user?.fullName || user?.username}
+        >
+            <i className="bi bi-person-circle"></i>
 
-                                <button
-                                    type="button"
-                                    className="vbc-logout-button"
-                                    onClick={handleLogout}
-                                >
-                                    <i className="bi bi-box-arrow-right"></i>
-                                    <span>Đăng xuất</span>
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                {/*=================== Đăng nhập ========================*/}
+            <span>Tài khoản</span>
+        </Link>
 
-                                <div
-                                    className="vbc-login-wrapper"
-                                    onMouseEnter={handleShowLoginHint}
-                                    onMouseLeave={() => setShowLoginHint(false)}
-                                    onFocus={handleShowLoginHint}
-                                    onBlur={(event) => {
-                                        if (
-                                            !event.currentTarget.contains(
-                                                event.relatedTarget
-                                            )
-                                        ) {
-                                            setShowLoginHint(false);
-                                        }
-                                    }}
-                                >
-                                    <Link
-                                        to="/login"
-                                        className="vbc-login-button"
-                                    >
-                                        Đăng nhập
-                                    </Link>
+        {/*=================== Đăng xuất ========================*/}
 
-                                    {/*=================== Thông báo đăng nhập ========================*/}
+        <button
+            type="button"
+            className="vbc-logout-button"
+            onClick={handleLogout}
+        >
+            <i className="bi bi-box-arrow-right"></i>
+            <span>Đăng xuất</span>
+        </button>
+    </>
+) : (
+    <>
+        {/*=================== Đăng nhập ========================*/}
 
-                                    {showLoginHint && !isHintDismissed && (
-                                        <div className="vbc-login-hint">
-                                            <button
-                                                type="button"
-                                                className="vbc-login-hint__close"
-                                                onClick={handleDismissHint}
-                                                aria-label="Đóng thông báo"
-                                                title="Đóng thông báo"
-                                            >
-                                                <i className="bi bi-x-lg"></i>
-                                            </button>
+        <div
+            className="vbc-login-wrapper"
+            onMouseEnter={handleShowLoginHint}
+            onMouseLeave={() => setShowLoginHint(false)}
+            onFocus={handleShowLoginHint}
+            onBlur={(event) => {
+                if (
+                    !event.currentTarget.contains(event.relatedTarget)
+                ) {
+                    setShowLoginHint(false);
+                }
+            }}
+        >
+            <Link
+                to="/login"
+                className="vbc-login-button"
+            >
+                Đăng nhập
+            </Link>
 
-                                            <h6>
-                                                Chào mừng bạn đến với VBC!
-                                            </h6>
+            {/*=================== Thông báo đăng nhập ========================*/}
 
-                                            <p>
-                                                Đăng nhập để nhận ưu đãi thành viên,
-                                                hoặc đăng ký để trải nghiệm dịch vụ
-                                                đặt vé dễ dàng hơn.
-                                            </p>
+            {showLoginHint && !isHintDismissed && (
+                <div className="vbc-login-hint">
+                    <button
+                        type="button"
+                        className="vbc-login-hint__close"
+                        onClick={handleDismissHint}
+                        aria-label="Đóng thông báo"
+                        title="Đóng thông báo"
+                    >
+                        <i className="bi bi-x-lg"></i>
+                    </button>
 
-                                            <Link
-                                                to="/register"
-                                                className="vbc-login-hint__link"
-                                            >
-                                                Đăng ký ngay
-                                                <i className="bi bi-arrow-right"></i>
-                                            </Link>
-                                        </div>
-                                    )}
-                                </div>
+                    <h6>
+                        Chào mừng bạn đến với VBC!
+                    </h6>
 
-                                {/*=================== Đăng ký ========================*/}
+                    <p>
+                        Đăng nhập để nhận ưu đãi thành viên,
+                        hoặc đăng ký để trải nghiệm dịch vụ
+                        đặt vé dễ dàng hơn.
+                    </p>
 
-                                <Link
-                                    to="/register"
-                                    className="vbc-register-button"
-                                >
-                                    Đăng ký
-                                </Link>
-                            </>
-                        )}
+                    <Link
+                        to="/register"
+                        className="vbc-login-hint__link"
+                    >
+                        Đăng ký ngay
+                        <i className="bi bi-arrow-right"></i>
+                    </Link>
+                </div>
+            )}
+        </div>
+
+        {/*=================== Đăng ký ========================*/}
+
+        <Link
+            to="/register"
+            className="vbc-register-button"
+        >
+            Đăng ký
+        </Link>
+    </>
+)}
+
                     </div>
                 </div>
             </div>

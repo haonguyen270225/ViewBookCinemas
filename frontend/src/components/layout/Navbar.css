@@ -686,13 +686,25 @@
     gap: 8px;
     min-height: 40px;
     padding: 0 13px;
+
     color: #ffffff;
     background-color: #292929;
     border: 1px solid #414141;
     border-radius: 7px;
+
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.vbc-account-label:hover {
+    color: #ffffff;
+    background-color: #dc3545;
+    border-color: #dc3545;
 }
 
 .vbc-account-label i {
