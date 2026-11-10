@@ -1,25 +1,37 @@
+
 import { Link } from "react-router-dom";
 import MovieCard from "./MovieCard.jsx";
 import "./MovieList.css";
+
+//=================== Danh sách phim ========================
 
 function MovieList({
     title,
     subtitle,
     movies = [],
-    emptyMessage = "Hiện chưa có phim để hiển thị.",
-    viewAllLink
+    emptyMessage = "Hiện chưa có phim trong danh sách.",
+    viewAllLink,
+    titleTone = "default"
 }) {
     return (
-        <section className="movie-list-section">
+        <div className="movie-list-section">
+
+            {/*=================== Tiêu đề danh sách ========================*/}
+
             <div className="movie-list-header">
-                <div>
-                    <h2 className="movie-list-title">{title}</h2>
+
+                <div className="movie-list-heading">
+
+                    <h2 className={`movie-list-title movie-list-title--${titleTone}`}>
+                        {title}
+                    </h2>
 
                     {subtitle && (
                         <p className="movie-list-subtitle">
                             {subtitle}
                         </p>
                     )}
+
                 </div>
 
                 {viewAllLink && (
@@ -27,14 +39,18 @@ function MovieList({
                         to={viewAllLink}
                         className="movie-list-view-all"
                     >
-                        Xem tất cả
-                        <i className="bi bi-arrow-right"></i>
+                        Xem tất cả →
                     </Link>
                 )}
+
             </div>
 
+            {/*=================== Danh sách thẻ phim ========================*/}
+
             {movies.length > 0 ? (
+
                 <div className="row g-4">
+
                     {movies.map((movie) => (
                         <div
                             className="col-6 col-md-4 col-lg-3"
@@ -43,13 +59,18 @@ function MovieList({
                             <MovieCard movie={movie} />
                         </div>
                     ))}
+
                 </div>
+
             ) : (
+
                 <div className="movie-list-empty">
                     {emptyMessage}
                 </div>
+
             )}
-        </section>
+
+        </div>
     );
 }
 

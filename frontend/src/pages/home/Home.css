@@ -138,3 +138,19 @@
         padding: 30px 20px;
     }
 }
+
+
+
+/*=================== Khoảng cách các khu vực phim ========================*/
+
+.home-movies {
+    padding: 12px 0;
+}
+
+/*=================== Responsive ========================*/
+
+@media (max-width: 768px) {
+    .home-movies {
+        padding: 8px 0;
+    }
+}
