@@ -1,0 +1,167 @@
+
+/*========================= Profile Container ========================*/
+
+.account-profile {
+    padding: 28px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 13px;
+    background: var(--vbc-bg-card);
+    box-shadow: 0 4px 18px var(--vbc-shadow);
+}
+
+/*========================= Header ========================*/
+
+.account-profile-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 28px;
+}
+
+.account-content-label {
+    color: var(--vbc-primary);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+}
+
+.account-profile-header h2 {
+    margin: 7px 0;
+    color: var(--vbc-text);
+    font-size: 23px;
+}
+
+.account-profile-header p {
+    margin: 0;
+    color: var(--vbc-text-secondary);
+    font-size: 13px;
+}
+
+/*========================= Inputs ========================*/
+
+.account-profile .form-label,
+.account-password .form-label {
+    margin-bottom: 8px;
+    color: var(--vbc-text);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.account-input {
+    min-height: 46px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 8px;
+    background-color: var(--vbc-bg-input);
+    color: var(--vbc-text);
+    font-size: 13px;
+}
+
+.account-input:focus {
+    border-color: var(--vbc-primary);
+    background-color: var(--vbc-bg-input);
+    color: var(--vbc-text);
+    box-shadow: 0 0 0 3px var(--vbc-primary-light);
+}
+
+.account-input:disabled {
+    border-color: var(--vbc-border);
+    background-color: var(--vbc-bg-secondary);
+    color: var(--vbc-text-secondary);
+    opacity: 1;
+}
+
+.account-input::placeholder {
+    color: var(--vbc-text-muted);
+}
+
+.account-profile-note {
+    display: block;
+    margin-top: 6px;
+    color: var(--vbc-text-muted);
+    font-size: 11px;
+}
+
+/*========================= Buttons ========================*/
+
+.account-profile-edit,
+.account-profile-save,
+.account-profile-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 9px 17px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.account-profile-edit {
+    border: 1px solid var(--vbc-primary);
+    background: transparent;
+    color: var(--vbc-primary);
+}
+
+.account-profile-edit:hover {
+    background: var(--vbc-primary);
+    color: #ffffff;
+}
+
+.account-profile-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 27px;
+    padding-top: 20px;
+    border-top: 1px solid var(--vbc-border);
+}
+
+.account-profile-save {
+    border: 1px solid var(--vbc-primary);
+    background: var(--vbc-primary);
+    color: #ffffff;
+}
+
+.account-profile-save:hover {
+    filter: brightness(0.92);
+}
+
+.account-profile-cancel {
+    border: 1px solid var(--vbc-border);
+    background: var(--vbc-bg-secondary);
+    color: var(--vbc-text);
+}
+
+.account-profile-cancel:hover {
+    border-color: var(--vbc-border-hover);
+}
+
+.account-profile-save:disabled,
+.account-profile-cancel:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/*========================= Responsive ========================*/
+
+@media (max-width: 575.98px) {
+    .account-profile {
+        padding: 19px;
+    }
+
+    .account-profile-header {
+        flex-direction: column;
+    }
+
+    .account-profile-actions {
+        flex-direction: column-reverse;
+    }
+
+    .account-profile-actions button {
+        width: 100%;
+    }
+}

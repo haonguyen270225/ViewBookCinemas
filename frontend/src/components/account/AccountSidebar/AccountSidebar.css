@@ -1,0 +1,154 @@
+
+/*========================= Account Sidebar ========================*/
+
+.account-sidebar {
+    position: sticky;
+    top: 100px;
+    padding: 25px 18px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 14px;
+    background: var(--vbc-bg-card);
+    box-shadow: 0 4px 18px var(--vbc-shadow);
+}
+
+/*========================= User Information ========================*/
+
+.account-sidebar-user {
+    text-align: center;
+}
+
+.account-sidebar-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    background: var(--vbc-primary);
+    color: #ffffff;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.account-sidebar-user h3 {
+    margin: 0 0 5px;
+    color: var(--vbc-text);
+    font-size: 19px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.account-sidebar-user p {
+    margin: 0 0 12px;
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.account-sidebar-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    border-radius: 20px;
+    background: var(--vbc-primary-light);
+    color: var(--vbc-primary);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/*========================= Divider ========================*/
+
+.account-sidebar-divider {
+    height: 1px;
+    margin: 24px 0;
+    background: var(--vbc-border);
+}
+
+/*========================= Menu ========================*/
+
+.account-sidebar-heading {
+    display: block;
+    margin: 0 0 12px 10px;
+    color: var(--vbc-text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.account-sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.account-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--vbc-text-secondary);
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.account-sidebar-item > i:first-child {
+    font-size: 17px;
+}
+
+.account-sidebar-item:hover {
+    background: var(--vbc-bg-secondary);
+    color: var(--vbc-text);
+}
+
+.account-sidebar-item.active {
+    border-color: var(--vbc-primary-light);
+    background: var(--vbc-primary-light);
+    color: var(--vbc-primary);
+}
+
+.account-sidebar-arrow {
+    margin-left: auto;
+    font-size: 12px;
+}
+
+/*========================= Sidebar Note ========================*/
+
+.account-sidebar-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 25px;
+    padding: 12px;
+    border-radius: 9px;
+    background: var(--vbc-bg-secondary);
+    color: var(--vbc-text-secondary);
+}
+
+.account-sidebar-note i {
+    margin-top: 2px;
+    color: var(--vbc-primary);
+}
+
+.account-sidebar-note p {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/*========================= Responsive ========================*/
+
+@media (max-width: 991.98px) {
+    .account-sidebar {
+        position: static;
+    }
+}

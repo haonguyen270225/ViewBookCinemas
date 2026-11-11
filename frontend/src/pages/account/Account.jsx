@@ -2,8 +2,20 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
+//========================= Import Layout ========================
+
 import Navbar from "../../components/layout/Navbar.jsx";
 import Footer from "../../components/layout/Footer.jsx";
+
+//========================= Import Account Components ========================
+
+import AccountSidebar from "../../components/account/AccountSidebar/AccountSidebar.jsx";
+import AccountOverview from "../../components/account/AccountOverview/AccountOverview.jsx";
+import AccountProfile from "../../components/account/AccountProfile/AccountProfile.jsx";
+import AccountPassword from "../../components/account/AccountPassword/AccountPassword.jsx";
+
+//========================= Import Context ========================
+
 import { useAuth } from "../../contexts/AuthContext.jsx";
 
 //========================= Import CSS ========================
@@ -13,6 +25,7 @@ import "./Account.css";
 //========================= Component Account ========================
 
 function Account() {
+
     const {
         user,
         isAuthenticated,
@@ -20,6 +33,10 @@ function Account() {
         updatePassword,
         showNotification
     } = useAuth();
+
+    //========================= State điều hướng ========================
+
+    const [activeTab, setActiveTab] = useState("overview");
 
     //========================= State thông tin cá nhân ========================
 
@@ -196,21 +213,37 @@ function Account() {
         }
     };
 
-    //========================= Lấy chữ cái đại diện ========================
+    //========================= Nội dung theo tab ========================
 
-    const getInitials = (fullName) => {
-        if (!fullName) return "U";
+    const renderAccountContent = () => {
+        switch (activeTab) {
+            case "profile":
+                return (
+                    <AccountProfile
+                        profileData={profileData}
+                        isEditing={isEditing}
+                        isSaving={isSaving}
+                        onProfileChange={handleProfileChange}
+                        onEdit={() => setIsEditing(true)}
+                        onCancel={handleCancelEdit}
+                        onSave={handleSaveProfile}
+                    />
+                );
 
-        const words = fullName.trim().split(/\s+/);
+            case "password":
+                return (
+                    <AccountPassword
+                        passwordData={passwordData}
+                        isChangingPassword={isChangingPassword}
+                        onPasswordChange={handlePasswordChange}
+                        onChangePassword={handleChangePassword}
+                    />
+                );
 
-        if (words.length === 1) {
-            return words[0].charAt(0).toUpperCase();
+            case "overview":
+            default:
+                return <AccountOverview user={user} />;
         }
-
-        return (
-            words[0].charAt(0) +
-            words[words.length - 1].charAt(0)
-        ).toUpperCase();
     };
 
     //========================= Render giao diện ========================
@@ -220,11 +253,12 @@ function Account() {
             <Navbar />
 
             <main className="account-page">
-                <div className="container py-5">
+
+                <div className="container account-container">
 
                     {/*========================= Page Header ========================*/}
 
-                    <div className="account-header mb-4">
+                    <div className="account-header">
                         <div>
                             <span className="account-subtitle">
                                 VIEWBOOKCINEMAS
@@ -233,303 +267,41 @@ function Account() {
                             <h1>Tài khoản của tôi</h1>
 
                             <p>
-                                Quản lý thông tin cá nhân và bảo mật tài khoản của bạn.
+                                Quản lý thông tin cá nhân và bảo mật
+                                tài khoản của bạn.
                             </p>
                         </div>
                     </div>
 
-                    {/*========================= Account Overview ========================*/}
+                    {/*========================= Account Layout ========================*/}
 
-                    <section className="account-overview mb-4">
-                        <div className="account-avatar">
-                            {getInitials(user.fullName)}
+                    <div className="row g-4">
+
+                        <div className="col-lg-3">
+
+                            <AccountSidebar
+                                user={user}
+                                activeTab={activeTab}
+                                onTabChange={(tab) => {
+                                    setActiveTab(tab);
+                                    setIsEditing(false);
+                                }}
+                            />
+
                         </div>
 
-                        <div className="account-overview-info">
-                            <h2>{user.fullName}</h2>
-                            <p>{user.email}</p>
+                        <div className="col-lg-9">
 
-                            <span className="account-status">
-                                <i className="bi bi-check-circle-fill"></i>
-                                Tài khoản đang hoạt động
-                            </span>
+                            <div className="account-content">
+                                {renderAccountContent()}
+                            </div>
+
                         </div>
 
-                        <div className="account-username">
-                            <span>Tên đăng nhập</span>
-                            <strong>{user.username}</strong>
-                        </div>
-                    </section>
-
-                    {/*========================= Profile Information ========================*/}
-
-                    <section className="account-section mb-4">
-
-                        <div className="account-section-header">
-                            <div>
-                                <h3>
-                                    <i className="bi bi-person-circle"></i>
-                                    Thông tin cá nhân
-                                </h3>
-
-                                <p>
-                                    Thông tin cơ bản được sử dụng trong tài khoản của bạn.
-                                </p>
-                            </div>
-
-                            {!isEditing && (
-                                <button
-                                    type="button"
-                                    className="account-edit-button"
-                                    onClick={() => setIsEditing(true)}
-                                >
-                                    <i className="bi bi-pencil-square"></i>
-                                    Chỉnh sửa
-                                </button>
-                            )}
-                        </div>
-
-                        <form onSubmit={handleSaveProfile}>
-                            <div className="row g-3">
-
-                                {/*========================= Full Name ========================*/}
-
-                                <div className="col-md-6">
-                                    <label className="form-label">
-                                        Họ và tên
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        name="fullName"
-                                        className="form-control account-input"
-                                        value={profileData.fullName}
-                                        onChange={handleProfileChange}
-                                        disabled={!isEditing}
-                                        maxLength={100}
-                                        required
-                                    />
-                                </div>
-
-                                {/*========================= Username ========================*/}
-
-                                <div className="col-md-6">
-                                    <label className="form-label">
-                                        Tên đăng nhập
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        className="form-control account-input"
-                                        value={profileData.username}
-                                        disabled
-                                    />
-
-                                    <small className="account-field-note">
-                                        Tên đăng nhập không thể thay đổi.
-                                    </small>
-                                </div>
-
-                                {/*========================= Email ========================*/}
-
-                                <div className="col-md-6">
-                                    <label className="form-label">
-                                        Email
-                                    </label>
-
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        className="form-control account-input"
-                                        value={profileData.email}
-                                        onChange={handleProfileChange}
-                                        disabled={!isEditing}
-                                        maxLength={150}
-                                        required
-                                    />
-                                </div>
-
-                                {/*========================= Phone Number ========================*/}
-
-                                <div className="col-md-6">
-                                    <label className="form-label">
-                                        Số điện thoại
-                                    </label>
-
-                                    <input
-                                        type="tel"
-                                        name="phoneNumber"
-                                        className="form-control account-input"
-                                        value={profileData.phoneNumber}
-                                        onChange={handleProfileChange}
-                                        disabled={!isEditing}
-                                        maxLength={15}
-                                        placeholder="Nhập số điện thoại"
-                                    />
-                                </div>
-
-                                {/*========================= Date Of Birth ========================*/}
-
-                                <div className="col-md-6">
-                                    <label className="form-label">
-                                        Ngày sinh
-                                    </label>
-
-                                    <input
-                                        type="date"
-                                        name="dateOfBirth"
-                                        className="form-control account-input"
-                                        value={profileData.dateOfBirth}
-                                        onChange={handleProfileChange}
-                                        disabled={!isEditing}
-                                        max={new Date().toISOString().split("T")[0]}
-                                    />
-                                </div>
-
-                                {/*========================= Gender ========================*/}
-
-                                <div className="col-md-6">
-                                    <label className="form-label">
-                                        Giới tính
-                                    </label>
-
-                                    <select
-                                        name="gender"
-                                        className="form-select account-input"
-                                        value={profileData.gender}
-                                        onChange={handleProfileChange}
-                                        disabled={!isEditing}
-                                    >
-                                        <option value="">Chưa cập nhật</option>
-                                        <option value="Male">Nam</option>
-                                        <option value="Female">Nữ</option>
-                                        <option value="Other">Khác</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/*========================= Profile Actions ========================*/}
-
-                            {isEditing && (
-                                <div className="account-form-actions">
-                                    <button
-                                        type="button"
-                                        className="account-cancel-button"
-                                        onClick={handleCancelEdit}
-                                        disabled={isSaving}
-                                    >
-                                        Hủy
-                                    </button>
-
-                                    <button
-                                        type="submit"
-                                        className="account-save-button"
-                                        disabled={isSaving}
-                                    >
-                                        {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
-                                    </button>
-                                </div>
-                            )}
-                        </form>
-                    </section>
-
-                    {/*========================= Change Password ========================*/}
-
-                    <section className="account-section">
-
-                        <div className="account-section-header">
-                            <div>
-                                <h3>
-                                    <i className="bi bi-shield-lock"></i>
-                                    Bảo mật tài khoản
-                                </h3>
-
-                                <p>
-                                    Thay đổi mật khẩu để bảo vệ tài khoản của bạn.
-                                </p>
-                            </div>
-                        </div>
-
-                        <form onSubmit={handleChangePassword}>
-                            <div className="row g-3">
-
-                                {/*========================= Current Password ========================*/}
-
-                                <div className="col-md-12">
-                                    <label className="form-label">
-                                        Mật khẩu hiện tại
-                                    </label>
-
-                                    <input
-                                        type="password"
-                                        name="oldPassword"
-                                        className="form-control account-input"
-                                        value={passwordData.oldPassword}
-                                        onChange={handlePasswordChange}
-                                        placeholder="Nhập mật khẩu hiện tại"
-                                        autoComplete="current-password"
-                                        required
-                                    />
-                                </div>
-
-                                {/*========================= New Password ========================*/}
-
-                                <div className="col-md-6">
-                                    <label className="form-label">
-                                        Mật khẩu mới
-                                    </label>
-
-                                    <input
-                                        type="password"
-                                        name="newPassword"
-                                        className="form-control account-input"
-                                        value={passwordData.newPassword}
-                                        onChange={handlePasswordChange}
-                                        placeholder="Tối thiểu 8 ký tự"
-                                        minLength={8}
-                                        autoComplete="new-password"
-                                        required
-                                    />
-                                </div>
-
-                                {/*========================= Confirm Password ========================*/}
-
-                                <div className="col-md-6">
-                                    <label className="form-label">
-                                        Xác nhận mật khẩu mới
-                                    </label>
-
-                                    <input
-                                        type="password"
-                                        name="confirmPassword"
-                                        className="form-control account-input"
-                                        value={passwordData.confirmPassword}
-                                        onChange={handlePasswordChange}
-                                        placeholder="Nhập lại mật khẩu mới"
-                                        minLength={8}
-                                        autoComplete="new-password"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            {/*========================= Password Actions ========================*/}
-
-                            <div className="account-form-actions">
-                                <button
-                                    type="submit"
-                                    className="account-save-button"
-                                    disabled={isChangingPassword}
-                                >
-                                    {isChangingPassword
-                                        ? "Đang cập nhật..."
-                                        : "Đổi mật khẩu"}
-                                </button>
-                            </div>
-                        </form>
-                    </section>
+                    </div>
 
                 </div>
+
             </main>
 
             <Footer />
