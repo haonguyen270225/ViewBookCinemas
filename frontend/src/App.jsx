@@ -15,6 +15,7 @@ import ForgotPassword from "./pages/forgot-password/ForgotPassword.jsx";
 import MovieDetail from "./pages/movie-detail/MovieDetail.jsx";
 import Account from "./pages/account/Account.jsx";
 import Booking from "./pages/booking/Booking.jsx";
+import AdminRoutes from "./admin/routes/AdminRoutes.jsx";
 
 //========================= Components ========================
 import AuthNotification from "./components/common/AuthNotification.jsx";
@@ -41,7 +42,8 @@ function App() {
             <Route path="/account" element={<Account />} />
             {/*========================= Đặt vé ========================*/}
             <Route path="/booking/:id" element={<Booking />} />
-
+            {/*========================= Khu vực Admin ========================*/}
+            <Route path="/admin/*" element={<AdminRoutes />} />
             {/*========================= Xác thực ========================*/}
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
