@@ -1,0 +1,370 @@
+
+/*=================== Nền cửa sổ thanh toán ========================*/
+
+.payment-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.payment-modal {
+    position: relative;
+    width: 100%;
+    max-width: 470px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 30px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 14px;
+    background: var(--vbc-bg-card);
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.3);
+}
+
+.payment-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--vbc-text-secondary);
+}
+
+.payment-modal-close:hover {
+    border-color: var(--vbc-primary);
+    color: var(--vbc-primary);
+}
+
+/*=================== Tiêu đề ========================*/
+
+.payment-modal-heading {
+    text-align: center;
+}
+
+.payment-modal-heading h3 {
+    margin: 15px 0 7px;
+    color: var(--vbc-text);
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.payment-modal-heading p {
+    margin: 0;
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.payment-modal-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #a50064;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.payment-modal-brand span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: #a50064;
+    color: #ffffff;
+}
+
+.payment-card-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: #5269a4;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+}
+
+.payment-card-brand i {
+    font-size: 25px;
+}
+
+/*=================== Số tiền thanh toán ========================*/
+
+.payment-modal-amount {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin: 22px 0;
+    padding: 15px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 9px;
+    background: var(--vbc-bg);
+    text-align: center;
+}
+
+.payment-modal-amount span {
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+}
+
+.payment-modal-amount strong {
+    color: var(--vbc-primary);
+    font-size: 25px;
+    font-weight: 900;
+}
+
+/*=================== QR thanh toán mô phỏng ========================*/
+
+.payment-modal-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.payment-qr-demo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 210px;
+    height: 210px;
+    padding: 13px;
+    border: 1px solid #dddddd;
+    border-radius: 9px;
+    background: #ffffff;
+}
+
+.payment-qr-grid {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background:
+        repeating-conic-gradient(#171717 0% 25%, #ffffff 0% 50%)
+        0 0 / 16px 16px;
+}
+
+.qr-box {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    border: 7px solid #171717;
+    background: #ffffff;
+}
+
+.qr-box::after {
+    position: absolute;
+    inset: 7px;
+    background: #171717;
+    content: "";
+}
+
+.qr-top-left {
+    top: 0;
+    left: 0;
+}
+
+.qr-top-right {
+    top: 0;
+    right: 0;
+}
+
+.qr-bottom-left {
+    bottom: 0;
+    left: 0;
+}
+
+.qr-middle {
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    transform: translate(-50%, -50%);
+}
+
+.payment-qr-label {
+    color: var(--vbc-text-muted);
+    font-size: 9px;
+    font-weight: 800;
+    text-align: center;
+}
+
+/*=================== Đồng hồ đếm ngược ========================*/
+
+.payment-countdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 20px;
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+}
+
+.payment-countdown i {
+    color: var(--vbc-primary);
+    font-size: 17px;
+}
+
+.payment-countdown strong {
+    color: var(--vbc-primary);
+    font-size: 20px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+}
+
+.payment-modal-note {
+    margin: 15px 0;
+    color: var(--vbc-text-muted);
+    font-size: 10px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/*=================== Form Card ========================*/
+
+.payment-card-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.payment-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.payment-form-group label {
+    color: var(--vbc-text);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.payment-form-group input {
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 12px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 7px;
+    outline: none;
+    background: var(--vbc-bg);
+    color: var(--vbc-text);
+    font-size: 13px;
+}
+
+.payment-form-group input:focus {
+    border-color: var(--vbc-primary);
+    box-shadow: 0 0 0 3px rgba(229, 57, 69, 0.1);
+}
+
+.payment-card-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+}
+
+.payment-card-error {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    color: #dc3545;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/*=================== Nút xác nhận ========================*/
+
+.payment-modal-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    min-height: 45px;
+    margin-top: 18px;
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 7px;
+    background: var(--vbc-primary);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    transition: 0.2s ease;
+}
+
+.payment-modal-primary:hover {
+    background: #c62832;
+    transform: translateY(-2px);
+}
+
+/*=================== Kết quả thanh toán ========================*/
+
+.payment-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px 5px 10px;
+    text-align: center;
+}
+
+.payment-result > i {
+    margin-bottom: 17px;
+    font-size: 65px;
+}
+
+.payment-result-success > i {
+    color: #28a745;
+}
+
+.payment-result-failed > i {
+    color: #dc3545;
+}
+
+.payment-result h3 {
+    margin: 0 0 10px;
+    color: var(--vbc-text);
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.payment-result p {
+    margin: 0;
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/*=================== Responsive ========================*/
+
+@media (max-width: 576px) {
+    .payment-modal {
+        padding: 25px 17px;
+    }
+
+    .payment-modal-heading h3 {
+        font-size: 18px;
+    }
+
+    .payment-modal-amount strong {
+        font-size: 22px;
+    }
+
+    .payment-qr-demo {
+        width: 190px;
+        height: 190px;
+    }
+}

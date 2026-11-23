@@ -39,6 +39,7 @@ function Booking() {
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("momo");
   const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
+  const [paymentResult, setPaymentResult] = useState(null);
   //=================== Cuộn lên đầu trang khi chuyển bước ========================
 
   useLayoutEffect(() => {
@@ -114,6 +115,7 @@ function Booking() {
     // Reset phương thức và trạng thái thanh toán
     setSelectedPaymentMethod("momo");
     setIsPaymentCompleted(false);
+    setPaymentResult(null);
   }, [id]);
 
   //=================== Chọn hoặc bỏ chọn ghế ========================
@@ -239,12 +241,18 @@ function Booking() {
     setIsPaymentCompleted(false);
   };
 
-  //=================== Xác nhận thanh toán mô phỏng ========================
+//=================== Nhận kết quả thanh toán ========================
 
-  const handleConfirmPayment = () => {
+const handleConfirmPayment = (result) => {
+    if (result?.paymentStatus !== "Success") {
+        return;
+    }
+
+    setPaymentResult(result);
     setIsPaymentCompleted(true);
     setActiveStep(4);
-  };
+};
+
   //=================== Kiểm tra dữ liệu ========================
 
   if (!showtime || !movie || !cinema || !room) {
@@ -356,12 +364,17 @@ function Booking() {
                   <p>
                     Phương thức thanh toán:{" "}
                     <strong>
-                      {selectedPaymentMethod === "momo"
+                      {paymentResult?.paymentMethod === "MoMo"
                         ? "Ví điện tử MoMo"
                         : "Thẻ ngân hàng (Card)"}
                     </strong>
                   </p>
-                  <h3>{new Intl.NumberFormat("vi-VN").format(totalPrice)}đ</h3>
+                  <h3>
+                    {new Intl.NumberFormat("vi-VN").format(
+                      paymentResult?.amount ?? totalPrice,
+                    )}
+                    đ
+                  </h3>
                   <Link to="/showtimes" className="booking-success-link">
                     Quay lại lịch chiếu
                   </Link>
