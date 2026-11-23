@@ -1,4 +1,6 @@
 
+import { cinemas } from "./cinemas.js";
+
 //=================== Hàm tạo ngày chiếu mẫu ========================
 
 const getDateOffset = (offset) => {
@@ -12,20 +14,10 @@ const getDateOffset = (offset) => {
     return `${year}-${month}-${day}`;
 };
 
-//=================== Danh sách rạp chiếu mẫu ========================
+//=================== Danh sách rạp ========================
+// Sử dụng dữ liệu duy nhất từ cinemas.js
 
-export const cinemas = [
-    {
-        id: 1,
-        name: "ViewBookCinemas - Cần Thơ",
-        address: "Địa chỉ cụ thể của rạp, Ninh Kiều, Cần Thơ, Việt Nam"
-    },
-    {
-        id: 2,
-        name: "ViewBookCinemas - TP. Hồ Chí Minh",
-        address: "Địa chỉ cụ thể của rạp, Quận 1, TP. Hồ Chí Minh, Việt Nam"
-    }
-];
+export { cinemas };
 
 //=================== Danh sách lịch chiếu mẫu ========================
 
@@ -88,7 +80,7 @@ export const showtimes = [
     {
         id: 6,
         movieId: 1,
-        cinemaId: 2,
+        cinemaId: 3,
         roomName: "Phòng 05",
         movieVersion: "2D - Phụ đề Việt",
         startTime: `${getDateOffset(0)}T15:00:00`,
@@ -99,7 +91,7 @@ export const showtimes = [
     {
         id: 7,
         movieId: 2,
-        cinemaId: 2,
+        cinemaId: 3,
         roomName: "Phòng 06",
         movieVersion: "2D - Phụ đề Việt",
         startTime: `${getDateOffset(1)}T20:00:00`,
