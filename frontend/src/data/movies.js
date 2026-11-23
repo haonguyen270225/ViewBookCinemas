@@ -6,6 +6,7 @@ export const movies = [
     poster:
       "https://upload.wikimedia.org/wikipedia/vi/d/d0/Spider-Man-_Homecoming.JPG?utm_source=vi.wikipedia.org&utm_campaign=index&utm_content=original",
     trailerUrl: "/trailers/Nguoi_Nhen_Tro_Ve_Nha.mp4",
+    trailerPageUrl: "",
     genres: ["Hành động", "Viễn tưởng"],
     duration: 125,
     rating: 8.5,
@@ -79,6 +80,13 @@ export const movies = [
     ageRating: "T16",
     country: "Nhật Bản",
     status: "Đang chiếu",
+    slug: "chu-he-ma-quai-02",
+    description: "",
+    backdropUrl: "",
+    trailerPageUrl: "",
+    releaseDate: null,
+    isFeatured: false,
+    displayOrder: null,
   },
   {
     id: 5,
@@ -92,6 +100,13 @@ export const movies = [
     ageRating: "T16",
     country: "Nhật Bản",
     status: "Đang chiếu",
+    slug: "thanh-pho-tuong-lai",
+    description: "",
+    backdropUrl: "",
+    trailerPageUrl: "",
+    releaseDate: null,
+    isFeatured: false,
+    displayOrder: null,
   },
 ];
 
