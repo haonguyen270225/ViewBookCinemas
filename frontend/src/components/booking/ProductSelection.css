@@ -1,0 +1,465 @@
+
+/*=================== Khu vực chọn sản phẩm ========================*/
+
+.booking-product-section {
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 10px;
+    background: var(--vbc-bg-card);
+}
+
+.booking-product-heading,
+.booking-combo-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.booking-product-label {
+    color: var(--vbc-primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.booking-product-heading h2,
+.booking-combo-heading h2 {
+    margin: 7px 0;
+    color: var(--vbc-text);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.booking-product-heading p,
+.booking-combo-heading p {
+    margin: 0;
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.booking-product-heading-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 55px;
+    width: 55px;
+    height: 55px;
+    border-radius: 12px;
+    background: rgba(229, 57, 69, 0.1);
+    color: var(--vbc-primary);
+    font-size: 25px;
+}
+
+/*=================== Danh mục sản phẩm ========================*/
+
+.booking-product-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin: 25px 0;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--vbc-border);
+}
+
+.booking-product-categories button {
+    padding: 9px 15px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 20px;
+    background: var(--vbc-bg);
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    transition: 0.2s ease;
+}
+
+.booking-product-categories button:hover,
+.booking-product-categories button.active {
+    border-color: var(--vbc-primary);
+    background: var(--vbc-primary);
+    color: #ffffff;
+}
+
+/*=================== Danh sách sản phẩm ========================*/
+
+.booking-product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.booking-product-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--vbc-border);
+    border-radius: 9px;
+    background: var(--vbc-bg);
+    transition: 0.2s ease;
+}
+
+.booking-product-card:hover {
+    border-color: var(--vbc-primary);
+    transform: translateY(-3px);
+}
+
+.booking-product-image {
+    position: relative;
+    height: 155px;
+    overflow: hidden;
+    background: var(--vbc-bg-secondary);
+}
+
+.booking-product-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.booking-product-card:hover .booking-product-image img {
+    transform: scale(1.05);
+}
+
+.booking-product-info {
+    padding: 14px;
+}
+
+.booking-product-info h3 {
+    overflow: hidden;
+    margin: 0 0 7px;
+    color: var(--vbc-text);
+    font-size: 14px;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.booking-product-info p {
+    display: -webkit-box;
+    min-height: 34px;
+    overflow: hidden;
+    margin: 0 0 13px;
+    color: var(--vbc-text-secondary);
+    font-size: 11px;
+    line-height: 1.55;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.booking-product-card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.booking-product-card-bottom > strong {
+    color: var(--vbc-primary);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/*=================== Điều chỉnh số lượng ========================*/
+
+.booking-quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.booking-quantity-control button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    padding: 0;
+    border: 1px solid var(--vbc-primary);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--vbc-primary);
+    font-size: 15px;
+    transition: 0.2s ease;
+}
+
+.booking-quantity-control button:hover {
+    background: var(--vbc-primary);
+    color: #ffffff;
+}
+
+.booking-quantity-control span {
+    min-width: 14px;
+    color: var(--vbc-text);
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+}
+
+/*=================== Combo ========================*/
+
+.booking-combo-section {
+    margin-top: 38px;
+    padding-top: 28px;
+    border-top: 1px solid var(--vbc-border);
+}
+
+.booking-combo-heading {
+    margin-bottom: 20px;
+}
+
+.booking-combo-heading > i {
+    color: var(--vbc-primary);
+    font-size: 28px;
+}
+
+.booking-combo-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 9px;
+    border-radius: 4px;
+    background: var(--vbc-primary);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+/*=================== Trạng thái trống ========================*/
+
+.booking-product-empty {
+    padding: 30px 10px;
+    color: var(--vbc-text-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+/*=================== Responsive ========================*/
+
+@media (max-width: 576px) {
+    .booking-product-section {
+        padding: 16px;
+    }
+
+    .booking-product-heading h2,
+    .booking-combo-heading h2 {
+        font-size: 18px;
+    }
+
+    .booking-product-heading-icon {
+        flex-basis: 45px;
+        width: 45px;
+        height: 45px;
+        font-size: 21px;
+    }
+
+    .booking-product-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .booking-product-card {
+        display: grid;
+        grid-template-columns: 105px minmax(0, 1fr);
+    }
+
+    .booking-product-image {
+        height: 100%;
+        min-height: 135px;
+    }
+
+    .booking-product-info {
+        padding: 11px;
+    }
+
+    .booking-product-info h3 {
+        font-size: 12px;
+    }
+
+    .booking-product-info p {
+        min-height: 32px;
+        font-size: 10px;
+    }
+
+    .booking-product-card-bottom > strong {
+        font-size: 12px;
+    }
+
+    .booking-quantity-control {
+        gap: 6px;
+    }
+
+    .booking-quantity-control button {
+        width: 25px;
+        height: 25px;
+    }
+}
+
+/*=================== Cải thiện font chữ và kích thước ========================*/
+
+.booking-product-heading h2,
+.booking-combo-heading h2 {
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.booking-product-heading p,
+.booking-combo-heading p {
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.booking-product-label {
+    font-size: 12px;
+}
+
+.booking-product-categories button {
+    padding: 10px 17px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 7px;
+}
+
+.booking-product-info {
+    padding: 16px;
+}
+
+.booking-product-info h3 {
+    font-size: 16px;
+    font-weight: 750;
+    line-height: 1.4;
+}
+
+.booking-product-info p {
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 42px;
+}
+
+.booking-product-card-bottom > strong {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.booking-quantity-control {
+    gap: 9px;
+}
+
+.booking-quantity-control button {
+    width: 33px;
+    height: 33px;
+    font-size: 16px;
+}
+
+.booking-quantity-control span {
+    min-width: 18px;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+/*=================== Icon thay đổi theo danh mục ========================*/
+
+.booking-product-heading-icon {
+    position: relative;
+    flex: 0 0 62px;
+    width: 62px;
+    height: 62px;
+    font-size: 28px;
+    overflow: visible;
+}
+
+.booking-product-heading-icon > i {
+    position: relative;
+    z-index: 2;
+}
+
+/*=================== Hiệu ứng khói cho đồ ăn nóng ========================*/
+
+.booking-product-heading-icon.hot-food-icon {
+    overflow: visible;
+}
+
+.booking-icon-steam {
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 5px;
+    width: 42px;
+    height: 28px;
+    transform: translateX(-50%);
+}
+
+.booking-icon-steam span {
+    display: block;
+    width: 5px;
+    height: 15px;
+    border: 2px solid var(--vbc-primary);
+    border-top: 0;
+    border-bottom: 0;
+    border-radius: 50%;
+    opacity: 0;
+    animation: booking-steam 1.5s ease-in-out infinite;
+}
+
+.booking-icon-steam span:nth-child(2) {
+    height: 21px;
+    animation-delay: 0.25s;
+}
+
+.booking-icon-steam span:nth-child(3) {
+    animation-delay: 0.5s;
+}
+
+@keyframes booking-steam {
+    0% {
+        opacity: 0;
+        transform: translateY(8px) scaleY(0.7);
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-8px) scaleY(1.1);
+    }
+}
+
+/*=================== Responsive ========================*/
+
+@media (max-width: 576px) {
+    .booking-product-heading h2,
+    .booking-combo-heading h2 {
+        font-size: 21px;
+    }
+
+    .booking-product-heading p,
+    .booking-combo-heading p {
+        font-size: 13px;
+    }
+
+    .booking-product-categories button {
+        padding: 9px 13px;
+        font-size: 12px;
+    }
+
+    .booking-product-info h3 {
+        font-size: 14px;
+    }
+
+    .booking-product-info p {
+        font-size: 12px;
+    }
+
+    .booking-product-card-bottom > strong {
+        font-size: 14px;
+    }
+}
