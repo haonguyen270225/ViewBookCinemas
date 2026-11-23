@@ -14,43 +14,41 @@ import Login from "./pages/login/Login.jsx";
 import ForgotPassword from "./pages/forgot-password/ForgotPassword.jsx";
 import MovieDetail from "./pages/movie-detail/MovieDetail.jsx";
 import Account from "./pages/account/Account.jsx";
+import Booking from "./pages/booking/Booking.jsx";
 
 //========================= Components ========================
 import AuthNotification from "./components/common/AuthNotification.jsx";
 
 function App() {
     return (
-        <AuthProvider>
-            <BrowserRouter>
-                <AuthNotification />
+      <AuthProvider>
+        <BrowserRouter>
+          <AuthNotification />
 
-                <Routes>
-                    {/*========================= Trang chủ ========================*/}
-                    <Route path="/" element={<Home />} />
+          <Routes>
+            {/*========================= Trang chủ ========================*/}
+            <Route path="/" element={<Home />} />
+            {/*========================= Phim ========================*/}
+            <Route path="/movies" element={<Movies />} />
+            <Route path="/movies/:id" element={<MovieDetail />} />
+            {/*========================= Lịch chiếu ========================*/}
+            <Route path="/showtimes" element={<Showtimes />} />
+            {/*========================= Rạp chiếu ========================*/}
+            <Route path="/cinemas" element={<Cinemas />} />
+            {/*========================= Khuyến mãi ========================*/}
+            <Route path="/promotions" element={<Promotions />} />
+            {/*========================= Tài khoản ========================*/}
+            <Route path="/account" element={<Account />} />
+            {/*========================= Đặt vé ========================*/}
+            <Route path="/booking/:id" element={<Booking />} />
 
-                    {/*========================= Phim ========================*/}
-                    <Route path="/movies" element={<Movies />} />
-                    <Route path="/movies/:id" element={<MovieDetail />} />
-
-                    {/*========================= Lịch chiếu ========================*/}
-                    <Route path="/showtimes" element={<Showtimes />} />
-
-                    {/*========================= Rạp chiếu ========================*/}
-                    <Route path="/cinemas" element={<Cinemas />} />
-
-                    {/*========================= Khuyến mãi ========================*/}
-                    <Route path="/promotions" element={<Promotions />} />
-
-                    {/*========================= Tài khoản ========================*/}
-                    <Route path="/account" element={<Account />} />
-
-                    {/*========================= Xác thực ========================*/}
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                </Routes>
-            </BrowserRouter>
-        </AuthProvider>
+            {/*========================= Xác thực ========================*/}
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     );
 }
 

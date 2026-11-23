@@ -1,0 +1,605 @@
+
+/*=================== Trang Đặt vé ========================*/
+
+.booking-page {
+    min-height: 70vh;
+    background: var(--vbc-bg);
+}
+
+.booking-hero {
+    padding: 45px 0;
+    background: linear-gradient(90deg, #171717, #352024);
+}
+
+.booking-hero span {
+    color: #ff737d;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+.booking-hero h1 {
+    margin: 10px 0;
+    color: #ffffff;
+    font-size: clamp(30px, 5vw, 42px);
+}
+
+.booking-hero p {
+    margin: 0;
+    color: #cccccc;
+    font-size: 14px;
+}
+
+.booking-content {
+    padding-top: 35px;
+    padding-bottom: 65px;
+}
+
+/*=================== Tiến trình đặt vé ========================*/
+
+.booking-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 35px;
+}
+
+.booking-progress-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--vbc-text-muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.booking-progress-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 50%;
+    background: var(--vbc-bg-card);
+}
+
+.booking-progress-step.active {
+    color: var(--vbc-primary);
+}
+
+.booking-progress-step.active .booking-progress-number {
+    border-color: var(--vbc-primary);
+    background: var(--vbc-primary);
+    color: #ffffff;
+}
+
+.booking-progress-line {
+    width: clamp(35px, 10vw, 100px);
+    height: 2px;
+    margin: 0 12px;
+    background: var(--vbc-border);
+}
+
+/*=================== Thông tin suất chiếu ========================*/
+
+.booking-showtime {
+    display: flex;
+    gap: 22px;
+    padding: 22px;
+    margin-bottom: 35px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 10px;
+    background: var(--vbc-bg-card);
+}
+
+.booking-showtime-poster {
+    flex: 0 0 115px;
+    overflow: hidden;
+    border-radius: 7px;
+    background: var(--vbc-bg-secondary);
+}
+
+.booking-showtime-poster img {
+    display: block;
+    width: 100%;
+    height: 155px;
+    object-fit: cover;
+}
+
+.booking-showtime-info {
+    min-width: 0;
+}
+
+.booking-showtime-label {
+    color: var(--vbc-primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.booking-showtime-info h2 {
+    margin: 6px 0 12px;
+    color: var(--vbc-text);
+    font-size: 23px;
+}
+
+.booking-showtime-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+}
+
+.booking-showtime-details p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+}
+
+.booking-showtime-details i {
+    color: var(--vbc-primary);
+}
+
+/*=================== Bố cục chọn ghế và tổng tiền ========================*/
+
+.booking-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 310px;
+    gap: 25px;
+    align-items: start;
+}
+
+.booking-seat-area,
+.booking-summary {
+    padding: 24px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 10px;
+    background: var(--vbc-bg-card);
+}
+
+.booking-seat-section h3,
+.booking-summary h3 {
+    margin-bottom: 25px;
+    color: var(--vbc-text);
+    font-size: 21px;
+}
+
+/*=================== Màn hình chiếu ========================*/
+
+.booking-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    max-width: 520px;
+    margin: 0 auto 38px;
+    padding: 13px;
+    border-bottom: 5px solid var(--vbc-primary);
+    border-radius: 50% 50% 8px 8px;
+    background: linear-gradient(
+        to bottom,
+        rgba(229, 57, 69, 0.13),
+        transparent
+    );
+    color: var(--vbc-text-secondary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 4px;
+}
+
+.booking-screen i {
+    color: var(--vbc-primary);
+    font-size: 20px;
+}
+
+/*=================== Sơ đồ ghế ========================*/
+
+.booking-seat-container {
+    width: 100%;
+    overflow-x: auto;
+    padding: 0 0 12px;
+}
+
+.booking-seat-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-width: max-content;
+    margin-bottom: 9px;
+}
+
+.booking-row-label {
+    width: 18px;
+    color: var(--vbc-text-muted);
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.booking-seat-list {
+    display: flex;
+    gap: 6px;
+}
+
+.booking-seat {
+    width: 32px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid;
+    border-radius: 6px 6px 4px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.booking-seat.standard,
+.legend-seat.standard {
+    border-color: #b7c4d1;
+    background: #e5edf4;
+    color: #425466;
+}
+
+.booking-seat.vip,
+.legend-seat.vip {
+    border-color: #e0a52e;
+    background: #fff0c2;
+    color: #8a5b00;
+}
+
+.booking-seat.couple,
+.legend-seat.couple {
+    border-color: #b58acb;
+    background: #eeddf7;
+    color: #70408b;
+}
+
+.booking-seat.selected,
+.legend-seat.selected {
+    border-color: #e53945;
+    background: #e53945;
+    color: #ffffff;
+}
+
+.booking-seat.unavailable,
+.legend-seat.unavailable {
+    border-color: #777777;
+    background: #777777;
+    color: #ffffff;
+}
+
+.booking-seat:not(:disabled):hover {
+    transform: translateY(-3px);
+    filter: brightness(0.94);
+}
+
+.booking-seat.selected:hover {
+    background: #c62832;
+}
+
+.booking-seat:disabled {
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+
+/*=================== Chú thích ghế ========================*/
+
+.booking-seat-legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px 22px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--vbc-border);
+}
+
+.booking-seat-legend > div {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--vbc-text-secondary);
+    font-size: 11px;
+}
+
+.legend-seat {
+    width: 18px;
+    height: 18px;
+    border: 1px solid;
+    border-radius: 4px;
+}
+
+/*=================== Tổng kết đặt vé ========================*/
+
+.booking-summary {
+    position: sticky;
+    top: 100px;
+}
+
+.booking-summary-seats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--vbc-border);
+}
+
+.booking-summary-seats span {
+    color: var(--vbc-text-muted);
+    font-size: 12px;
+}
+
+.booking-summary-seats strong {
+    color: var(--vbc-text);
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.booking-summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    padding: 17px 0;
+}
+
+.booking-summary-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+}
+
+.booking-summary-item > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.booking-summary-item strong {
+    color: var(--vbc-text);
+}
+
+.booking-summary-item small {
+    color: var(--vbc-text-muted);
+}
+
+.booking-summary-item > span {
+    white-space: nowrap;
+}
+
+.booking-summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 0;
+    border-top: 1px solid var(--vbc-border);
+}
+
+.booking-summary-total span {
+    color: var(--vbc-text-secondary);
+    font-size: 13px;
+}
+
+.booking-summary-total strong {
+    color: var(--vbc-primary);
+    font-size: 20px;
+}
+
+.booking-confirm-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 45px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--vbc-primary);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    transition: 0.2s ease;
+}
+
+.booking-confirm-button:hover:not(:disabled) {
+    background: #c62832;
+    transform: translateY(-2px);
+}
+
+.booking-confirm-button:disabled {
+    background: #999999;
+    cursor: not-allowed;
+}
+
+.booking-summary-note {
+    margin: 13px 0 0;
+    color: var(--vbc-text-muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/*=================== Thông báo xác nhận ========================*/
+
+.booking-confirmed {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px solid #a8d9b5;
+    border-radius: 8px;
+    background: #effaf2;
+    color: #236b38;
+}
+
+.booking-confirmed > i {
+    font-size: 20px;
+}
+
+.booking-confirmed strong {
+    font-size: 12px;
+}
+
+.booking-confirmed p {
+    margin: 5px 0 0;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/*=================== Không tìm thấy suất chiếu ========================*/
+
+.booking-error {
+    display: flex;
+    align-items: center;
+    min-height: 55vh;
+    padding: 50px 0;
+    text-align: center;
+}
+
+.booking-error i {
+    color: var(--vbc-primary);
+    font-size: 45px;
+}
+
+.booking-error h2 {
+    margin: 15px 0 10px;
+    color: var(--vbc-text);
+}
+
+.booking-error p {
+    color: var(--vbc-text-secondary);
+}
+
+.booking-error a {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    background: var(--vbc-primary);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/*=================== Responsive ========================*/
+
+@media (max-width: 991px) {
+    .booking-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-summary {
+        position: static;
+    }
+}
+
+@media (max-width: 576px) {
+    .booking-content {
+        padding-top: 25px;
+    }
+
+    .booking-progress-step {
+        gap: 6px;
+        font-size: 10px;
+    }
+
+    .booking-progress-line {
+        width: 25px;
+        margin: 0 5px;
+    }
+
+    .booking-showtime {
+        gap: 14px;
+        padding: 14px;
+    }
+
+    .booking-showtime-poster {
+        flex-basis: 85px;
+    }
+
+    .booking-showtime-poster img {
+        height: 120px;
+    }
+
+    .booking-showtime-info h2 {
+        font-size: 18px;
+    }
+
+    .booking-showtime-details {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .booking-seat-area,
+    .booking-summary {
+        padding: 16px;
+    }
+
+    .booking-seat-list {
+        gap: 4px;
+    }
+
+    .booking-seat {
+        width: 27px;
+        height: 27px;
+        font-size: 9px;
+    }
+
+    .booking-seat-row {
+        gap: 7px;
+    }
+}
+
+/*=================== Dark Mode ========================*/
+
+[data-theme="dark"] .booking-screen {
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 115, 125, 0.12),
+        transparent
+    );
+}
+
+[data-theme="dark"] .booking-seat.standard,
+[data-theme="dark"] .legend-seat.standard {
+    border-color: #64798b;
+    background: #344454;
+    color: #e1eaf2;
+}
+
+[data-theme="dark"] .booking-seat.vip,
+[data-theme="dark"] .legend-seat.vip {
+    border-color: #a87b27;
+    background: #5b461f;
+    color: #ffe2a1;
+}
+
+[data-theme="dark"] .booking-seat.couple,
+[data-theme="dark"] .legend-seat.couple {
+    border-color: #8964a0;
+    background: #493653;
+    color: #efd5ff;
+}
+
+[data-theme="dark"] .booking-seat.selected,
+[data-theme="dark"] .legend-seat.selected {
+    border-color: #ff737d;
+    background: #e53945;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .booking-seat.unavailable,
+[data-theme="dark"] .legend-seat.unavailable {
+    border-color: #666666;
+    background: #666666;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .booking-confirmed {
+    border-color: #356c45;
+    background: #1e3826;
+    color: #a8e2b8;
+}
