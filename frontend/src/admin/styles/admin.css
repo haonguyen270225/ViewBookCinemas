@@ -642,3 +642,370 @@
         padding: 16px;
     }
 }
+
+/* ===================== SIDEBAR ACCORDION ===================== */
+
+.admin-menu-group-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 5px 0 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+}
+
+.admin-menu-group-toggle span {
+    color: inherit;
+    font: inherit;
+}
+
+.admin-menu-group-toggle i {
+    color: #7f8aa6;
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.admin-menu-group-toggle:hover span {
+    color: #ffffff;
+}
+
+.admin-menu-items {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===================== THEME TOGGLE BUTTON ===================== */
+
+.admin-theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 39px;
+    height: 39px;
+    border: 1px solid #e9eaf0;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #596174;
+    font-size: 17px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-theme-toggle:hover {
+    border-color: #e53945;
+    color: #e53945;
+    transform: translateY(-1px);
+}
+
+/* ===================== DARK MODE ===================== */
+
+.admin-layout[data-theme="dark"] {
+    background: #101522;
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-header {
+    background: #191f2e;
+    border-bottom-color: #2b3345;
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-header-heading h5 {
+    color: #f1f3f8;
+}
+
+.admin-layout[data-theme="dark"] .admin-header-heading span {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-menu-toggle,
+.admin-layout[data-theme="dark"] .admin-header-icon,
+.admin-layout[data-theme="dark"] .admin-theme-toggle {
+    background: #222a3b;
+    border-color: #343e52;
+    color: #d5dbea;
+}
+
+.admin-layout[data-theme="dark"] .admin-menu-toggle:hover,
+.admin-layout[data-theme="dark"] .admin-header-icon:hover,
+.admin-layout[data-theme="dark"] .admin-theme-toggle:hover {
+    border-color: #e53945;
+    color: #ff727c;
+}
+
+.admin-layout[data-theme="dark"] .admin-profile-info strong {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-profile-info span,
+.admin-layout[data-theme="dark"] .admin-profile-arrow {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-profile-avatar {
+    background: #3a2632;
+    color: #ff7b84;
+}
+
+/* Nội dung Dashboard */
+
+.admin-layout[data-theme="dark"] .admin-page-intro h3,
+.admin-layout[data-theme="dark"] .admin-coming-soon h3 {
+    color: #f1f3f8;
+}
+
+.admin-layout[data-theme="dark"] .admin-page-intro p,
+.admin-layout[data-theme="dark"] .admin-coming-soon p {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-date {
+    background: #191f2e;
+    border-color: #2b3345;
+    color: #c5ccda;
+}
+
+.admin-layout[data-theme="dark"] .admin-stat-card,
+.admin-layout[data-theme="dark"] .admin-panel {
+    background: #191f2e;
+    border-color: #2b3345;
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-stat-card:hover {
+    border-color: #46516a;
+    color: #ffffff;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+}
+
+.admin-layout[data-theme="dark"] .admin-stat-title,
+.admin-layout[data-theme="dark"] .admin-panel-heading p {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-panel-heading h5 {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-overview-item {
+    border-bottom-color: #2b3345;
+}
+
+.admin-layout[data-theme="dark"] .admin-overview-item span {
+    color: #a5aec0;
+}
+
+.admin-layout[data-theme="dark"] .admin-overview-item strong {
+    color: #edf0f7;
+}
+
+/* Thông báo Dashboard */
+
+.admin-layout[data-theme="dark"] .admin-notice-content {
+    background: #35252e;
+}
+
+.admin-layout[data-theme="dark"] .admin-notice-content strong {
+    color: #f2dfe2;
+}
+
+.admin-layout[data-theme="dark"] .admin-notice-content p {
+    color: #c0aeb5;
+}
+
+.admin-layout[data-theme="dark"] .admin-notice-footer {
+    border-top-color: #3a3441;
+}
+
+.admin-layout[data-theme="dark"] .admin-notice-footer span {
+    color: #a5aec0;
+}
+
+/* Bảng dữ liệu */
+
+.admin-layout[data-theme="dark"] .admin-table th {
+    background: #222a3b;
+    color: #aab4c8;
+}
+
+.admin-layout[data-theme="dark"] .admin-table td {
+    border-bottom-color: #2b3345;
+    color: #b9c2d3;
+}
+
+.admin-layout[data-theme="dark"] .admin-table td strong {
+    color: #edf0f7;
+}
+
+/* Trang chức năng đang phát triển */
+
+.admin-layout[data-theme="dark"] .admin-coming-soon-icon {
+    background: #35252e;
+    color: #ff7b84;
+}
+
+/* Hiệu ứng chuyển giao diện */
+
+.admin-layout,
+.admin-layout .admin-header,
+.admin-layout .admin-stat-card,
+.admin-layout .admin-panel,
+.admin-layout .admin-date,
+.admin-layout .admin-theme-toggle,
+.admin-layout .admin-header-icon,
+.admin-layout .admin-menu-toggle {
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+@media (max-width: 600px) {
+    .admin-header-right {
+        gap: 8px;
+    }
+
+    .admin-theme-toggle,
+    .admin-header-icon {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+/* ===================== SIDEBAR SCROLLBAR ===================== */
+
+.admin-sidebar-menu {
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* Cuộn mượt */
+    scroll-behavior: smooth;
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(160, 172, 195, 0.28) transparent;
+}
+
+/* Chrome, Edge, Safari */
+.admin-sidebar-menu::-webkit-scrollbar {
+    width: 4px;
+}
+
+.admin-sidebar-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-sidebar-menu::-webkit-scrollbar-thumb {
+    background: rgba(160, 172, 195, 0.25);
+    border-radius: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.admin-sidebar-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(160, 172, 195, 0.55);
+}
+
+/* ===================== SIDEBAR ACCORDION ANIMATION ===================== */
+
+.admin-menu-items-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+        grid-template-rows 0.3s ease,
+        opacity 0.25s ease;
+}
+
+.admin-menu-items-wrapper.expanded {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.admin-menu-items {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.admin-menu-group-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.admin-menu-group.expanded .admin-menu-group-toggle i {
+    transform: rotate(0deg);
+}
+
+.admin-menu-group.collapsed .admin-menu-group-toggle i {
+    transform: rotate(-90deg);
+}
+
+/* Hỗ trợ người dùng hạn chế hiệu ứng chuyển động */
+@media (prefers-reduced-motion: reduce) {
+    .admin-menu-items-wrapper,
+    .admin-menu-group-toggle i {
+        transition: none;
+    }
+}
+
+
+
+/* =========================================
+   SIDEBAR - MENU HIERARCHY
+========================================= */
+
+/* Tiêu đề các nhóm quản lý */
+.admin-menu-group-toggle {
+    min-height: 38px;
+    padding: 8px 10px 8px 12px;
+}
+
+.admin-menu-group-toggle span {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+}
+
+/* Khu vực chứa các item con */
+.admin-menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    padding: 5px 0 8px 12px;
+    margin-left: 8px;
+
+    border-left: 1px solid rgba(160, 172, 195, 0.2);
+}
+
+/* Item con */
+.admin-menu-item {
+    min-height: 38px;
+    padding: 9px 10px 9px 12px;
+    margin-left: 2px;
+
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.4;
+
+    border-radius: 6px;
+}
+
+/* Icon của item con */
+.admin-menu-item i {
+    font-size: 14px;
+}
+
+/* Item đang được chọn */
+.admin-menu-item.active {
+    font-weight: 600;
+}
+
+/* Hiệu ứng khi rê chuột vào item */
+.admin-menu-item:hover {
+    transform: translateX(2px);
+}
+

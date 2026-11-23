@@ -22,11 +22,13 @@ const pageTitles = {
     "/admin/settings": "Cài đặt hệ thống"
 };
 
-function AdminHeader({ onMenuClick }) {
+function AdminHeader({ onMenuClick, theme, onToggleTheme }) {
     const location = useLocation();
 
     const pageTitle =
         pageTitles[location.pathname] || "Quản trị hệ thống";
+
+    const isDarkMode = theme === "dark";
 
     return (
         <header className="admin-header">
@@ -47,6 +49,30 @@ function AdminHeader({ onMenuClick }) {
             </div>
 
             <div className="admin-header-right">
+                <button
+                    type="button"
+                    className="admin-theme-toggle"
+                    onClick={onToggleTheme}
+                    aria-label={
+                        isDarkMode
+                            ? "Chuyển sang giao diện sáng"
+                            : "Chuyển sang giao diện tối"
+                    }
+                    title={
+                        isDarkMode
+                            ? "Light Mode"
+                            : "Dark Mode"
+                    }
+                >
+                    <i
+                        className={`bi ${
+                            isDarkMode
+                                ? "bi-sun-fill"
+                                : "bi-moon-stars-fill"
+                        }`}
+                    ></i>
+                </button>
+
                 <button
                     type="button"
                     className="admin-header-icon"

@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 const menuGroups = [
@@ -115,10 +116,23 @@ const menuGroups = [
 ];
 
 function AdminSidebar({ isOpen, onNavigate }) {
+    // Tất cả nhóm menu mặc định đóng khi vào Admin hoặc tải lại trang
+    const [openGroups, setOpenGroups] = useState(() => {
+        return Object.fromEntries(
+            menuGroups.map((group) => [group.title, false])
+        );
+    });
+
+    const handleToggleGroup = (groupTitle) => {
+        setOpenGroups((current) => ({
+            ...current,
+            [groupTitle]: !current[groupTitle]
+        }));
+    };
+
     return (
-        <aside
-            className={`admin-sidebar ${isOpen ? "is-open" : ""}`}
-        >
+        <aside className={`admin-sidebar ${isOpen ? "is-open" : ""}`}>
+            {/* Logo */}
             <div className="admin-sidebar-brand">
                 <div className="admin-brand-icon">
                     <i className="bi bi-camera-reels-fill"></i>
@@ -130,36 +144,71 @@ function AdminSidebar({ isOpen, onNavigate }) {
                 </div>
             </div>
 
+            {/* Menu */}
             <div className="admin-sidebar-menu">
-                {menuGroups.map((group) => (
-                    <div
-                        className="admin-menu-group"
-                        key={group.title}
-                    >
-                        <p className="admin-menu-title">
-                            {group.title}
-                        </p>
+                {menuGroups.map((group, index) => {
+                    const isExpanded = openGroups[group.title];
+                    const menuId = `admin-menu-group-${index}`;
 
-                        {group.items.map((item) => (
-                            <NavLink
-                                key={item.path}
-                                to={item.path}
-                                end={item.path === "/admin"}
-                                className={({ isActive }) =>
-                                    `admin-menu-item ${
-                                        isActive ? "active" : ""
-                                    }`
-                                }
-                                onClick={onNavigate}
+                    return (
+                        <div
+                            className={`admin-menu-group ${
+                                isExpanded ? "expanded" : "collapsed"
+                            }`}
+                            key={group.title}
+                        >
+                            <button
+                                type="button"
+                                className="admin-menu-title admin-menu-group-toggle"
+                                onClick={() => handleToggleGroup(group.title)}
+                                aria-expanded={isExpanded}
+                                aria-controls={menuId}
                             >
-                                <i className={`bi ${item.icon}`}></i>
-                                <span>{item.label}</span>
-                            </NavLink>
-                        ))}
-                    </div>
-                ))}
+                                <span>{group.title}</span>
+
+                                <i
+                                    className={`bi ${
+                                        isExpanded
+                                            ? "bi-chevron-down"
+                                            : "bi-chevron-right"
+                                    }`}
+                                ></i>
+                            </button>
+
+                            {/* Wrapper luôn tồn tại để tạo hiệu ứng đóng/mở */}
+                            <div
+                                id={menuId}
+                                className={`admin-menu-items-wrapper ${
+                                    isExpanded ? "expanded" : ""
+                                }`}
+                                aria-hidden={!isExpanded}
+                            >
+                                <div className="admin-menu-items">
+                                    {group.items.map((item) => (
+                                        <NavLink
+                                            key={item.path}
+                                            to={item.path}
+                                            end={item.path === "/admin"}
+                                            tabIndex={isExpanded ? 0 : -1}
+                                            className={({ isActive }) =>
+                                                `admin-menu-item ${
+                                                    isActive ? "active" : ""
+                                                }`
+                                            }
+                                            onClick={onNavigate}
+                                        >
+                                            <i className={`bi ${item.icon}`}></i>
+                                            <span>{item.label}</span>
+                                        </NavLink>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
+            {/* Footer */}
             <div className="admin-sidebar-footer">
                 <div className="admin-sidebar-footer-icon">
                     <i className="bi bi-shield-check"></i>
