@@ -8,11 +8,15 @@ function SeatMap({
 }) {
     const rows = [...new Set(seats.map((seat) => seat.seatRow))];
 
+    //=================== Lấy thông tin loại ghế ========================
+
     const getSeatType = (seatTypeId) => {
         return seatTypes.find(
             (type) => type.seatTypeId === seatTypeId
         );
     };
+
+    //=================== Xác định trạng thái ghế ========================
 
     const getSeatClass = (seat) => {
         if (unavailableSeatIds.includes(seat.seatId)) {
@@ -36,6 +40,72 @@ function SeatMap({
         return "standard";
     };
 
+    //=================== Kiểm tra ghế đôi ========================
+
+    const isCoupleSeat = (seat) => {
+        return getSeatType(seat.seatTypeId)?.seatTypeName === "Ghế đôi";
+    };
+
+    //=================== Hiển thị một ghế ========================
+
+    const renderSeat = (seat) => {
+        const unavailable = unavailableSeatIds.includes(seat.seatId);
+
+        return (
+            <button
+                type="button"
+                key={seat.seatId}
+                className={`booking-seat ${getSeatClass(seat)}`}
+                disabled={unavailable}
+                onClick={() => onToggleSeat(seat)}
+                title={`${seat.seatCode} - ${
+                    getSeatType(seat.seatTypeId)?.seatTypeName
+                }`}
+                aria-label={`Ghế ${seat.seatCode}`}
+                aria-pressed={selectedSeatIds.includes(seat.seatId)}
+            >
+                {seat.seatNumber}
+            </button>
+        );
+    };
+
+    //=================== Gom ghế thành từng cặp ========================
+
+    const groupSeats = (rowSeats) => {
+        const groups = [];
+
+        let index = 0;
+
+        while (index < rowSeats.length) {
+            const currentSeat = rowSeats[index];
+            const nextSeat = rowSeats[index + 1];
+
+            // Hai ghế đôi liền kề được gom thành một cặp
+            if (
+                isCoupleSeat(currentSeat) &&
+                nextSeat &&
+                isCoupleSeat(nextSeat) &&
+                nextSeat.seatNumber === currentSeat.seatNumber + 1
+            ) {
+                groups.push({
+                    type: "couple",
+                    seats: [currentSeat, nextSeat]
+                });
+
+                index += 2;
+            } else {
+                groups.push({
+                    type: "single",
+                    seats: [currentSeat]
+                });
+
+                index += 1;
+            }
+        }
+
+        return groups;
+    };
+
     return (
         <section className="booking-seat-section">
             <h3>Chọn vị trí ghế</h3>
@@ -51,28 +121,32 @@ function SeatMap({
                         .filter((seat) => seat.seatRow === row)
                         .sort((a, b) => a.seatNumber - b.seatNumber);
 
+                    const seatGroups = groupSeats(rowSeats);
+
                     return (
                         <div className="booking-seat-row" key={row}>
                             <span className="booking-row-label">{row}</span>
 
                             <div className="booking-seat-list">
-                                {rowSeats.map((seat) => {
-                                    const unavailable =
-                                        unavailableSeatIds.includes(seat.seatId);
+                                {seatGroups.map((group, index) => {
+                                    if (group.type === "couple") {
+                                        return (
+                                            <div
+                                                className="booking-couple-pair"
+                                                key={`couple-${group.seats[0].seatId}`}
+                                            >
+                                                {group.seats.map(renderSeat)}
+                                            </div>
+                                        );
+                                    }
 
                                     return (
-                                        <button
-                                            type="button"
-                                            key={seat.seatId}
-                                            className={`booking-seat ${getSeatClass(seat)}`}
-                                            disabled={unavailable}
-                                            onClick={() => onToggleSeat(seat)}
-                                            title={`${seat.seatCode} - ${
-                                                getSeatType(seat.seatTypeId)?.seatTypeName
-                                            }`}
+                                        <span
+                                            className="booking-single-seat"
+                                            key={`seat-${group.seats[0].seatId}`}
                                         >
-                                            {seat.seatNumber}
-                                        </button>
+                                            {renderSeat(group.seats[0])}
+                                        </span>
                                     );
                                 })}
                             </div>

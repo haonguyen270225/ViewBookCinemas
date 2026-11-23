@@ -1,5 +1,4 @@
-
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
 import Navbar from "../../components/layout/Navbar.jsx";
@@ -22,216 +21,206 @@ import "./Booking.css";
 //=================== Trang Đặt vé ========================
 
 function Booking() {
-    const { id } = useParams();
+  const { id } = useParams();
+//=================== Cuộn lên đầu trang khi mở đặt vé ========================
 
-    const [selectedSeatIds, setSelectedSeatIds] = useState([]);
-    const [isConfirmed, setIsConfirmed] = useState(false);
+useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+}, [id]);
 
-    //=================== Lấy thông tin suất chiếu ========================
+  const [selectedSeatIds, setSelectedSeatIds] = useState([]);
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
-    const showtime = showtimes.find(
-        (item) => item.id === Number(id)
-    );
+  //=================== Lấy thông tin suất chiếu ========================
 
-    //=================== Lấy thông tin phim ========================
+  const showtime = showtimes.find((item) => item.id === Number(id));
 
-    const movie = showtime
-        ? movies.find((item) => item.id === showtime.movieId)
-        : null;
+  //=================== Lấy thông tin phim ========================
 
-    //=================== Lấy thông tin rạp ========================
+  const movie = showtime
+    ? movies.find((item) => item.id === showtime.movieId)
+    : null;
 
-    const cinema = showtime
-        ? cinemas.find((item) => item.id === showtime.cinemaId)
-        : null;
+  //=================== Lấy thông tin rạp ========================
 
-    //=================== Lấy thông tin phòng chiếu ========================
+  const cinema = showtime
+    ? cinemas.find((item) => item.id === showtime.cinemaId)
+    : null;
 
-    const room = showtime
-        ? cinemaRooms.find(
-            (item) =>
-                item.cinemaId === showtime.cinemaId &&
-                item.roomName === showtime.roomName
-        )
-        : null;
+  //=================== Lấy thông tin phòng chiếu ========================
 
-    //=================== Lấy danh sách ghế của phòng ========================
+  const room = showtime
+    ? cinemaRooms.find(
+        (item) =>
+          item.cinemaId === showtime.cinemaId &&
+          item.roomName === showtime.roomName,
+      )
+    : null;
 
-    const roomSeats = useMemo(() => {
-        if (!room) return [];
+  //=================== Lấy danh sách ghế của phòng ========================
 
-        return seats
-            .filter(
-                (seat) =>
-                    seat.roomId === room.roomId &&
-                    seat.status === "Active"
-            )
-            .sort((a, b) => {
-                if (a.seatRow !== b.seatRow) {
-                    return a.seatRow.localeCompare(b.seatRow);
-                }
+  const roomSeats = useMemo(() => {
+    if (!room) return [];
 
-                return a.seatNumber - b.seatNumber;
-            });
-    }, [room]);
+    return seats
+      .filter((seat) => seat.roomId === room.roomId && seat.status === "Active")
+      .sort((a, b) => {
+        if (a.seatRow !== b.seatRow) {
+          return a.seatRow.localeCompare(b.seatRow);
+        }
 
-    //=================== Tạo trạng thái ghế mẫu ========================
-    // Dữ liệu này chỉ mô phỏng ghế đã đặt theo từng suất chiếu.
-    // Khi kết nối Backend sẽ thay bằng dữ liệu ShowtimeSeat.
+        return a.seatNumber - b.seatNumber;
+      });
+  }, [room]);
 
-    const unavailableSeatIds = useMemo(() => {
-        if (!showtime) return [];
+  //=================== Tạo trạng thái ghế mẫu ========================
+  // Dữ liệu này chỉ mô phỏng ghế đã đặt theo từng suất chiếu.
+  // Khi kết nối Backend sẽ thay bằng dữ liệu ShowtimeSeat.
 
-        return roomSeats
-            .filter(
-                (seat) =>
-                    (seat.seatId * 7 + showtime.id * 11) % 23 === 0
-            )
-            .map((seat) => seat.seatId);
-    }, [roomSeats, showtime]);
+  const unavailableSeatIds = useMemo(() => {
+    if (!showtime) return [];
 
-    //=================== Reset ghế khi đổi suất chiếu ========================
+    return roomSeats
+      .filter((seat) => (seat.seatId * 7 + showtime.id * 11) % 23 === 0)
+      .map((seat) => seat.seatId);
+  }, [roomSeats, showtime]);
 
-    useEffect(() => {
-        setSelectedSeatIds([]);
-        setIsConfirmed(false);
-    }, [id]);
+  //=================== Reset ghế khi đổi suất chiếu ========================
 
-    //=================== Chọn hoặc bỏ chọn ghế ========================
+  useEffect(() => {
+    setSelectedSeatIds([]);
+    setIsConfirmed(false);
+  }, [id]);
 
-    const handleToggleSeat = (seat) => {
-        setIsConfirmed(false);
+  //=================== Chọn hoặc bỏ chọn ghế ========================
 
-        setSelectedSeatIds((current) => {
-            if (current.includes(seat.seatId)) {
-                return current.filter(
-                    (seatId) => seatId !== seat.seatId
-                );
-            }
+  const handleToggleSeat = (seat) => {
+    setIsConfirmed(false);
 
-            return [...current, seat.seatId];
-        });
-    };
+    setSelectedSeatIds((current) => {
+      if (current.includes(seat.seatId)) {
+        return current.filter((seatId) => seatId !== seat.seatId);
+      }
 
-    //=================== Lấy thông tin ghế đã chọn ========================
+      return [...current, seat.seatId];
+    });
+  };
 
-    const selectedSeats = roomSeats.filter(
-        (seat) => selectedSeatIds.includes(seat.seatId)
-    );
+  //=================== Lấy thông tin ghế đã chọn ========================
 
-    //=================== Xác nhận lựa chọn ========================
+  const selectedSeats = roomSeats.filter((seat) =>
+    selectedSeatIds.includes(seat.seatId),
+  );
 
-    const handleConfirm = () => {
-        if (selectedSeats.length === 0) return;
+  //=================== Xác nhận lựa chọn ========================
 
-        setIsConfirmed(true);
-    };
+  const handleConfirm = () => {
+    if (selectedSeats.length === 0) return;
 
-    //=================== Kiểm tra dữ liệu ========================
+    setIsConfirmed(true);
+  };
 
-    if (!showtime || !movie || !cinema || !room) {
-        return (
-            <>
-                <Navbar />
+  //=================== Kiểm tra dữ liệu ========================
 
-                <main className="booking-error">
-                    <div className="container">
-                        <i className="bi bi-exclamation-circle"></i>
-
-                        <h2>Không tìm thấy thông tin đặt vé</h2>
-
-                        <p>
-                            Suất chiếu không tồn tại hoặc thông tin phòng chiếu
-                            chưa được cấu hình.
-                        </p>
-
-                        <Link to="/showtimes">
-                            Quay lại lịch chiếu
-                        </Link>
-                    </div>
-                </main>
-
-                <Footer />
-            </>
-        );
-    }
-
-    //=================== Giao diện trang Đặt vé ========================
-
+  if (!showtime || !movie || !cinema || !room) {
     return (
-        <>
-            <Navbar />
+      <>
+        <Navbar />
 
-            <main className="booking-page">
-                <section className="booking-hero">
-                    <div className="container">
-                        <span>VIEWBOOKCINEMAS</span>
-                        <h1>ĐẶT VÉ XEM PHIM</h1>
-                        <p>
-                            Chọn vị trí ghế ngồi yêu thích và tận hưởng
-                            trải nghiệm điện ảnh của bạn.
-                        </p>
-                    </div>
-                </section>
+        <main className="booking-error">
+          <div className="container">
+            <i className="bi bi-exclamation-circle"></i>
 
-                <div className="container booking-content">
+            <h2>Không tìm thấy thông tin đặt vé</h2>
 
-                    {/*=================== Các bước đặt vé ========================*/}
+            <p>
+              Suất chiếu không tồn tại hoặc thông tin phòng chiếu chưa được cấu
+              hình.
+            </p>
 
-                    <BookingProgress />
+            <Link to="/showtimes">Quay lại lịch chiếu</Link>
+          </div>
+        </main>
 
-                    {/*=================== Thông tin suất chiếu ========================*/}
-
-                    <ShowtimeSummary
-                        movie={movie}
-                        cinema={cinema}
-                        showtime={showtime}
-                        room={room}
-                    />
-
-                    {/*=================== Khu vực chọn ghế ========================*/}
-
-                    <div className="booking-layout">
-                        <div className="booking-seat-area">
-                            <SeatMap
-                                seats={roomSeats}
-                                seatTypes={seatTypes}
-                                selectedSeatIds={selectedSeatIds}
-                                unavailableSeatIds={unavailableSeatIds}
-                                onToggleSeat={handleToggleSeat}
-                            />
-                        </div>
-
-                        <div className="booking-summary-area">
-                            <BookingSummary
-                                selectedSeats={selectedSeats}
-                                seatTypes={seatTypes}
-                                basePrice={showtime.basePrice}
-                                onConfirm={handleConfirm}
-                            />
-
-                            {isConfirmed && (
-                                <div className="booking-confirmed">
-                                    <i className="bi bi-check-circle-fill"></i>
-
-                                    <div>
-                                        <strong>Đã xác nhận lựa chọn ghế</strong>
-                                        <p>
-                                            Đây là bước xác nhận mô phỏng.
-                                            Chức năng giữ ghế và thanh toán
-                                            sẽ được triển khai sau.
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <Footer />
-        </>
+        <Footer />
+      </>
     );
+  }
+
+  //=================== Giao diện trang Đặt vé ========================
+
+  return (
+    <>
+      <Navbar />
+
+      <main className="booking-page">
+        <section className="booking-hero">
+          <div className="container">
+            <span>VIEWBOOKCINEMAS</span>
+            <h1>ĐẶT VÉ XEM PHIM</h1>
+            <p>
+              Chọn vị trí ghế ngồi yêu thích và tận hưởng trải nghiệm điện ảnh
+              của bạn.
+            </p>
+          </div>
+        </section>
+
+        <div className="container booking-content">
+          {/*=================== Các bước đặt vé ========================*/}
+
+          <BookingProgress />
+
+          {/*=================== Thông tin suất chiếu ========================*/}
+
+          <ShowtimeSummary
+            movie={movie}
+            cinema={cinema}
+            showtime={showtime}
+            room={room}
+          />
+
+          {/*=================== Khu vực chọn ghế ========================*/}
+
+          <div className="booking-layout">
+            <div className="booking-seat-area">
+              <SeatMap
+                seats={roomSeats}
+                seatTypes={seatTypes}
+                selectedSeatIds={selectedSeatIds}
+                unavailableSeatIds={unavailableSeatIds}
+                onToggleSeat={handleToggleSeat}
+              />
+            </div>
+
+            <div className="booking-summary-area">
+              <BookingSummary
+                selectedSeats={selectedSeats}
+                seatTypes={seatTypes}
+                basePrice={showtime.basePrice}
+                onConfirm={handleConfirm}
+              />
+
+              {isConfirmed && (
+                <div className="booking-confirmed">
+                  <i className="bi bi-check-circle-fill"></i>
+
+                  <div>
+                    <strong>Đã xác nhận lựa chọn ghế</strong>
+                    <p>
+                      Đây là bước xác nhận mô phỏng. Chức năng giữ ghế và thanh
+                      toán sẽ được triển khai sau.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </>
+  );
 }
 
 export default Booking;

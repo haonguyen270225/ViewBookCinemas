@@ -603,3 +603,22 @@
     background: #1e3826;
     color: #a8e2b8;
 }
+
+/*=================== Bố trí ghế đôi ========================*/
+
+.booking-couple-pair {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.booking-couple-pair .booking-seat:first-child {
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+.booking-couple-pair .booking-seat:last-child {
+    margin-left: -1px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+}
