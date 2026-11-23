@@ -13,6 +13,7 @@ import AccountSidebar from "../../components/account/AccountSidebar/AccountSideb
 import AccountOverview from "../../components/account/AccountOverview/AccountOverview.jsx";
 import AccountProfile from "../../components/account/AccountProfile/AccountProfile.jsx";
 import AccountPassword from "../../components/account/AccountPassword/AccountPassword.jsx";
+import TicketHistory from "../../components/account/TicketHistory/TicketHistory.jsx";
 
 //========================= Import Context ========================
 
@@ -217,32 +218,33 @@ function Account() {
 
     const renderAccountContent = () => {
         switch (activeTab) {
-            case "profile":
-                return (
-                    <AccountProfile
-                        profileData={profileData}
-                        isEditing={isEditing}
-                        isSaving={isSaving}
-                        onProfileChange={handleProfileChange}
-                        onEdit={() => setIsEditing(true)}
-                        onCancel={handleCancelEdit}
-                        onSave={handleSaveProfile}
-                    />
-                );
+          case "profile":
+            return (
+              <AccountProfile
+                profileData={profileData}
+                isEditing={isEditing}
+                isSaving={isSaving}
+                onProfileChange={handleProfileChange}
+                onEdit={() => setIsEditing(true)}
+                onCancel={handleCancelEdit}
+                onSave={handleSaveProfile}
+              />
+            );
 
-            case "password":
-                return (
-                    <AccountPassword
-                        passwordData={passwordData}
-                        isChangingPassword={isChangingPassword}
-                        onPasswordChange={handlePasswordChange}
-                        onChangePassword={handleChangePassword}
-                    />
-                );
-
-            case "overview":
-            default:
-                return <AccountOverview user={user} />;
+          case "password":
+            return (
+              <AccountPassword
+                passwordData={passwordData}
+                isChangingPassword={isChangingPassword}
+                onPasswordChange={handlePasswordChange}
+                onChangePassword={handleChangePassword}
+              />
+            );
+          case "tickets":
+            return <TicketHistory />;
+          case "overview":
+          default:
+            return <AccountOverview user={user} />;
         }
     };
 
@@ -301,9 +303,8 @@ function Account() {
                     </div>
 
                 </div>
-
+                
             </main>
-
             <Footer />
         </>
     );

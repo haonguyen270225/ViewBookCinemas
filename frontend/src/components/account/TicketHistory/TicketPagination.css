@@ -1,0 +1,58 @@
+
+/*========================= Ticket Pagination ========================*/
+
+.ticket-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+
+    margin-top: 22px;
+    padding-top: 18px;
+
+    border-top: 1px solid var(--vbc-border);
+}
+
+.ticket-pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+
+    border: 1px solid var(--vbc-border);
+    border-radius: 5px;
+
+    background: var(--vbc-bg-card);
+    color: var(--vbc-text);
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.ticket-pagination-btn:hover:not(:disabled) {
+    border-color: var(--vbc-primary);
+    background: var(--vbc-primary);
+    color: #ffffff;
+}
+
+.ticket-pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.ticket-pagination-info {
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+}
+
+.ticket-pagination-info strong {
+    color: var(--vbc-primary);
+}
+
+@media (max-width: 480px) {
+    .ticket-pagination {
+        gap: 14px;
+    }
+}

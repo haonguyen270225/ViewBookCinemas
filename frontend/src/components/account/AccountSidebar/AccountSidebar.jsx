@@ -1,6 +1,13 @@
 
 import "./AccountSidebar.css";
 
+import {
+    LayoutDashboard,
+    UserRound,
+    ShieldCheck,
+    Ticket
+} from "lucide-react";
+
 //========================= Component AccountSidebar ========================
 
 function AccountSidebar({ user, activeTab, onTabChange }) {
@@ -28,17 +35,22 @@ function AccountSidebar({ user, activeTab, onTabChange }) {
         {
             id: "overview",
             label: "Tổng quan",
-            icon: "bi-grid"
+            icon: LayoutDashboard
         },
         {
             id: "profile",
             label: "Thông tin cá nhân",
-            icon: "bi-person"
+            icon: UserRound
         },
         {
             id: "password",
             label: "Bảo mật tài khoản",
-            icon: "bi-shield-lock"
+            icon: ShieldCheck
+        },
+        {
+            id: "tickets",
+            label: "Lịch sử đặt vé",
+            icon: Ticket
         }
     ];
 
@@ -48,6 +60,7 @@ function AccountSidebar({ user, activeTab, onTabChange }) {
         <aside className="account-sidebar">
 
             <div className="account-sidebar-user">
+
                 <div className="account-sidebar-avatar">
                     {getInitials(user?.fullName)}
                 </div>
@@ -60,40 +73,57 @@ function AccountSidebar({ user, activeTab, onTabChange }) {
                     <i className="bi bi-patch-check-fill"></i>
                     Thành viên VBC
                 </span>
+
             </div>
 
             <div className="account-sidebar-divider"></div>
 
             <nav className="account-sidebar-menu">
+
                 <span className="account-sidebar-heading">
                     QUẢN LÝ TÀI KHOẢN
                 </span>
 
-                {menuItems.map((item) => (
-                    <button
-                        key={item.id}
-                        type="button"
-                        className={`account-sidebar-item ${
-                            activeTab === item.id ? "active" : ""
-                        }`}
-                        onClick={() => onTabChange(item.id)}
-                    >
-                        <i className={`bi ${item.icon}`}></i>
-                        <span>{item.label}</span>
+                {menuItems.map((item) => {
 
-                        {activeTab === item.id && (
-                            <i className="bi bi-chevron-right account-sidebar-arrow"></i>
-                        )}
-                    </button>
-                ))}
+                    const Icon = item.icon;
+
+                    return (
+                        <button
+                            key={item.id}
+                            type="button"
+                            className={`account-sidebar-item ${
+                                activeTab === item.id ? "active" : ""
+                            }`}
+                            onClick={() => onTabChange(item.id)}
+                        >
+
+                            <Icon
+                                size={18}
+                                strokeWidth={2}
+                            />
+
+                            <span>{item.label}</span>
+
+                            {activeTab === item.id && (
+                                <i className="bi bi-chevron-right account-sidebar-arrow"></i>
+                            )}
+
+                        </button>
+                    );
+                })}
+
             </nav>
 
             <div className="account-sidebar-note">
+
                 <i className="bi bi-info-circle"></i>
+
                 <p>
                     Quản lý thông tin và bảo mật tài khoản
                     để có trải nghiệm tốt hơn tại VBC.
                 </p>
+
             </div>
 
         </aside>

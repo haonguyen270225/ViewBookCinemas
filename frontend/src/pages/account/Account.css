@@ -81,3 +81,12 @@
         font-size: 25px;
     }
 }
+
+.account-container {
+    max-width: 1200px;
+}
+
+.account-content {
+    min-width: 0;
+    height: 100%;
+}

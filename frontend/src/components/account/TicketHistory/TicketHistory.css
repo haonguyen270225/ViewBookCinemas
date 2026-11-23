@@ -1,0 +1,168 @@
+
+/*========================= Ticket History Section ========================*/
+
+.ticket-history-section {
+    width: 100%;
+    margin-top: 0;
+    padding: 16px;
+
+    background: var(--vbc-bg-card);
+    border: none;
+    border-radius: 8px;
+}
+
+/*========================= Header ========================*/
+
+.ticket-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.ticket-history-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ticket-history-icon {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 6px;
+    color: var(--vbc-primary);
+    background: var(--vbc-primary-light);
+}
+
+.ticket-history-title h2 {
+    margin: 0 0 3px;
+    color: var(--vbc-text);
+    font-size: 17px;
+    font-weight: 750;
+}
+
+.ticket-history-title p {
+    margin: 0;
+    color: var(--vbc-text-secondary);
+    font-size: 11px;
+}
+
+.ticket-total {
+    padding: 5px 9px;
+    border-radius: 4px;
+
+    color: var(--vbc-primary);
+    background: var(--vbc-primary-light);
+
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/*========================= Filters ========================*/
+
+.ticket-history-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.ticket-filter-btn {
+    padding: 6px 10px;
+
+    border: 1px solid transparent;
+    border-radius: 4px;
+
+    background: transparent;
+    color: var(--vbc-text-secondary);
+
+    font-size: 11px;
+    font-weight: 650;
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.ticket-filter-btn:hover {
+    background: var(--vbc-bg-secondary);
+    color: var(--vbc-primary);
+}
+
+.ticket-filter-btn.active {
+    border-color: var(--vbc-primary);
+    background: var(--vbc-primary);
+    color: #ffffff;
+}
+
+/*========================= Ticket List ========================*/
+
+.ticket-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ticket-history-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 35px 15px;
+    color: var(--vbc-text-muted);
+    text-align: center;
+}
+
+.ticket-history-empty h3 {
+    margin: 12px 0 5px;
+    color: var(--vbc-text);
+    font-size: 15px;
+}
+
+.ticket-history-empty p {
+    margin: 0;
+    color: var(--vbc-text-secondary);
+    font-size: 12px;
+}
+
+/*========================= Pagination ========================*/
+
+.ticket-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+/*========================= Responsive ========================*/
+
+@media (max-width: 576px) {
+    .ticket-history-section {
+        padding: 12px;
+    }
+
+    .ticket-history-title h2 {
+        font-size: 16px;
+    }
+
+    .ticket-history-title p {
+        font-size: 10px;
+    }
+
+    .ticket-history-filters {
+        gap: 5px;
+    }
+
+    .ticket-filter-btn {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+}
