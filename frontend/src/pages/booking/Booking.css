@@ -777,3 +777,71 @@
     }
 }
 
+/*=================== Hoàn tất thanh toán ========================*/
+
+.booking-payment-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 45px 25px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 10px;
+    background: var(--vbc-bg-card);
+    text-align: center;
+}
+
+.booking-payment-success > i {
+    color: #28a745;
+    font-size: 65px;
+    margin-bottom: 18px;
+}
+
+.booking-payment-success h2 {
+    color: var(--vbc-text);
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.booking-payment-success p {
+    margin: 7px 0;
+    color: var(--vbc-text-secondary);
+    font-size: 13px;
+}
+
+.booking-payment-success h3 {
+    margin: 15px 0;
+    color: var(--vbc-primary);
+    font-size: 26px;
+    font-weight: 800;
+}
+
+.booking-success-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    margin-top: 15px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    background: var(--vbc-primary);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.booking-success-link:hover {
+    background: #c62832;
+    color: #ffffff;
+}
+
+/*=================== Bố cục thanh toán toàn chiều rộng ========================*/
+
+.booking-layout-full {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.booking-layout-full .booking-main-area {
+    width: 100%;
+    min-width: 0;
+}

@@ -1,0 +1,508 @@
+
+/*=================== Khu vực thanh toán ========================*/
+
+.payment-section {
+    padding: 25px;
+    border: none;
+    border-radius: 10px;
+    background: var(--vbc-bg-card);
+}
+
+.payment-heading {
+    margin-bottom: 25px;
+}
+
+.payment-eyebrow {
+    color: var(--vbc-primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.payment-heading h2 {
+    margin: 8px 0;
+    color: var(--vbc-text);
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.payment-heading p {
+    margin: 0;
+    color: var(--vbc-text-secondary);
+    font-size: 13px;
+}
+
+/*=================== Phương thức thanh toán ========================*/
+
+.payment-method-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.payment-method {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 8px;
+    background: var(--vbc-bg-card);
+    text-align: left;
+    transition: 0.2s ease;
+}
+
+.payment-method:hover,
+.payment-method.active {
+    border-color: var(--vbc-primary);
+    background: rgba(229, 57, 69, 0.04);
+}
+
+.payment-method-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 45px;
+    width: 45px;
+    height: 45px;
+    border-radius: 9px;
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 900;
+}
+
+.momo-icon {
+    background: #a50064;
+    font-size: 19px;
+}
+
+.card-icon {
+    background: #263b75;
+}
+
+.payment-method-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.payment-method-info strong {
+    color: var(--vbc-text);
+    font-size: 14px;
+}
+
+.payment-method-info small {
+    color: var(--vbc-text-muted);
+    font-size: 11px;
+}
+
+.payment-radio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 21px;
+    width: 21px;
+    height: 21px;
+    border: 1px solid var(--vbc-border);
+    border-radius: 50%;
+    color: #ffffff;
+}
+
+.payment-method.active .payment-radio {
+    border-color: var(--vbc-primary);
+    background: var(--vbc-primary);
+}
+
+/*=================== Khu vực xem trước thanh toán ========================*/
+
+.payment-preview {
+    margin-top: 20px;
+    padding: 24px 15px;
+    border: 1px dashed var(--vbc-border);
+    border-radius: 9px;
+    background: var(--vbc-bg-secondary);
+}
+
+.payment-momo-preview,
+.payment-card-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.payment-momo-logo {
+    margin-bottom: 15px;
+    color: #a50064;
+    font-size: 23px;
+    font-weight: 900;
+}
+
+.payment-demo-qr {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 15px;
+    padding: 9px;
+    background: #ffffff;
+}
+
+.payment-qr-pattern {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    background-image:
+        repeating-conic-gradient(#222 0% 25%, #fff 0% 50%);
+    background-size: 13px 13px;
+    overflow: hidden;
+}
+
+.qr-corner {
+    position: absolute;
+    z-index: 1;
+    width: 38px;
+    height: 38px;
+    border: 7px solid #222222;
+    background: #ffffff;
+}
+
+.qr-corner::after {
+    position: absolute;
+    inset: 5px;
+    background: #222222;
+    content: "";
+}
+
+.qr-corner.top-left {
+    top: 0;
+    left: 0;
+}
+
+.qr-corner.top-right {
+    top: 0;
+    right: 0;
+}
+
+.qr-corner.bottom-left {
+    bottom: 0;
+    left: 0;
+}
+
+.qr-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 25px;
+    height: 25px;
+    border: 5px solid #ffffff;
+    background: #222222;
+    transform: translate(-50%, -50%);
+}
+
+.payment-preview strong {
+    color: var(--vbc-text);
+    font-size: 13px;
+}
+
+.payment-preview p {
+    max-width: 400px;
+    margin: 7px 0 0;
+    color: var(--vbc-text-muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/*=================== Thẻ thanh toán mô phỏng ========================*/
+
+.payment-card-visual {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: min(100%, 330px);
+    min-height: 185px;
+    margin-bottom: 18px;
+    padding: 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #202b55, #594078);
+    color: #ffffff;
+    text-align: left;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.payment-card-top,
+.payment-card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.payment-card-top span,
+.payment-card-bottom span {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.payment-card-top i {
+    font-size: 25px;
+}
+
+.payment-card-number {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.payment-card-bottom i {
+    font-size: 25px;
+}
+
+/*=================== Tổng tiền ========================*/
+
+.payment-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+    padding: 18px 0;
+    border-top: 1px solid var(--vbc-border);
+    border-bottom: 1px solid var(--vbc-border);
+}
+
+.payment-total span {
+    color: var(--vbc-text-secondary);
+    font-size: 13px;
+}
+
+.payment-total strong {
+    color: var(--vbc-primary);
+    font-size: 22px;
+    white-space: nowrap;
+}
+
+/*=================== Nút thao tác ========================*/
+
+.payment-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.payment-back-button,
+.payment-confirm-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1;
+    min-height: 45px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    transition: 0.2s ease;
+}
+
+.payment-back-button {
+    border: 1px solid var(--vbc-border);
+    background: transparent;
+    color: var(--vbc-text-secondary);
+}
+
+.payment-back-button:hover {
+    border-color: var(--vbc-primary);
+    color: var(--vbc-primary);
+}
+
+.payment-confirm-button {
+    border: 0;
+    background: var(--vbc-primary);
+    color: #ffffff;
+}
+
+.payment-confirm-button:hover {
+    background: #c62832;
+    transform: translateY(-2px);
+}
+
+/*=================== Thông báo Demo ========================*/
+
+.payment-demo-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 17px 0 0;
+    color: var(--vbc-text-muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.payment-demo-note i {
+    color: var(--vbc-primary);
+    font-size: 14px;
+}
+
+/*=================== Responsive ========================*/
+
+@media (max-width: 576px) {
+    .payment-section {
+        padding: 17px;
+    }
+
+    .payment-heading h2 {
+        font-size: 20px;
+    }
+
+    .payment-method {
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .payment-method-icon {
+        flex-basis: 40px;
+        width: 40px;
+        height: 40px;
+    }
+
+    .payment-method-info strong {
+        font-size: 12px;
+    }
+
+    .payment-method-info small {
+        font-size: 10px;
+    }
+
+    .payment-actions {
+        flex-direction: column-reverse;
+    }
+
+    .payment-total strong {
+        font-size: 19px;
+    }
+}
+
+/* ==============================
+   PAYMENT HEADING
+============================== */
+
+.payment-heading {
+    margin-bottom: 25px;
+    text-align: left;
+    border: none;
+    box-shadow: none;
+}
+
+/* VIEWBOOKCINEMAS - nằm bên trái */
+.payment-eyebrow {
+    display: block;
+    text-align: left;
+    color: var(--vbc-primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+/* Thanh toán đơn hàng - nằm giữa */
+.payment-heading h2 {
+    margin: 12px 0;
+    color: var(--vbc-text);
+    font-size: 27px;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* Nội dung hướng dẫn - nằm giữa */
+.payment-heading p {
+    margin: 0;
+    color: var(--vbc-text-secondary);
+    font-size: 13px;
+    text-align: center;
+}
+
+/* ==============================
+   PAYMENT DEMO NOTE
+============================== */
+
+.payment-demo-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 17px 0 0;
+    color: var(--vbc-text-muted);
+    font-size: 11px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.payment-demo-note i {
+    flex-shrink: 0;
+    color: var(--vbc-primary);
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* Căn giữa nội dung thanh toán theo chiều rộng cửa sổ */
+.payment-method-list,
+.payment-preview,
+.payment-total,
+.payment-actions,
+.payment-demo-note {
+    width: 100%;
+    max-width: 850px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Căn giữa khu vực chọn phương thức */
+.payment-method-list {
+    justify-content: center;
+}
+
+/* Căn giữa tổng tiền */
+.payment-total {
+    text-align: center;
+}
+
+/* Căn giữa các nút thao tác */
+.payment-actions {
+    justify-content: center;
+}
+
+/*=================== Căn giữa nội dung thanh toán ========================*/
+
+.payment-method-list,
+.payment-preview,
+.payment-total,
+.payment-actions,
+.payment-demo-note {
+    width: 100%;
+    max-width: 850px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Căn giữa phương thức thanh toán */
+.payment-method-list {
+    justify-content: center;
+}
+
+/* Căn giữa khu vực tổng tiền */
+.payment-total {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+}
+
+/* Căn giữa các nút thao tác */
+.payment-actions {
+    justify-content: center;
+}
