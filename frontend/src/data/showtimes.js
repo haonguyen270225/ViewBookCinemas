@@ -1,6 +1,4 @@
 
-import { cinemas } from "./cinemas.js";
-
 //=================== Hàm tạo ngày chiếu mẫu ========================
 
 const getDateOffset = (offset) => {
@@ -14,11 +12,6 @@ const getDateOffset = (offset) => {
     return `${year}-${month}-${day}`;
 };
 
-//=================== Danh sách rạp ========================
-// Sử dụng dữ liệu duy nhất từ cinemas.js
-
-export { cinemas };
-
 //=================== Danh sách lịch chiếu mẫu ========================
 
 export const showtimes = [
@@ -26,7 +19,7 @@ export const showtimes = [
         id: 1,
         movieId: 1,
         cinemaId: 1,
-        roomName: "Phòng 01",
+        roomId: 1,
         movieVersion: "2D - Phụ đề Việt",
         startTime: `${getDateOffset(0)}T09:00:00`,
         endTime: `${getDateOffset(0)}T11:05:00`,
@@ -37,7 +30,7 @@ export const showtimes = [
         id: 2,
         movieId: 1,
         cinemaId: 1,
-        roomName: "Phòng 02",
+        roomId: 2,
         movieVersion: "2D - Lồng tiếng Việt",
         startTime: `${getDateOffset(0)}T13:30:00`,
         endTime: `${getDateOffset(0)}T15:35:00`,
@@ -48,7 +41,7 @@ export const showtimes = [
         id: 3,
         movieId: 2,
         cinemaId: 1,
-        roomName: "Phòng 03",
+        roomId: 3,
         movieVersion: "2D - Phụ đề Việt",
         startTime: `${getDateOffset(0)}T18:00:00`,
         endTime: `${getDateOffset(0)}T19:50:00`,
@@ -59,7 +52,7 @@ export const showtimes = [
         id: 4,
         movieId: 3,
         cinemaId: 1,
-        roomName: "Phòng 01",
+        roomId: 1,
         movieVersion: "2D - Phụ đề Việt",
         startTime: `${getDateOffset(1)}T10:00:00`,
         endTime: `${getDateOffset(1)}T11:45:00`,
@@ -70,7 +63,7 @@ export const showtimes = [
         id: 5,
         movieId: 4,
         cinemaId: 1,
-        roomName: "Phòng 02",
+        roomId: 2,
         movieVersion: "2D - Phụ đề Việt",
         startTime: `${getDateOffset(1)}T19:30:00`,
         endTime: `${getDateOffset(1)}T21:45:00`,
@@ -81,7 +74,7 @@ export const showtimes = [
         id: 6,
         movieId: 1,
         cinemaId: 3,
-        roomName: "Phòng 05",
+        roomId: 7,
         movieVersion: "2D - Phụ đề Việt",
         startTime: `${getDateOffset(0)}T15:00:00`,
         endTime: `${getDateOffset(0)}T17:05:00`,
@@ -92,7 +85,7 @@ export const showtimes = [
         id: 7,
         movieId: 2,
         cinemaId: 3,
-        roomName: "Phòng 06",
+        roomId: 8,
         movieVersion: "2D - Phụ đề Việt",
         startTime: `${getDateOffset(1)}T20:00:00`,
         endTime: `${getDateOffset(1)}T21:50:00`,
