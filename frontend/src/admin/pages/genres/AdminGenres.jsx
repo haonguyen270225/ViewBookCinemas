@@ -3,9 +3,13 @@ import { useMemo, useState } from "react";
 
 import moviesData from "../../../data/movies.js";
 
+import {
+    getGenres,
+    saveGenres
+} from "../../../services/genreService.js";
+
 import "./AdminGenres.css";
 
-const STORAGE_KEY = "viewbook-admin-genres";
 const MOVIE_STORAGE_KEY = "viewbook-admin-movies";
 
 const STATUS_OPTIONS = [
@@ -57,54 +61,8 @@ const getInitialMovies = () => {
     return moviesData;
 };
 
-// Tổng hợp thể loại từ danh sách phim
-const getGenresFromMovies = (movies) => {
-    const genreMap = new Map();
-
-    movies.forEach((movie) => {
-        (movie.genres || []).forEach((genre) => {
-            const name = String(genre).trim();
-
-            if (!name) return;
-
-            const key = normalizeName(name);
-
-            if (!genreMap.has(key)) {
-                genreMap.set(key, {
-                    id: `genre-${createSlug(name)}`,
-                    name,
-                    slug: createSlug(name),
-                    description: "",
-                    status: "Đang sử dụng"
-                });
-            }
-        });
-    });
-
-    return Array.from(genreMap.values());
-};
-
-// Đọc dữ liệu thể loại đã lưu
-const getInitialGenres = () => {
-    try {
-        const savedGenres = localStorage.getItem(STORAGE_KEY);
-
-        if (savedGenres) {
-            const parsed = JSON.parse(savedGenres);
-
-            if (Array.isArray(parsed)) {
-                return parsed;
-            }
-        }
-    } catch (error) {
-        console.error("Không thể đọc dữ liệu thể loại:", error);
-    }
-
-    return getGenresFromMovies(getInitialMovies());
-};
-
 function AdminGenres() {
-    const [genres, setGenres] = useState(getInitialGenres);
+    const [genres, setGenres] = useState(getGenres);
     const [movies] = useState(getInitialMovies);
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -156,19 +114,17 @@ function AdminGenres() {
         }).sort((a, b) => a.name.localeCompare(b.name, "vi"));
     }, [genres, searchTerm, selectedStatus]);
 
-    // Lưu dữ liệu
+    // Lưu dữ liệu thông qua genreService
     const updateGenres = (newGenres) => {
-        try {
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(newGenres)
-            );
+        const isSaved = saveGenres(newGenres);
 
-            setGenres(newGenres);
-        } catch (error) {
-            console.error("Không thể lưu thể loại:", error);
+        if (!isSaved) {
             alert("Không thể lưu dữ liệu trên trình duyệt.");
+            return false;
         }
+
+        setGenres(newGenres);
+        return true;
     };
 
     // Mở form thêm
@@ -247,8 +203,11 @@ function AdminGenres() {
             )
             : [...genres, genreData];
 
-        updateGenres(updatedGenres);
-        handleCloseModal();
+        const isSaved = updateGenres(updatedGenres);
+
+        if (isSaved) {
+            handleCloseModal();
+        }
     };
 
     // Xóa thể loại
