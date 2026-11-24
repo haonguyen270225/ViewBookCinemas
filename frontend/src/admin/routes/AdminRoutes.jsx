@@ -13,6 +13,7 @@ import AdminShowtimes from "../pages/showtimes/AdminShowtimes.jsx";
 import AdminBookings from "../pages/bookings/AdminBookings.jsx";
 import AdminTickets from "../pages/tickets/AdminTickets.jsx";
 import AdminPayments from "../pages/payments/AdminPayments.jsx";
+import AdminProducts from "../pages/products/AdminProducts.jsx";
 
 
 function AdminRoutes() {
@@ -37,10 +38,7 @@ function AdminRoutes() {
             element={<AdminComingSoon title="Quản lý khách hàng" />}
           />
 
-          <Route
-            path="products"
-            element={<AdminComingSoon title="Quản lý sản phẩm" />}
-          />
+          <Route path="products" element={<AdminProducts />} />
 
           <Route
             path="categories"
