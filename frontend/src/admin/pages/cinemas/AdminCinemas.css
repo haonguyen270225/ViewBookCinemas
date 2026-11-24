@@ -1,0 +1,733 @@
+
+/* ===================== ADMIN CINEMAS ===================== */
+
+.admin-cinemas {
+    width: 100%;
+    min-width: 0;
+}
+
+.admin-cinemas-add-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 8px;
+    background: #e53945;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-cinemas-add-button:hover {
+    background: #c92e3a;
+    transform: translateY(-1px);
+}
+
+.admin-cinemas-statistics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.admin-cinema-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid #e9eaf0;
+    border-radius: 13px;
+    background: #ffffff;
+}
+
+.admin-cinema-stat-card span,
+.admin-cinema-stat-card strong {
+    display: block;
+}
+
+.admin-cinema-stat-card span {
+    margin-bottom: 5px;
+    color: #838a9b;
+    font-size: 12px;
+}
+
+.admin-cinema-stat-card strong {
+    color: #252b3b;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.admin-cinema-stat-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    font-size: 20px;
+}
+
+.admin-cinema-stat-icon.blue {
+    background: #eaf2ff;
+    color: #3478e5;
+}
+
+.admin-cinema-stat-icon.green {
+    background: #e8f8f0;
+    color: #26a36b;
+}
+
+.admin-cinema-stat-icon.gray {
+    background: #f0f1f4;
+    color: #7b8495;
+}
+
+/* ===================== TOOLBAR ===================== */
+
+.admin-cinemas-panel {
+    overflow: hidden;
+}
+
+.admin-cinemas-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.admin-cinemas-search {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 180px;
+    height: 42px;
+    padding: 0 13px;
+    border: 1px solid #e5e7ed;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.admin-cinemas-search i {
+    flex-shrink: 0;
+    color: #9298a8;
+    font-size: 15px;
+}
+
+.admin-cinemas-search input {
+    width: 100%;
+    height: 100%;
+    padding: 0 10px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #252b3b;
+    font-size: 12px;
+}
+
+.admin-cinemas-search input::placeholder {
+    color: #a1a6b3;
+}
+
+.admin-cinemas-filter {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.admin-cinemas-filter label {
+    flex-shrink: 0;
+    color: #747c8d;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.admin-cinemas-filter select {
+    height: 42px;
+    min-width: 155px;
+    padding: 0 30px 0 11px;
+    border: 1px solid #e5e7ed;
+    border-radius: 8px;
+    outline: none;
+    background: #ffffff;
+    color: #4b5265;
+    font-size: 11px;
+}
+
+.admin-cinemas-reset-button {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #e5e7ed;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #687083;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-cinemas-reset-button:hover {
+    border-color: #e53945;
+    color: #e53945;
+}
+
+/* ===================== LIST HEADING ===================== */
+
+.admin-cinemas-list-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 17px;
+}
+
+.admin-cinemas-list-heading h5 {
+    margin: 0 0 4px;
+    color: #252b3b;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.admin-cinemas-list-heading p {
+    margin: 0;
+    color: #9298a8;
+    font-size: 11px;
+}
+
+.admin-cinemas-list-heading > span {
+    color: #858b9b;
+    font-size: 11px;
+}
+
+.admin-cinemas-list-heading > span strong {
+    color: #e53945;
+}
+
+/* ===================== CINEMA TABLE ===================== */
+
+.admin-cinemas-table {
+    min-width: 1050px;
+}
+
+.admin-cinema-info {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 190px;
+}
+
+.admin-cinema-info img {
+    flex-shrink: 0;
+    width: 58px;
+    height: 43px;
+    border-radius: 7px;
+    background: #f0f1f4;
+    object-fit: cover;
+}
+
+.admin-cinema-info strong,
+.admin-cinema-info span {
+    display: block;
+}
+
+.admin-cinema-info strong {
+    max-width: 190px;
+    overflow: hidden;
+    color: #252b3b;
+    font-size: 11px;
+    text-overflow: ellipsis;
+}
+
+.admin-cinema-info span {
+    margin-top: 5px;
+    color: #9298a8;
+    font-size: 10px;
+}
+
+.admin-cinema-address {
+    max-width: 190px;
+    white-space: normal;
+}
+
+.admin-cinema-address span,
+.admin-cinema-address small {
+    display: block;
+}
+
+.admin-cinema-address span {
+    color: #687083;
+    line-height: 1.5;
+}
+
+.admin-cinema-address small {
+    margin-top: 4px;
+    color: #9298a8;
+    font-size: 10px;
+}
+
+.admin-cinema-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.admin-cinema-contact span {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #687083;
+    font-size: 10px;
+}
+
+.admin-cinema-contact i {
+    color: #9298a8;
+}
+
+.admin-cinema-hours {
+    color: #596174;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.admin-cinema-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.admin-cinema-status.active {
+    background: #e8f8f0;
+    color: #23945f;
+}
+
+.admin-cinema-status.inactive {
+    background: #f0f1f4;
+    color: #7b8495;
+}
+
+.admin-cinema-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.admin-cinema-actions button {
+    display: grid;
+    place-items: center;
+    width: 31px;
+    height: 31px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-cinema-actions button.edit {
+    background: #eaf2ff;
+    color: #3478e5;
+}
+
+.admin-cinema-actions button.delete {
+    background: #fff0f1;
+    color: #e53945;
+}
+
+.admin-cinema-actions button:hover {
+    transform: translateY(-2px);
+    filter: brightness(0.96);
+}
+
+/* ===================== EMPTY STATE ===================== */
+
+.admin-cinemas-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.admin-cinemas-empty > i {
+    margin-bottom: 14px;
+    color: #a7adba;
+    font-size: 38px;
+}
+
+.admin-cinemas-empty h5 {
+    margin: 0 0 7px;
+    color: #343b4d;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.admin-cinemas-empty p {
+    margin: 0 0 15px;
+    color: #9298a8;
+    font-size: 12px;
+}
+
+.admin-cinemas-empty button {
+    padding: 8px 13px;
+    border: none;
+    border-radius: 7px;
+    background: #fff0f1;
+    color: #e53945;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ===================== MODAL ===================== */
+
+.admin-cinema-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(15, 20, 35, 0.58);
+    backdrop-filter: blur(3px);
+}
+
+.admin-cinema-modal {
+    width: 100%;
+    max-width: 760px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.admin-cinema-modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 22px 25px;
+    border-bottom: 1px solid #eceef2;
+    background: #ffffff;
+}
+
+.admin-cinema-modal-header h4 {
+    margin: 0 0 5px;
+    color: #252b3b;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.admin-cinema-modal-header p {
+    margin: 0;
+    color: #9298a8;
+    font-size: 11px;
+}
+
+.admin-cinema-modal-header > button {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: #f2f3f6;
+    color: #687083;
+    cursor: pointer;
+}
+
+.admin-cinema-form {
+    padding: 23px 25px 25px;
+}
+
+.admin-cinema-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.admin-cinema-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.admin-cinema-form-group.full {
+    grid-column: 1 / -1;
+}
+
+.admin-cinema-form-group label {
+    color: #4b5265;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.admin-cinema-form-group input,
+.admin-cinema-form-group select,
+.admin-cinema-form-group textarea {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 11px;
+    border: 1px solid #e2e5eb;
+    border-radius: 7px;
+    outline: none;
+    background: #ffffff;
+    color: #343b4d;
+    font-family: inherit;
+    font-size: 12px;
+    transition: border-color 0.2s ease;
+}
+
+.admin-cinema-form-group textarea {
+    min-height: 95px;
+    resize: vertical;
+}
+
+.admin-cinema-form-group input:focus,
+.admin-cinema-form-group select:focus,
+.admin-cinema-form-group textarea:focus {
+    border-color: #e53945;
+}
+
+.admin-cinema-form-group input::placeholder,
+.admin-cinema-form-group textarea::placeholder {
+    color: #a1a6b3;
+}
+
+.admin-cinema-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 18px;
+    border-top: 1px solid #eceef2;
+}
+
+.admin-cinema-form-footer button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 105px;
+    min-height: 39px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-cinema-form-footer button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.admin-cinema-form-footer button.cancel {
+    background: #f0f1f4;
+    color: #687083;
+}
+
+.admin-cinema-form-footer button.submit {
+    background: #e53945;
+    color: #ffffff;
+}
+
+.admin-cinema-form-footer button.submit:hover:not(:disabled) {
+    background: #c92e3a;
+}
+
+/* ===================== DARK MODE ===================== */
+
+.admin-layout[data-theme="dark"] .admin-cinema-stat-card,
+.admin-layout[data-theme="dark"] .admin-cinemas-search,
+.admin-layout[data-theme="dark"] .admin-cinemas-filter select,
+.admin-layout[data-theme="dark"] .admin-cinemas-reset-button {
+    border-color: #2b3345;
+    background: #191f2e;
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-stat-card strong,
+.admin-layout[data-theme="dark"] .admin-cinemas-list-heading h5,
+.admin-layout[data-theme="dark"] .admin-cinema-info strong {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-stat-card span,
+.admin-layout[data-theme="dark"] .admin-cinemas-list-heading p,
+.admin-layout[data-theme="dark"] .admin-cinemas-list-heading > span,
+.admin-layout[data-theme="dark"] .admin-cinema-info span,
+.admin-layout[data-theme="dark"] .admin-cinema-address span,
+.admin-layout[data-theme="dark"] .admin-cinema-contact span,
+.admin-layout[data-theme="dark"] .admin-cinema-hours {
+    color: #a5aec0;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinemas-search input {
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinemas-search input::placeholder {
+    color: #7f8aa6;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinemas-filter label {
+    color: #a5aec0;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinemas-filter select option {
+    background: #191f2e;
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-modal {
+    background: #191f2e;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-modal-header {
+    border-bottom-color: #2b3345;
+    background: #191f2e;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-modal-header h4,
+.admin-layout[data-theme="dark"] .admin-cinema-form-group label {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-modal-header p {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-modal-header > button {
+    background: #2b3345;
+    color: #d5dbea;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-form-group input,
+.admin-layout[data-theme="dark"] .admin-cinema-form-group select,
+.admin-layout[data-theme="dark"] .admin-cinema-form-group textarea {
+    border-color: #343e52;
+    background: #222a3b;
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-form-group input::placeholder,
+.admin-layout[data-theme="dark"] .admin-cinema-form-group textarea::placeholder {
+    color: #7f8aa6;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-form-footer {
+    border-top-color: #2b3345;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinema-form-footer button.cancel {
+    background: #2b3345;
+    color: #d5dbea;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinemas-empty h5 {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-cinemas-empty p {
+    color: #929db2;
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+@media (max-width: 900px) {
+    .admin-cinemas-statistics {
+        gap: 12px;
+    }
+
+    .admin-cinema-stat-card {
+        padding: 16px;
+    }
+
+    .admin-cinemas-toolbar {
+        flex-wrap: wrap;
+    }
+
+    .admin-cinemas-search {
+        flex-basis: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-cinemas-statistics {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-cinema-stat-card {
+        padding: 15px;
+    }
+
+    .admin-cinemas-filter {
+        flex: 1;
+        justify-content: space-between;
+    }
+
+    .admin-cinemas-filter select {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .admin-cinemas-list-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-cinema-modal-overlay {
+        align-items: flex-start;
+        padding: 10px;
+    }
+
+    .admin-cinema-modal {
+        max-height: calc(100vh - 20px);
+    }
+
+    .admin-cinema-modal-header,
+    .admin-cinema-form {
+        padding: 18px;
+    }
+
+    .admin-cinema-form-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .admin-cinema-form-group.full {
+        grid-column: auto;
+    }
+
+    .admin-cinema-form-footer {
+        flex-direction: column-reverse;
+    }
+
+    .admin-cinema-form-footer button {
+        width: 100%;
+    }
+}
