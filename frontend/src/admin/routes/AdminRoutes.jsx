@@ -5,6 +5,7 @@ import AdminLayout from "../layouts/AdminLayout.jsx";
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
 import AdminComingSoon from "../pages/AdminComingSoon.jsx";
 import AdminMovies from "../pages/movies/AdminMovies.jsx";
+import AdminGenres from "../pages/genres/AdminGenres.jsx";
 
 function AdminRoutes() {
     return (
@@ -14,11 +15,7 @@ function AdminRoutes() {
           <Route path="dashboard" element={<Dashboard />} />
 
           <Route path="movies" element={<AdminMovies />} />
-
-          <Route
-            path="genres"
-            element={<AdminComingSoon title="Quản lý thể loại" />}
-          />
+          <Route path="genres" element={<AdminGenres />} />
 
           <Route
             path="cinemas"
