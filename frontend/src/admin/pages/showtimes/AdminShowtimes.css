@@ -1,0 +1,684 @@
+
+/* ===================== ADMIN SHOWTIMES ===================== */
+
+.admin-showtimes {
+    width: 100%;
+    min-width: 0;
+}
+
+.admin-showtimes-add-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 8px;
+    background: #e53945;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-showtimes-add-button:hover:not(:disabled) {
+    background: #c92e3a;
+    transform: translateY(-1px);
+}
+
+.admin-showtimes-add-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* ===================== STATISTICS ===================== */
+
+.admin-showtimes-statistics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.admin-showtime-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid #e9eaf0;
+    border-radius: 13px;
+    background: #ffffff;
+}
+
+.admin-showtime-stat-card span,
+.admin-showtime-stat-card strong {
+    display: block;
+}
+
+.admin-showtime-stat-card span {
+    margin-bottom: 5px;
+    color: #838a9b;
+    font-size: 11px;
+}
+
+.admin-showtime-stat-card strong {
+    color: #252b3b;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.admin-showtime-stat-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 43px;
+    height: 43px;
+    border-radius: 11px;
+    font-size: 19px;
+}
+
+.admin-showtime-stat-icon.blue {
+    background: #eaf2ff;
+    color: #3478e5;
+}
+
+.admin-showtime-stat-icon.green {
+    background: #e8f8f0;
+    color: #26a36b;
+}
+
+.admin-showtime-stat-icon.purple {
+    background: #f1eaff;
+    color: #8455c7;
+}
+
+.admin-showtime-stat-icon.gray {
+    background: #f0f1f4;
+    color: #7b8495;
+}
+
+/* ===================== TOOLBAR ===================== */
+
+.admin-showtimes-panel {
+    overflow: hidden;
+}
+
+.admin-showtimes-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.admin-showtimes-search {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 190px;
+    height: 41px;
+    padding: 0 12px;
+    border: 1px solid #e5e7ed;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.admin-showtimes-search i {
+    flex-shrink: 0;
+    color: #9298a8;
+    font-size: 14px;
+}
+
+.admin-showtimes-search input {
+    width: 100%;
+    height: 100%;
+    padding: 0 9px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #252b3b;
+    font-size: 11px;
+}
+
+.admin-showtimes-toolbar > select,
+.admin-showtimes-toolbar > input {
+    height: 41px;
+    min-width: 130px;
+    max-width: 175px;
+    padding: 0 10px;
+    border: 1px solid #e5e7ed;
+    border-radius: 8px;
+    outline: none;
+    background: #ffffff;
+    color: #4b5265;
+    font-size: 10px;
+}
+
+.admin-showtimes-reset-button {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 41px;
+    height: 41px;
+    border: 1px solid #e5e7ed;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #687083;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-showtimes-reset-button:hover {
+    border-color: #e53945;
+    color: #e53945;
+}
+
+/* ===================== LIST HEADING ===================== */
+
+.admin-showtimes-list-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 17px;
+}
+
+.admin-showtimes-list-heading h5 {
+    margin: 0 0 4px;
+    color: #252b3b;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.admin-showtimes-list-heading p {
+    margin: 0;
+    color: #9298a8;
+    font-size: 11px;
+}
+
+.admin-showtimes-list-heading > span {
+    color: #858b9b;
+    font-size: 11px;
+}
+
+.admin-showtimes-list-heading > span strong {
+    color: #e53945;
+}
+
+/* ===================== TABLE ===================== */
+
+.admin-showtimes-table {
+    min-width: 1050px;
+}
+
+.admin-showtime-movie {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 170px;
+}
+
+.admin-showtime-movie img {
+    flex-shrink: 0;
+    width: 42px;
+    height: 56px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #f0f1f4;
+}
+
+.admin-showtime-movie strong {
+    max-width: 160px;
+    color: #303749;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.admin-showtime-location strong,
+.admin-showtime-location span,
+.admin-showtime-time strong,
+.admin-showtime-time span {
+    display: block;
+}
+
+.admin-showtime-location strong {
+    max-width: 160px;
+    overflow: hidden;
+    color: #303749;
+    font-size: 11px;
+    text-overflow: ellipsis;
+}
+
+.admin-showtime-location span,
+.admin-showtime-time span {
+    margin-top: 5px;
+    color: #9298a8;
+    font-size: 10px;
+}
+
+.admin-showtime-time strong {
+    color: #303749;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.admin-showtime-price {
+    color: #e53945;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.admin-showtime-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.admin-showtime-status.scheduled {
+    background: #eaf2ff;
+    color: #3478e5;
+}
+
+.admin-showtime-status.completed {
+    background: #e8f8f0;
+    color: #23945f;
+}
+
+.admin-showtime-status.cancelled {
+    background: #fff0f1;
+    color: #e53945;
+}
+
+.admin-showtime-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.admin-showtime-actions button {
+    display: grid;
+    place-items: center;
+    width: 31px;
+    height: 31px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-showtime-actions button.edit {
+    background: #eaf2ff;
+    color: #3478e5;
+}
+
+.admin-showtime-actions button.delete {
+    background: #fff0f1;
+    color: #e53945;
+}
+
+.admin-showtime-actions button:hover {
+    transform: translateY(-2px);
+    filter: brightness(0.96);
+}
+
+/* ===================== EMPTY STATE ===================== */
+
+.admin-showtimes-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 230px;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.admin-showtimes-empty > i {
+    margin-bottom: 14px;
+    color: #a7adba;
+    font-size: 38px;
+}
+
+.admin-showtimes-empty h5 {
+    margin: 0 0 7px;
+    color: #343b4d;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.admin-showtimes-empty p {
+    margin: 0 0 15px;
+    color: #9298a8;
+    font-size: 12px;
+}
+
+.admin-showtimes-empty button {
+    padding: 8px 13px;
+    border: none;
+    border-radius: 7px;
+    background: #fff0f1;
+    color: #e53945;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ===================== MODAL ===================== */
+
+.admin-showtime-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(15, 20, 35, 0.58);
+    backdrop-filter: blur(3px);
+}
+
+.admin-showtime-modal {
+    width: 100%;
+    max-width: 700px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.admin-showtime-modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 22px 25px;
+    border-bottom: 1px solid #eceef2;
+    background: #ffffff;
+}
+
+.admin-showtime-modal-header h4 {
+    margin: 0 0 5px;
+    color: #252b3b;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.admin-showtime-modal-header p {
+    margin: 0;
+    color: #9298a8;
+    font-size: 11px;
+}
+
+.admin-showtime-modal-header > button {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: #f2f3f6;
+    color: #687083;
+    cursor: pointer;
+}
+
+.admin-showtime-form {
+    padding: 23px 25px 25px;
+}
+
+.admin-showtime-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.admin-showtime-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.admin-showtime-form-group.full {
+    grid-column: 1 / -1;
+}
+
+.admin-showtime-form-group label {
+    color: #4b5265;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.admin-showtime-form-group input,
+.admin-showtime-form-group select {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 11px;
+    border: 1px solid #e2e5eb;
+    border-radius: 7px;
+    outline: none;
+    background: #ffffff;
+    color: #343b4d;
+    font-family: inherit;
+    font-size: 12px;
+    transition: border-color 0.2s ease;
+}
+
+.admin-showtime-form-group input:focus,
+.admin-showtime-form-group select:focus {
+    border-color: #e53945;
+}
+
+.admin-showtime-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 18px;
+    border-top: 1px solid #eceef2;
+}
+
+.admin-showtime-form-footer button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 105px;
+    min-height: 39px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-showtime-form-footer button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.admin-showtime-form-footer button.cancel {
+    background: #f0f1f4;
+    color: #687083;
+}
+
+.admin-showtime-form-footer button.submit {
+    background: #e53945;
+    color: #ffffff;
+}
+
+.admin-showtime-form-footer button.submit:hover:not(:disabled) {
+    background: #c92e3a;
+}
+
+/* ===================== DARK MODE ===================== */
+
+.admin-layout[data-theme="dark"] .admin-showtime-stat-card,
+.admin-layout[data-theme="dark"] .admin-showtimes-search,
+.admin-layout[data-theme="dark"] .admin-showtimes-toolbar > select,
+.admin-layout[data-theme="dark"] .admin-showtimes-toolbar > input,
+.admin-layout[data-theme="dark"] .admin-showtimes-reset-button {
+    border-color: #2b3345;
+    background: #191f2e;
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-stat-card strong,
+.admin-layout[data-theme="dark"] .admin-showtimes-list-heading h5,
+.admin-layout[data-theme="dark"] .admin-showtime-movie strong,
+.admin-layout[data-theme="dark"] .admin-showtime-location strong,
+.admin-layout[data-theme="dark"] .admin-showtime-time strong {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-stat-card span,
+.admin-layout[data-theme="dark"] .admin-showtimes-list-heading p,
+.admin-layout[data-theme="dark"] .admin-showtimes-list-heading > span,
+.admin-layout[data-theme="dark"] .admin-showtime-location span,
+.admin-layout[data-theme="dark"] .admin-showtime-time span {
+    color: #a5aec0;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtimes-search input {
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtimes-search input::placeholder {
+    color: #7f8aa6;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-modal {
+    background: #191f2e;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-modal-header {
+    border-bottom-color: #2b3345;
+    background: #191f2e;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-modal-header h4,
+.admin-layout[data-theme="dark"] .admin-showtime-form-group label {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-modal-header p {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-modal-header > button {
+    background: #2b3345;
+    color: #d5dbea;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-form-group input,
+.admin-layout[data-theme="dark"] .admin-showtime-form-group select {
+    border-color: #343e52;
+    background: #222a3b;
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-form-group select option {
+    background: #222a3b;
+    color: #e5e9f2;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-form-footer {
+    border-top-color: #2b3345;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtime-form-footer button.cancel {
+    background: #2b3345;
+    color: #d5dbea;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtimes-empty h5 {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-showtimes-empty p {
+    color: #929db2;
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+@media (max-width: 1100px) {
+    .admin-showtimes-statistics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-showtimes-toolbar {
+        flex-wrap: wrap;
+    }
+
+    .admin-showtimes-search {
+        flex-basis: 100%;
+    }
+
+    .admin-showtimes-toolbar > select,
+    .admin-showtimes-toolbar > input {
+        flex: 1;
+        max-width: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-showtimes-statistics {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-showtime-stat-card {
+        padding: 15px;
+    }
+
+    .admin-showtimes-list-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-showtime-modal-overlay {
+        align-items: flex-start;
+        padding: 10px;
+    }
+
+    .admin-showtime-modal {
+        max-height: calc(100vh - 20px);
+    }
+
+    .admin-showtime-modal-header,
+    .admin-showtime-form {
+        padding: 18px;
+    }
+
+    .admin-showtime-form-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .admin-showtime-form-group.full {
+        grid-column: auto;
+    }
+
+    .admin-showtime-form-footer {
+        flex-direction: column-reverse;
+    }
+
+    .admin-showtime-form-footer button {
+        width: 100%;
+    }
+}
