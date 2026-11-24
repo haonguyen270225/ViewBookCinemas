@@ -1,11 +1,14 @@
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import moviesData from "../../../data/movies.js";
+import {
+    getMovies,
+    createMovie,
+    updateMovie,
+    deleteMovie
+} from "../../../services/movieService.js";
 
 import "./AdminMovies.css";
-
-const STORAGE_KEY = "viewbook-admin-movies";
 
 const STATUS_OPTIONS = [
     "Đang chiếu",
@@ -64,25 +67,6 @@ const EMPTY_FORM = {
     isFeatured: false
 };
 
-// Đọc dữ liệu phim từ localStorage
-const getInitialMovies = () => {
-    try {
-        const savedMovies = localStorage.getItem(STORAGE_KEY);
-
-        if (savedMovies) {
-            const parsedMovies = JSON.parse(savedMovies);
-
-            if (Array.isArray(parsedMovies)) {
-                return parsedMovies;
-            }
-        }
-    } catch (error) {
-        console.error("Không thể đọc dữ liệu phim:", error);
-    }
-
-    return moviesData;
-};
-
 // Chuyển tên phim thành slug
 const createSlug = (value) => {
     return value
@@ -116,7 +100,9 @@ const getStatusClass = (status) => {
 };
 
 function AdminMovies() {
-    const [movies, setMovies] = useState(getInitialMovies);
+    const [movies, setMovies] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("Tất cả");
@@ -128,20 +114,22 @@ function AdminMovies() {
 
     const [formData, setFormData] = useState(EMPTY_FORM);
 
-    // Lưu dữ liệu vào state và localStorage
-    const updateMovies = (newMovies) => {
-        setMovies(newMovies);
+    // Tải danh sách phim từ movieService
+    useEffect(() => {
+        const loadMovies = async () => {
+            try {
+                const data = await getMovies();
+                setMovies(data);
+            } catch (error) {
+                console.error("Không thể tải dữ liệu phim:", error);
+                alert("Không thể tải danh sách phim.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-        try {
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify(newMovies)
-            );
-        } catch (error) {
-            console.error("Không thể lưu dữ liệu phim:", error);
-            alert("Không thể lưu dữ liệu trên trình duyệt.");
-        }
-    };
+        loadMovies();
+    }, []);
 
     // Danh sách thể loại từ dữ liệu phim và danh sách gợi ý
     const genres = useMemo(() => {
@@ -258,6 +246,8 @@ function AdminMovies() {
 
     // Đóng form
     const handleCloseModal = () => {
+        if (isSaving) return;
+
         setIsModalOpen(false);
         setEditingMovie(null);
         setFormData({ ...EMPTY_FORM });
@@ -274,7 +264,7 @@ function AdminMovies() {
     };
 
     // Thêm hoặc cập nhật phim
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const title = formData.title.trim();
@@ -296,10 +286,6 @@ function AdminMovies() {
 
         const movieData = {
             ...(editingMovie || {}),
-
-            id: editingMovie
-                ? editingMovie.id
-                : Math.max(0, ...movies.map((movie) => Number(movie.id) || 0)) + 1,
 
             title,
 
@@ -337,35 +323,70 @@ function AdminMovies() {
             trailerPageUrl: editingMovie?.trailerPageUrl || ""
         };
 
-        let updatedMovies;
+        setIsSaving(true);
 
-        if (editingMovie) {
-            updatedMovies = movies.map((movie) =>
-                movie.id === editingMovie.id
-                    ? movieData
-                    : movie
+        try {
+            if (editingMovie) {
+                // Cập nhật phim thông qua service
+                const updatedMovie = await updateMovie(
+                    editingMovie.id,
+                    movieData
+                );
+
+                setMovies((currentMovies) =>
+                    currentMovies.map((movie) =>
+                        String(movie.id) === String(updatedMovie.id)
+                            ? updatedMovie
+                            : movie
+                    )
+                );
+            } else {
+                // Thêm phim thông qua service
+                const newMovie = await createMovie(movieData);
+
+                setMovies((currentMovies) => [
+                    ...currentMovies,
+                    newMovie
+                ]);
+            }
+
+            setIsModalOpen(false);
+            setEditingMovie(null);
+            setFormData({ ...EMPTY_FORM });
+        } catch (error) {
+            console.error("Không thể lưu thông tin phim:", error);
+
+            alert(
+                error.message || "Không thể lưu thông tin phim."
             );
-        } else {
-            updatedMovies = [...movies, movieData];
+        } finally {
+            setIsSaving(false);
         }
-
-        updateMovies(updatedMovies);
-        handleCloseModal();
     };
 
     // Xóa phim
-    const handleDelete = (movie) => {
+    const handleDelete = async (movie) => {
         const confirmed = window.confirm(
             `Bạn có chắc chắn muốn xóa phim "${movie.title}" không?`
         );
 
         if (!confirmed) return;
 
-        const updatedMovies = movies.filter(
-            (item) => item.id !== movie.id
-        );
+        try {
+            await deleteMovie(movie.id);
 
-        updateMovies(updatedMovies);
+            setMovies((currentMovies) =>
+                currentMovies.filter(
+                    (item) => String(item.id) !== String(movie.id)
+                )
+            );
+        } catch (error) {
+            console.error("Không thể xóa phim:", error);
+
+            alert(
+                error.message || "Không thể xóa phim."
+            );
+        }
     };
 
     // Xóa bộ lọc
@@ -375,6 +396,18 @@ function AdminMovies() {
         setSelectedGenre("Tất cả");
         setSelectedCountry("Tất cả");
     };
+
+    // Trạng thái tải dữ liệu
+    if (isLoading) {
+        return (
+            <div className="admin-movies">
+                <div className="admin-movies-empty">
+                    <i className="bi bi-hourglass-split"></i>
+                    <h5>Đang tải danh sách phim...</h5>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="admin-movies">
@@ -706,6 +739,7 @@ function AdminMovies() {
                                 type="button"
                                 onClick={handleCloseModal}
                                 aria-label="Đóng"
+                                disabled={isSaving}
                             >
                                 <i className="bi bi-x-lg"></i>
                             </button>
@@ -964,6 +998,7 @@ function AdminMovies() {
                                     type="button"
                                     className="cancel"
                                     onClick={handleCloseModal}
+                                    disabled={isSaving}
                                 >
                                     Hủy
                                 </button>
@@ -971,12 +1006,15 @@ function AdminMovies() {
                                 <button
                                     type="submit"
                                     className="submit"
+                                    disabled={isSaving}
                                 >
                                     <i className="bi bi-check-lg"></i>
 
-                                    {editingMovie
-                                        ? "Lưu thay đổi"
-                                        : "Thêm phim"}
+                                    {isSaving
+                                        ? "Đang lưu..."
+                                        : editingMovie
+                                            ? "Lưu thay đổi"
+                                            : "Thêm phim"}
                                 </button>
                             </div>
                         </form>
