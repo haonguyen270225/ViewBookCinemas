@@ -5,7 +5,8 @@ import { useSearchParams } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar.jsx";
 import Footer from "../../components/layout/Footer.jsx";
 import MovieCard from "../../components/movie/MovieCard.jsx";
-import movies from "../../data/movies.js";
+
+import { getMovies } from "../../services/movieService.js";
 
 import "./Movies.css";
 
@@ -17,11 +18,53 @@ function Movies() {
 
     const urlSearch = searchParams.get("search") || "";
 
+    const [movies, setMovies] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [reloadTrigger, setReloadTrigger] = useState(0);
+
     const [searchTerm, setSearchTerm] = useState(urlSearch);
     const [selectedStatus, setSelectedStatus] = useState("Tất cả");
     const [selectedGenre, setSelectedGenre] = useState("Tất cả");
     const [selectedAge, setSelectedAge] = useState("Tất cả");
     const [selectedCountry, setSelectedCountry] = useState("Tất cả");
+
+    //=================== Tải danh sách phim ========================
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadMovies = async () => {
+            try {
+                setIsLoading(true);
+                setError("");
+
+                const data = await getMovies();
+
+                if (isMounted) {
+                    setMovies(data);
+                }
+            } catch (error) {
+                console.error("Không thể tải danh sách phim:", error);
+
+                if (isMounted) {
+                    setError(
+                        error.message || "Không thể tải danh sách phim."
+                    );
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        loadMovies();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [reloadTrigger]);
 
     //=================== Danh sách dữ liệu bộ lọc ========================
 
@@ -30,18 +73,22 @@ function Movies() {
             (movie) => movie.genres || []
         );
 
-        return ["Tất cả", ...new Set(allGenres)];
-    }, []);
+        return [
+            "Tất cả",
+            ...new Set(allGenres)
+        ];
+    }, [movies]);
 
     const countries = useMemo(() => {
         const allCountries = movies
             .map((movie) => movie.country)
             .filter(Boolean);
 
-        return ["Tất cả", ...new Set(allCountries)].sort(
-            (a, b) => a.localeCompare(b, "vi")
-        );
-    }, []);
+        return [
+            "Tất cả",
+            ...new Set(allCountries)
+        ].sort((a, b) => a.localeCompare(b, "vi"));
+    }, [movies]);
 
     const ageRatings = ["Tất cả", "P", "K", "T13", "T16", "T18"];
 
@@ -58,7 +105,7 @@ function Movies() {
 
             const keyword = searchTerm.trim().toLowerCase();
 
-            const matchesSearch = movie.title
+            const matchesSearch = (movie.title || "")
                 .toLowerCase()
                 .includes(keyword);
 
@@ -87,6 +134,7 @@ function Movies() {
             );
         });
     }, [
+        movies,
         searchTerm,
         selectedStatus,
         selectedGenre,
@@ -120,6 +168,12 @@ function Movies() {
         setSelectedAge("Tất cả");
         setSelectedCountry("Tất cả");
         setSearchParams({});
+    };
+
+    //=================== Thử tải lại dữ liệu ========================
+
+    const handleRetry = () => {
+        setReloadTrigger((previous) => previous + 1);
     };
 
     //=================== Giao diện trang Movies ========================
@@ -297,50 +351,90 @@ function Movies() {
                         </button>
                     </div>
 
-                    {/*=================== Kết quả tìm kiếm ========================*/}
+                    {/*=================== Kết quả danh sách phim ========================*/}
 
-                    <div className="movies-result-header">
-                        <h3>
-                            {selectedStatus === "Tất cả"
-                                ? "Tất cả phim"
-                                : selectedStatus}
-                        </h3>
+                    {isLoading ? (
+                        <div className="text-center py-5">
+                            <div
+                                className="spinner-border text-danger"
+                                role="status"
+                            >
+                                <span className="visually-hidden">
+                                    Đang tải...
+                                </span>
+                            </div>
 
-                        <span>
-                            Tìm thấy <strong>{filteredMovies.length}</strong> phim
-                        </span>
-                    </div>
-
-                    {/*=================== Danh sách phim ========================*/}
-
-                    {filteredMovies.length > 0 ? (
-                        <div className="row g-4 movies-grid">
-                            {filteredMovies.map((movie) => (
-                                <div
-                                    className="col-6 col-md-4 col-lg-3"
-                                    key={movie.id}
-                                >
-                                    <MovieCard movie={movie} />
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="movies-empty">
-                            <i className="bi bi-film"></i>
-
-                            <h4>Không tìm thấy phim phù hợp</h4>
-
-                            <p>
-                                Hãy thử thay đổi từ khóa hoặc điều kiện lọc.
+                            <p className="mt-3">
+                                Đang tải danh sách phim...
                             </p>
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-5" role="alert">
+                            <i className="bi bi-exclamation-circle fs-1 text-danger"></i>
+
+                            <h4 className="mt-3">
+                                Không thể tải danh sách phim
+                            </h4>
+
+                            <p>{error}</p>
 
                             <button
                                 type="button"
-                                onClick={handleClearFilters}
+                                className="btn btn-danger"
+                                onClick={handleRetry}
                             >
-                                Xóa bộ lọc
+                                <i className="bi bi-arrow-clockwise me-2"></i>
+                                Thử lại
                             </button>
                         </div>
+                    ) : (
+                        <>
+                            {/* Thông tin kết quả tìm kiếm */}
+
+                            <div className="movies-result-header">
+                                <h3>
+                                    {selectedStatus === "Tất cả"
+                                        ? "Tất cả phim"
+                                        : selectedStatus}
+                                </h3>
+
+                                <span>
+                                    Tìm thấy <strong>{filteredMovies.length}</strong> phim
+                                </span>
+                            </div>
+
+                            {/* Danh sách phim */}
+
+                            {filteredMovies.length > 0 ? (
+                                <div className="row g-4 movies-grid">
+                                    {filteredMovies.map((movie) => (
+                                        <div
+                                            className="col-6 col-md-4 col-lg-3"
+                                            key={movie.id}
+                                        >
+                                            <MovieCard movie={movie} />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="movies-empty">
+                                    <i className="bi bi-film"></i>
+
+                                    <h4>Không tìm thấy phim phù hợp</h4>
+
+                                    <p>
+                                        Hãy thử thay đổi từ khóa hoặc điều kiện lọc.
+                                    </p>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleClearFilters}
+                                    >
+                                        Xóa bộ lọc
+                                    </button>
+                                </div>
+                            )}
+                        </>
                     )}
 
                 </section>
