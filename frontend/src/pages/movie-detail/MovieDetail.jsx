@@ -1,7 +1,9 @@
 
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import movies from "../../data/movies.js";
+import { getMovieById } from "../../services/movieService.js";
+
 import MovieReviews from "../../components/movie/MovieReviews/MovieReviews.jsx";
 
 import Navbar from "../../components/layout/Navbar.jsx";
@@ -14,11 +16,101 @@ import "./MovieDetail.css";
 function MovieDetail() {
     const { id } = useParams();
 
-    //=================== Tìm phim theo ID ========================
+    const [movie, setMovie] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [reloadTrigger, setReloadTrigger] = useState(0);
 
-    const movie = movies.find(
-        (item) => String(item.id) === id
-    );
+    //=================== Lấy thông tin phim ========================
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchMovie = async () => {
+            try {
+                setIsLoading(true);
+                setError("");
+
+                const movieData = await getMovieById(id);
+
+                if (isMounted) {
+                    setMovie(movieData);
+                }
+            } catch (error) {
+                console.error("Không thể tải thông tin phim:", error);
+
+                if (isMounted) {
+                    setError(
+                        error.message ||
+                        "Không thể tải thông tin phim. Vui lòng thử lại."
+                    );
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchMovie();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [id, reloadTrigger]);
+
+    //=================== Trạng thái đang tải ========================
+
+    if (isLoading) {
+        return (
+            <>
+                <Navbar />
+
+                <main className="movie-detail-not-found">
+                    <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+
+                    <p>Đang tải thông tin phim...</p>
+                </main>
+
+                <Footer />
+            </>
+        );
+    }
+
+    //=================== Trạng thái lỗi ========================
+
+    if (error) {
+        return (
+            <>
+                <Navbar />
+
+                <main className="movie-detail-not-found">
+                    <h2>Không thể tải thông tin phim!</h2>
+
+                    <p>{error}</p>
+
+                    <button
+                        type="button"
+                        className="btn-back-movies"
+                        onClick={() => setReloadTrigger((prev) => prev + 1)}
+                    >
+                        Thử lại
+                    </button>
+
+                    <Link
+                        to="/movies"
+                        className="btn-back-movies"
+                    >
+                        Quay lại danh sách phim
+                    </Link>
+                </main>
+
+                <Footer />
+            </>
+        );
+    }
 
     //=================== Kiểm tra phim ========================
 
