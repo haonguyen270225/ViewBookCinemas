@@ -3,7 +3,6 @@ import { useMemo, useState } from "react";
 
 import productCategories from "../../data/productCategories.js";
 import products from "../../data/products.js";
-import combos from "../../data/combos.js";
 
 import "./ProductSelection.css";
 
@@ -41,7 +40,8 @@ function ProductSelection({
     selectedProductQuantities,
     selectedComboQuantities,
     onChangeProductQuantity,
-    onChangeComboQuantity
+    onChangeComboQuantity,
+    combos = []
 }) {
     const [selectedCategoryId, setSelectedCategoryId] = useState("all");
 
@@ -64,11 +64,16 @@ function ProductSelection({
         );
     }, [selectedCategoryId]);
 
-    //=================== Lọc combo ========================
+    //=================== Danh sách combo khả dụng ========================
 
-    const activeCombos = combos.filter(
-        (combo) => combo.status === "Active"
-    );
+    // Combo được truyền từ Booking.jsx thông qua comboService.js.
+    // Không còn đọc trực tiếp dữ liệu combo tĩnh từ combos.js.
+
+    const activeCombos = useMemo(() => {
+        return Array.isArray(combos)
+            ? combos.filter((combo) => combo.status === "Active")
+            : [];
+    }, [combos]);
 
     const shouldShowCombos =
         selectedCategoryId === "all" ||

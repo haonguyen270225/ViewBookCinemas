@@ -62,14 +62,17 @@ const validateCombo = (data, combos, currentId = null) => {
     const numericPrice = Number(price);
 
     if (
-        !Number.isSafeInteger(numericPrice) ||
-        numericPrice <= 0
+      !Number.isSafeInteger(numericPrice) ||
+      numericPrice < 1000 ||
+      numericPrice % 1000 !== 0
     ) {
-        throw new Error("Giá combo phải là số nguyên dương.");
+      throw new Error(
+        "Giá combo phải là số nguyên dương và chia hết cho 1.000 VNĐ. Ví dụ: 45000, 46000, 47000.",
+      );
     }
 
     if (!COMBO_STATUS_OPTIONS.includes(status)) {
-        throw new Error("Trạng thái combo không hợp lệ.");
+      throw new Error("Trạng thái combo không hợp lệ.");
     }
 
     if (!isValidDate(startDate)) {

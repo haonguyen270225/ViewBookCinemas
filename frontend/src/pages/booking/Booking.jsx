@@ -14,13 +14,13 @@ import PaymentSelection from "../../components/booking/PaymentSelection.jsx";
 
 import { seatTypes } from "../../data/seatTypes.js";
 import products from "../../data/products.js";
-import combos from "../../data/combos.js";
 
 import { getShowtimeById } from "../../services/showtimeService.js";
 import { getMovieById } from "../../services/movieService.js";
 import { getCinemaById } from "../../services/cinemaService.js";
 import { getRoomById } from "../../services/roomService.js";
 import { getSeatsByRoomId } from "../../services/seatService.js";
+import { getActiveCombos } from "../../services/comboService.js";
 
 import {
     createBooking,
@@ -64,6 +64,8 @@ function Booking() {
 
     const [bookingData, setBookingData] = useState(null);
 
+    const [activeCombos, setActiveCombos] = useState([]);
+
     const [roomSeats, setRoomSeats] = useState([]);
 
     const [bookedSeatIds, setBookedSeatIds] = useState([]);
@@ -96,6 +98,7 @@ function Booking() {
             setBookingError("");
 
             setBookingData(null);
+            setActiveCombos([]);
             setRoomSeats([]);
             setBookedSeatIds([]);
 
@@ -158,21 +161,21 @@ function Booking() {
                     );
                 }
 
-                // 3. Lấy danh sách ghế theo roomId
+                // 3. Tải ghế, ghế đã đặt và Combo đang kinh doanh
 
-                const seatsData = await getSeatsByRoomId(
-                    selectedShowtime.roomId
-                );
-
-                // 4. Lấy danh sách ghế đã được đặt trước đó
-
-                const bookedIds = await getBookedSeatIdsByShowtimeId(
-                    selectedShowtime.id
-                );
+                const [
+                    seatsData,
+                    bookedIds,
+                    availableCombos
+                ] = await Promise.all([
+                    getSeatsByRoomId(selectedShowtime.roomId),
+                    getBookedSeatIdsByShowtimeId(selectedShowtime.id),
+                    getActiveCombos()
+                ]);
 
                 if (!isMounted) return;
 
-                // Chỉ lấy ghế đang hoạt động
+                // 4. Chỉ lấy ghế đang hoạt động
 
                 const activeSeats = seatsData
                     .filter((seat) => seat.status === "Active")
@@ -183,6 +186,8 @@ function Booking() {
 
                         return a.seatNumber - b.seatNumber;
                     });
+
+                // 5. Lưu dữ liệu đặt vé
 
                 setBookingData({
                     showtime: selectedShowtime,
@@ -195,6 +200,12 @@ function Booking() {
 
                 setBookedSeatIds(
                     Array.isArray(bookedIds) ? bookedIds : []
+                );
+
+                setActiveCombos(
+                    Array.isArray(availableCombos)
+                        ? availableCombos
+                        : []
                 );
             } catch (error) {
                 console.error(
@@ -304,7 +315,7 @@ function Booking() {
         setBookingSaveError("");
     };
 
-    //=================== Thay đổi số lượng combo ========================
+    //=================== Thay đổi số lượng Combo ========================
 
     const handleChangeComboQuantity = (comboId, change) => {
         setSelectedComboQuantities((current) => {
@@ -337,20 +348,19 @@ function Booking() {
             }));
     }, [selectedProductQuantities]);
 
-    //=================== Lấy combo đã chọn ========================
+    //=================== Lấy Combo đã chọn ========================
 
     const selectedCombos = useMemo(() => {
-        return combos
+        return activeCombos
             .filter(
                 (combo) =>
-                    combo.status === "Active" &&
                     selectedComboQuantities[combo.comboId] > 0
             )
             .map((combo) => ({
                 ...combo,
                 quantity: selectedComboQuantities[combo.comboId]
             }));
-    }, [selectedComboQuantities]);
+    }, [activeCombos, selectedComboQuantities]);
 
     //=================== Tính giá ghế ========================
 
@@ -439,7 +449,7 @@ function Booking() {
         setBookingSaveError("");
 
         try {
-            // Tạo đơn đặt vé và lưu thông tin vào Booking Service
+            // 1. Tạo đơn đặt vé và lưu thông tin vào Booking Service
 
             const booking = await createBooking({
                 showtimeId: showtime.id,
@@ -459,7 +469,7 @@ function Booking() {
                 );
             }
 
-            // Cập nhật giao diện sau khi lưu thành công
+            // 2. Cập nhật giao diện sau khi lưu thành công
 
             setSavedBooking(booking);
 
@@ -469,7 +479,7 @@ function Booking() {
 
             setActiveStep(4);
 
-            // Cập nhật ghế đã đặt trong trạng thái hiện tại
+            // 3. Cập nhật ghế đã đặt trong trạng thái hiện tại
 
             const updatedBookedSeatIds =
                 await getBookedSeatIdsByShowtimeId(showtime.id);
@@ -646,6 +656,7 @@ function Booking() {
                                         onChangeComboQuantity={
                                             handleChangeComboQuantity
                                         }
+                                        combos={activeCombos}
                                     />
                                 </div>
                             ) : activeStep === 3 ? (
