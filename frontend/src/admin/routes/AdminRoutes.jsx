@@ -10,6 +10,7 @@ import AdminCinemas from "../pages/cinemas/AdminCinemas.jsx";
 import AdminRooms from "../pages/rooms/AdminRooms.jsx";
 import AdminSeats from "../pages/seats/AdminSeats.jsx";
 import AdminShowtimes from "../pages/showtimes/AdminShowtimes.jsx";
+import AdminBookings from "../pages/bookings/AdminBookings.jsx";
 
 
 function AdminRoutes() {
@@ -25,11 +26,7 @@ function AdminRoutes() {
           <Route path="rooms" element={<AdminRooms />} />
           <Route path="seats" element={<AdminSeats />} />
           <Route path="showtimes" element={<AdminShowtimes />} />
-
-          <Route
-            path="bookings"
-            element={<AdminComingSoon title="Quản lý đặt vé" />}
-          />
+          <Route path="bookings" element={<AdminBookings />} />
 
           <Route
             path="tickets"
