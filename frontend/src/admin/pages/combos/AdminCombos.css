@@ -1,0 +1,1397 @@
+
+/* =========================
+   ADMIN COMBOS
+========================= */
+
+.admin-combos-page {
+    width: 100%;
+    min-height: 100%;
+    padding: 24px;
+    color: #252a34;
+}
+
+/* Header */
+
+.admin-combos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 26px;
+}
+
+.admin-combos-header h1 {
+    margin: 0 0 7px;
+    font-size: 27px;
+    font-weight: 750;
+    color: #202633;
+}
+
+.admin-combos-header p {
+    margin: 0;
+    color: #7b8494;
+    font-size: 14px;
+}
+
+.admin-combo-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 43px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 9px;
+    background: #6254d9;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.admin-combo-add-btn:hover {
+    background: #5042c4;
+    transform: translateY(-1px);
+}
+
+/* Alerts */
+
+.admin-combo-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 15px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.admin-combo-alert.error {
+    background: #fff0f0;
+    border: 1px solid #ffd0d0;
+    color: #c62828;
+}
+
+.admin-combo-alert.success {
+    background: #edfff4;
+    border: 1px solid #bceccc;
+    color: #16834b;
+}
+
+.admin-combo-alert button {
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-size: 22px;
+    line-height: 1;
+}
+
+/* Statistics */
+
+.admin-combo-statistics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.admin-combo-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 105px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #edf0f4;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(25, 35, 55, 0.035);
+}
+
+.admin-combo-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    font-size: 21px;
+}
+
+.admin-combo-stat-icon.total {
+    background: #eeebff;
+    color: #6254d9;
+}
+
+.admin-combo-stat-icon.active {
+    background: #e7f9ef;
+    color: #19965a;
+}
+
+.admin-combo-stat-icon.inactive {
+    background: #fff3e5;
+    color: #d88727;
+}
+
+.admin-combo-stat-card span {
+    display: block;
+    margin-bottom: 5px;
+    color: #7b8494;
+    font-size: 13px;
+}
+
+.admin-combo-stat-card strong {
+    display: block;
+    color: #252a34;
+    font-size: 25px;
+    font-weight: 750;
+}
+
+/* Toolbar */
+
+.admin-combo-toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.admin-combo-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: min(100%, 440px);
+    height: 43px;
+    padding: 0 13px;
+    border: 1px solid #e2e6ed;
+    border-radius: 8px;
+    background: #fff;
+    color: #8b94a3;
+}
+
+.admin-combo-search:focus-within {
+    border-color: #7669e5;
+    box-shadow: 0 0 0 3px rgba(98, 84, 217, 0.1);
+}
+
+.admin-combo-search input {
+    width: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #252a34;
+    font-size: 13px;
+}
+
+.admin-combo-search input::placeholder {
+    color: #a0a7b2;
+}
+
+.admin-combo-filter {
+    min-width: 190px;
+    height: 43px;
+    padding: 0 12px;
+    border: 1px solid #e2e6ed;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: #424957;
+    font-size: 13px;
+}
+
+.admin-combo-filter:focus {
+    border-color: #7669e5;
+}
+
+/* Table */
+
+.admin-combo-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #edf0f4;
+    border-radius: 11px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(25, 35, 55, 0.035);
+}
+
+.admin-combo-table {
+    width: 100%;
+    min-width: 1050px;
+    border-collapse: collapse;
+}
+
+.admin-combo-table thead {
+    background: #f7f8fc;
+}
+
+.admin-combo-table th {
+    padding: 15px 13px;
+    border-bottom: 1px solid #e9ecf2;
+    color: #626c7d;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.admin-combo-table td {
+    padding: 14px 13px;
+    border-bottom: 1px solid #f0f1f5;
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+.admin-combo-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-combo-table tbody tr:hover {
+    background: #fafaff;
+}
+
+.admin-combo-id {
+    color: #6a5cdb;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Image */
+
+.admin-combo-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 65px;
+    height: 55px;
+    overflow: hidden;
+    border: 1px solid #edf0f4;
+    border-radius: 8px;
+    background: #f6f7fa;
+    color: #a0a7b2;
+    font-size: 20px;
+}
+
+.admin-combo-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Combo information */
+
+.admin-combo-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+    max-width: 270px;
+}
+
+.admin-combo-info strong {
+    color: #303746;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.admin-combo-info span {
+    display: -webkit-box;
+    overflow: hidden;
+    color: #858d9b;
+    font-size: 12px;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.admin-combo-price {
+    color: #6254d9;
+    font-size: 13px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+/* Dates */
+
+.admin-combo-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: #515a69;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.admin-combo-dates small {
+    color: #929aa7;
+}
+
+/* Status */
+
+.admin-combo-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.admin-combo-status.active {
+    background: #e7f8ee;
+    color: #16834b;
+}
+
+.admin-combo-status.inactive {
+    background: #fff1e7;
+    color: #c87528;
+}
+
+/* Actions */
+
+.admin-combo-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.admin-combo-actions button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 7px;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.admin-combo-actions button.detail {
+    background: #e8f3ff;
+    color: #2878c7;
+}
+
+.admin-combo-actions button.edit {
+    background: #eeebff;
+    color: #6254d9;
+}
+
+.admin-combo-actions button.toggle {
+    background: #fff3e5;
+    color: #d88727;
+}
+
+.admin-combo-actions button.delete {
+    background: #fff0f0;
+    color: #dc4242;
+}
+
+.admin-combo-actions button:hover {
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+}
+
+/* Empty / loading */
+
+.admin-combo-empty {
+    height: 110px;
+    color: #8b94a3;
+    text-align: center !important;
+}
+
+.admin-combo-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.admin-combo-result-count {
+    margin-top: 13px;
+    color: #858d9b;
+    font-size: 12px;
+    text-align: right;
+}
+
+/* =========================================
+   CREATE / EDIT MODAL
+========================================= */
+
+.admin-combo-modal-overlay {
+    position: fixed;
+    z-index: 1100;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(17, 24, 39, 0.58);
+    backdrop-filter: blur(3px);
+}
+
+.admin-combo-modal {
+    width: 100%;
+    max-width: 650px;
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.2);
+    animation: adminComboModalIn 0.2s ease;
+}
+
+@keyframes adminComboModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-combo-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 21px 24px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.admin-combo-modal-header h2 {
+    margin: 0 0 6px;
+    color: #252a34;
+    font-size: 19px;
+    font-weight: 750;
+}
+
+.admin-combo-modal-header p {
+    margin: 0;
+    color: #858d9b;
+    font-size: 12px;
+}
+
+.admin-combo-modal-header > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 31px;
+    height: 31px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 7px;
+    background: #f1f2f6;
+    color: #697283;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.admin-combo-modal-body {
+    max-height: calc(100vh - 190px);
+    padding: 22px 24px;
+    overflow-y: auto;
+}
+
+.admin-combo-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 17px;
+}
+
+.admin-combo-form-group label {
+    color: #414958;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.admin-combo-form-group label span {
+    color: #e04444;
+}
+
+.admin-combo-form-group input,
+.admin-combo-form-group textarea,
+.admin-combo-form-group select {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid #dfe3eb;
+    border-radius: 7px;
+    outline: none;
+    background: #fff;
+    color: #303746;
+    font-size: 13px;
+    transition: 0.2s ease;
+}
+
+.admin-combo-form-group textarea {
+    min-height: 85px;
+    resize: vertical;
+}
+
+.admin-combo-form-group input:focus,
+.admin-combo-form-group textarea:focus,
+.admin-combo-form-group select:focus {
+    border-color: #7669e5;
+    box-shadow: 0 0 0 3px rgba(98, 84, 217, 0.1);
+}
+
+.admin-combo-form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.admin-combo-form-note {
+    margin: -5px 0 5px;
+    color: #8b94a3;
+    font-size: 11px;
+}
+
+/* Image preview */
+
+.admin-combo-image-preview {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 18px;
+    padding: 10px;
+    border: 1px dashed #dfe3eb;
+    border-radius: 8px;
+    background: #fafaff;
+}
+
+.admin-combo-image-preview img {
+    max-width: 100%;
+    max-height: 180px;
+    border-radius: 6px;
+    object-fit: contain;
+}
+
+.admin-combo-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid #edf0f4;
+    background: #fcfcfe;
+}
+
+.admin-combo-modal-footer button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 105px;
+    min-height: 39px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.admin-combo-modal-footer button.cancel {
+    background: #f0f1f5;
+    color: #606a79;
+}
+
+.admin-combo-modal-footer button.submit {
+    background: #6254d9;
+    color: #fff;
+}
+
+.admin-combo-modal-footer button.submit:hover {
+    background: #5042c4;
+}
+
+.admin-combo-modal-footer button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* =========================================
+   COMBO DETAIL MODAL
+   Reuse AdminProducts detail structure
+========================================= */
+
+.admin-product-detail-overlay {
+    z-index: 1200;
+}
+
+.admin-product-detail-modal {
+    max-width: 850px;
+}
+
+.admin-product-detail-image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.admin-product-detail-image-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-height: 350px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #f7f7fb;
+}
+
+.admin-product-detail-image-wrapper img {
+    display: block;
+    max-width: 100%;
+    max-height: 350px;
+    object-fit: contain;
+    cursor: zoom-in;
+    transition: transform 0.25s ease;
+}
+
+.admin-product-detail-image-wrapper img:hover {
+    transform: scale(1.025);
+}
+
+.admin-product-detail-image-section > span {
+    color: #8991a0;
+    font-size: 12px;
+}
+
+.admin-product-detail-image-section > span i {
+    margin-right: 5px;
+}
+
+.admin-product-detail-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.admin-product-detail-title h5 {
+    margin: 0;
+    color: #252a34;
+    font-size: 20px;
+    font-weight: 750;
+}
+
+.admin-product-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.admin-product-detail-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid #edf0f4;
+    border-radius: 9px;
+    background: #fafaff;
+}
+
+.admin-product-detail-grid > div > span {
+    color: #8991a0;
+    font-size: 12px;
+}
+
+.admin-product-detail-grid > div > strong {
+    color: #303746;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.admin-product-detail-grid > div > strong.price {
+    color: #6254d9;
+}
+
+.admin-product-detail-description,
+.admin-product-detail-url {
+    margin-top: 17px;
+}
+
+.admin-product-detail-description > span,
+.admin-product-detail-url > span {
+    display: block;
+    margin-bottom: 8px;
+    color: #515a69;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.admin-product-detail-description p,
+.admin-product-detail-url p {
+    margin: 0;
+    color: #747d8d;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.admin-product-detail-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid #edf0f4;
+}
+
+.admin-product-detail-footer button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 39px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.admin-product-detail-footer button.cancel {
+    background: #f0f1f5;
+    color: #606a79;
+}
+
+.admin-product-detail-footer button.edit {
+    background: #6254d9;
+    color: #fff;
+}
+
+.admin-product-detail-footer button.edit:hover {
+    background: #5042c4;
+}
+
+/* =========================================
+   IMAGE ZOOM
+========================================= */
+
+.admin-product-image-zoom {
+    position: fixed;
+    z-index: 1300;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 55px 30px 30px;
+    background: rgba(10, 13, 22, 0.94);
+    backdrop-filter: blur(5px);
+}
+
+.admin-product-image-zoom img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 5px;
+}
+
+.admin-product-image-zoom-close {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    font-size: 18px;
+    transition: 0.2s ease;
+}
+
+.admin-product-image-zoom-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: rotate(90deg);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 992px) {
+    .admin-combos-page {
+        padding: 18px;
+    }
+
+    .admin-combo-statistics {
+        gap: 12px;
+    }
+
+    .admin-combo-stat-card {
+        padding: 15px;
+    }
+
+    .admin-product-detail-modal {
+        max-width: 95%;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-combos-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-combo-statistics {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-combo-stat-card {
+        min-height: 85px;
+    }
+
+    .admin-combo-toolbar {
+        flex-direction: column;
+    }
+
+    .admin-combo-search,
+    .admin-combo-filter {
+        width: 100%;
+    }
+
+    .admin-product-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-combos-page {
+        padding: 14px;
+    }
+
+    .admin-combos-header h1 {
+        font-size: 22px;
+    }
+
+    .admin-combo-add-btn {
+        width: 100%;
+    }
+
+    .admin-combo-modal-overlay {
+        align-items: flex-start;
+        padding: 10px;
+    }
+
+    .admin-combo-modal {
+        max-height: calc(100vh - 20px);
+    }
+
+    .admin-combo-modal-header,
+    .admin-combo-modal-body {
+        padding: 17px;
+    }
+
+    .admin-combo-form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .admin-combo-modal-footer {
+        padding: 13px 17px;
+    }
+
+    .admin-combo-modal-footer button {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .admin-product-detail-overlay {
+        padding: 10px;
+    }
+
+    .admin-product-detail-modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: calc(100vh - 20px);
+        overflow-y: auto;
+    }
+
+    .admin-product-detail-image-wrapper {
+        max-height: 240px;
+    }
+
+    .admin-product-detail-image-wrapper img {
+        max-height: 240px;
+    }
+
+    .admin-product-detail-footer {
+        flex-wrap: wrap;
+        padding: 13px 17px;
+    }
+
+    .admin-product-detail-footer button {
+        flex: 1;
+    }
+
+    .admin-product-image-zoom {
+        padding: 55px 12px 15px;
+    }
+
+    .admin-product-image-zoom-close {
+        top: 12px;
+        right: 12px;
+    }
+}
+
+
+/* =========================================
+   ADMIN COMBOS - DARK MODE
+   MATCH ADMIN PRODUCTS EXACTLY
+========================================= */
+
+/* Statistics */
+
+.admin-layout[data-theme="dark"] .admin-combo-stat-card {
+    border-color: #2b3345;
+    background: #191f2e;
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-stat-card span {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-stat-card strong {
+    color: #edf0f7;
+}
+
+/* Search and filter */
+
+.admin-layout[data-theme="dark"] .admin-combo-search,
+.admin-layout[data-theme="dark"] .admin-combo-filter {
+    border-color: #343e52;
+    background: #222a3b;
+    color: #d5dbea;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-search input {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-search input::placeholder {
+    color: #8792a8;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-search:focus-within,
+.admin-layout[data-theme="dark"] .admin-combo-filter:focus {
+    border-color: #e53945;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-filter option {
+    background: #222a3b;
+    color: #edf0f7;
+}
+
+/* Table */
+
+.admin-layout[data-theme="dark"] .admin-combo-table-wrapper {
+    border-color: #343e52;
+    background: #191f2e;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-table thead {
+    background: #222a3b;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-table th {
+    background: #222a3b;
+    border-bottom-color: #343e52;
+    color: #aab4c8;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-table td {
+    border-bottom-color: #2b3345;
+    color: #b9c2d3;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-table tbody tr:hover {
+    background: #222a3b;
+}
+
+/* Combo image */
+
+.admin-layout[data-theme="dark"] .admin-combo-image {
+    border-color: #343e52;
+    background: #222a3b;
+    color: #929db2;
+}
+
+/* Combo information */
+
+.admin-layout[data-theme="dark"] .admin-combo-info strong {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-info span {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-id {
+    color: #b69aff;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-price {
+    color: #edf0f7;
+}
+
+/* Dates */
+
+.admin-layout[data-theme="dark"] .admin-combo-dates {
+    color: #c5ccda;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-dates small {
+    color: #929db2;
+}
+
+/* Status */
+
+.admin-layout[data-theme="dark"] .admin-combo-status.active {
+    background: #193d32;
+    color: #55d995;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-status.inactive {
+    background: #3d3024;
+    color: #ffb86b;
+}
+
+/* Action buttons */
+
+.admin-layout[data-theme="dark"] .admin-combo-actions button {
+    background: #222a3b;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-actions button.detail {
+    color: #b69aff;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-actions button.edit {
+    color: #70a8ff;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-actions button.toggle {
+    color: #ffb86b;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-actions button.delete {
+    color: #ff8585;
+}
+
+/* Empty and result count */
+
+.admin-layout[data-theme="dark"] .admin-combo-empty,
+.admin-layout[data-theme="dark"] .admin-combo-result-count {
+    color: #929db2;
+}
+
+/* Alerts */
+
+.admin-layout[data-theme="dark"] .admin-combo-alert.error {
+    background: rgba(220, 66, 66, 0.12);
+    border-color: rgba(220, 66, 66, 0.3);
+    color: #ff8585;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-alert.success {
+    background: rgba(25, 150, 90, 0.12);
+    border-color: rgba(25, 150, 90, 0.3);
+    color: #55d995;
+}
+
+/* =========================================
+   CREATE / EDIT MODAL
+========================================= */
+
+.admin-layout[data-theme="dark"] .admin-combo-modal {
+    border-color: #343e52;
+    background: #191f2e;
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-modal-header {
+    border-bottom-color: #343e52;
+    background: #191f2e;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-modal-header h2 {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-modal-header p {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-modal-header > button {
+    background: #2a3448;
+    color: #d5dbea;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-modal-body {
+    background: #191f2e;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-form-group label {
+    color: #c5ccda;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-form-group input,
+.admin-layout[data-theme="dark"] .admin-combo-form-group select,
+.admin-layout[data-theme="dark"] .admin-combo-form-group textarea {
+    border-color: #343e52;
+    background: #222a3b;
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-form-group input::placeholder,
+.admin-layout[data-theme="dark"] .admin-combo-form-group textarea::placeholder {
+    color: #8792a8;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-form-group input:focus,
+.admin-layout[data-theme="dark"] .admin-combo-form-group select:focus,
+.admin-layout[data-theme="dark"] .admin-combo-form-group textarea:focus {
+    border-color: #e53945;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-form-note {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-image-preview {
+    border-color: #343e52;
+    background: #222a3b;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-modal-footer {
+    border-top-color: #343e52;
+    background: #191f2e;
+}
+
+.admin-layout[data-theme="dark"] .admin-combo-modal-footer button.cancel {
+    background: #222a3b;
+    color: #d5dbea;
+}
+
+/* =========================================
+   DETAIL MODAL
+========================================= */
+
+.admin-layout[data-theme="dark"] .admin-product-detail-modal {
+    border-color: #343e52;
+    background: #191f2e;
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-header {
+    border-bottom-color: #343e52;
+    background: #191f2e;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-header h4,
+.admin-layout[data-theme="dark"] .admin-product-detail-title h5 {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-header p {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-header > button {
+    background: #2a3448;
+    color: #d5dbea;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-image-wrapper {
+    border-color: #343e52;
+    background: #222a3b;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-image-section > span {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-grid > div {
+    border-color: #343e52;
+    background: #222a3b;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-grid > div > span {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-grid > div > strong {
+    color: #edf0f7;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-description > span,
+.admin-layout[data-theme="dark"] .admin-product-detail-url > span {
+    color: #c5ccda;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-description p {
+    border-color: #343e52;
+    background: #222a3b;
+    color: #c5ccda;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-url p {
+    color: #929db2;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-footer {
+    border-top-color: #343e52;
+    background: #191f2e;
+}
+
+.admin-layout[data-theme="dark"] .admin-product-detail-footer button.cancel {
+    border-color: #343e52;
+    background: #222a3b;
+    color: #d5dbea;
+}
+
+[data-theme="dark"] .admin-combo-form-group input,
+[data-theme="dark"] .admin-combo-form-group textarea,
+[data-theme="dark"] .admin-combo-form-group select {
+    background: var(--vbc-bg-input);
+    border-color: var(--vbc-border);
+    color: var(--vbc-text);
+}
+
+[data-theme="dark"] .admin-combo-form-group input::placeholder,
+[data-theme="dark"] .admin-combo-form-group textarea::placeholder {
+    color: var(--vbc-text-muted);
+}
+
+[data-theme="dark"] .admin-combo-form-group input:focus,
+[data-theme="dark"] .admin-combo-form-group textarea:focus,
+[data-theme="dark"] .admin-combo-form-group select:focus {
+    border-color: var(--vbc-primary);
+}
+
+[data-theme="dark"] .admin-combo-form-note {
+    color: var(--vbc-text-muted);
+}
+
+[data-theme="dark"] .admin-combo-image-preview {
+    background: var(--vbc-bg-secondary);
+    border-color: var(--vbc-border);
+}
+
+[data-theme="dark"] .admin-combo-modal-footer {
+    background: var(--vbc-bg-secondary);
+    border-top-color: var(--vbc-border);
+}
+
+[data-theme="dark"] .admin-combo-modal-footer button.cancel {
+    background: var(--vbc-bg-input);
+    color: var(--vbc-text-secondary);
+}
+
+[data-theme="dark"] .admin-combo-modal-footer button.cancel:hover {
+    background: var(--vbc-border);
+    color: var(--vbc-text);
+}
+
+/* =========================================
+   DETAIL MODAL - DARK MODE
+========================================= */
+
+[data-theme="dark"] .admin-product-detail-modal {
+    background: var(--vbc-bg-card);
+    border: 1px solid var(--vbc-border);
+}
+
+[data-theme="dark"] .admin-product-detail-image-wrapper {
+    background: var(--vbc-bg-secondary);
+}
+
+[data-theme="dark"] .admin-product-detail-image-section > span {
+    color: var(--vbc-text-muted);
+}
+
+[data-theme="dark"] .admin-product-detail-title h5 {
+    color: var(--vbc-text);
+}
+
+[data-theme="dark"] .admin-product-detail-grid > div {
+    background: var(--vbc-bg-secondary);
+    border-color: var(--vbc-border);
+}
+
+[data-theme="dark"] .admin-product-detail-grid > div > span {
+    color: var(--vbc-text-muted);
+}
+
+[data-theme="dark"] .admin-product-detail-grid > div > strong {
+    color: var(--vbc-text);
+}
+
+[data-theme="dark"] .admin-product-detail-grid > div > strong.price {
+    color: #a99cff;
+}
+
+[data-theme="dark"] .admin-product-detail-description > span,
+[data-theme="dark"] .admin-product-detail-url > span {
+    color: var(--vbc-text);
+}
+
+[data-theme="dark"] .admin-product-detail-description p,
+[data-theme="dark"] .admin-product-detail-url p {
+    color: var(--vbc-text-secondary);
+}
+
+[data-theme="dark"] .admin-product-detail-footer {
+    background: var(--vbc-bg-secondary);
+    border-top-color: var(--vbc-border);
+}
+
+[data-theme="dark"] .admin-product-detail-footer button.cancel {
+    background: var(--vbc-bg-input);
+    color: var(--vbc-text-secondary);
+}
+
+/* =========================================
+   SMOOTH THEME TRANSITION
+========================================= */
+
+.admin-combos-page .admin-combo-stat-card,
+.admin-combos-page .admin-combo-table-wrapper,
+.admin-combos-page .admin-combo-table th,
+.admin-combos-page .admin-combo-table td,
+.admin-combos-page .admin-combo-search,
+.admin-combos-page .admin-combo-filter,
+.admin-combos-page .admin-combo-modal,
+.admin-combos-page .admin-combo-modal-header,
+.admin-combos-page .admin-combo-modal-body,
+.admin-combos-page .admin-combo-modal-footer,
+.admin-combos-page .admin-combo-form-group input,
+.admin-combos-page .admin-combo-form-group textarea,
+.admin-combos-page .admin-combo-form-group select {
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}

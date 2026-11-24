@@ -14,6 +14,7 @@ import AdminBookings from "../pages/bookings/AdminBookings.jsx";
 import AdminTickets from "../pages/tickets/AdminTickets.jsx";
 import AdminPayments from "../pages/payments/AdminPayments.jsx";
 import AdminProducts from "../pages/products/AdminProducts.jsx";
+import AdminCombos from "../pages/combos/AdminCombos.jsx";
 
 
 function AdminRoutes() {
@@ -45,10 +46,7 @@ function AdminRoutes() {
             element={<AdminComingSoon title="Quản lý danh mục" />}
           />
 
-          <Route
-            path="combos"
-            element={<AdminComingSoon title="Quản lý combo" />}
-          />
+          <Route path="combos" element={<AdminCombos />} />
 
           <Route
             path="promotions"
