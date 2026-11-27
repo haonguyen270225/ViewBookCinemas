@@ -434,7 +434,7 @@ export const createBooking = async (bookingData) => {
     }
 };
 
-//=================== Cập nhật trạng thái đơn đặt vé ========================
+
 
 
 //=================== Cập nhật trạng thái đơn đặt vé ========================
@@ -454,12 +454,17 @@ export const updateBookingStatus = async (id, status) => {
         throw new Error("Không tìm thấy đơn đặt vé cần cập nhật.");
     }
 
-    // Không cho phép hoàn kho lần thứ hai khi đơn đã bị hủy.
+    // Nếu trạng thái không thay đổi thì không thực hiện lại thao tác.
+    if (existingBooking.bookingStatus === status) {
+        return existingBooking;
+    }
 
-    if (existingBooking.bookingStatus === "Cancelled") {
-        if (status === "Cancelled") {
-            throw new Error("Đơn đặt vé này đã được hủy trước đó.");
-        }
+    // Chỉ cho phép cập nhật đơn đang được xác nhận.
+    // Đơn đã hủy hoặc hoàn thành không được kích hoạt lại.
+    if (existingBooking.bookingStatus !== "Confirmed") {
+        throw new Error(
+            "Đơn đã hủy hoặc hoàn thành, không thể thay đổi trạng thái."
+        );
     }
 
     const updatedBooking = {
@@ -474,10 +479,9 @@ export const updateBookingStatus = async (id, status) => {
             : booking
     );
 
-    // Chỉ hoàn kho khi chuyển từ Confirmed sang Cancelled.
-
+    // Chỉ hoàn kho khi đơn chuyển từ Confirmed sang Cancelled
+    // và thanh toán đã thành công.
     const shouldRestoreStock =
-        existingBooking.bookingStatus === "Confirmed" &&
         status === "Cancelled" &&
         existingBooking.paymentStatus === "Success";
 
@@ -501,9 +505,7 @@ export const updateBookingStatus = async (id, status) => {
                 (productQuantities[productId] || 0) + quantity;
         });
 
-        // Lưu trạng thái đơn trước, sau đó hoàn kho.
-        // Nếu hoàn kho thất bại, khôi phục trạng thái đơn ban đầu.
-
+        // Lưu trạng thái đơn trước khi hoàn kho.
         saveBookings(updatedBookings);
 
         try {
@@ -511,6 +513,7 @@ export const updateBookingStatus = async (id, status) => {
                 await restoreProductStock(productQuantities);
             }
         } catch (error) {
+            // Hoàn lại trạng thái đơn nếu hoàn kho thất bại.
             try {
                 saveBookings(bookings);
             } catch (rollbackError) {
