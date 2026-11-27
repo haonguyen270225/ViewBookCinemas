@@ -18,43 +18,43 @@ import AdminCombos from "../pages/combos/AdminCombos.jsx";
 import AdminCustomers from "../pages/customers/AdminCustomers.jsx";
 import AdminPromotions from "../pages/promotions/AdminPromotions.jsx";
 import AdminCategories from "../pages/categories/AdminCategories.jsx";
-
+import AdminReports from "../pages/reports/AdminReports.jsx";
 
 function AdminRoutes() {
     return (
-      <Routes>
-        <Route element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="dashboard" element={<Dashboard />} />
+        <Routes>
+            <Route element={<AdminLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="dashboard" element={<Dashboard />} />
 
-          <Route path="movies" element={<AdminMovies />} />
-          <Route path="genres" element={<AdminGenres />} />
-          <Route path="cinemas" element={<AdminCinemas />} />
-          <Route path="rooms" element={<AdminRooms />} />
-          <Route path="seats" element={<AdminSeats />} />
-          <Route path="showtimes" element={<AdminShowtimes />} />
-          <Route path="bookings" element={<AdminBookings />} />
-          <Route path="tickets" element={<AdminTickets />} />
-          <Route path="payments" element={<AdminPayments />} />
-          <Route path="customers" element={<AdminCustomers />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="categories" element={<AdminCategories />} />
-          <Route path="combos" element={<AdminCombos />} />
-          <Route path="promotions" element={<AdminPromotions />} />
-          <Route
-            path="reports"
-            element={<AdminComingSoon title="Báo cáo thống kê" />}
-          />
-          <Route
-            path="settings"
-            element={<AdminComingSoon title="Cài đặt hệ thống" />}
-          />
-          <Route
-            path="*"
-            element={<AdminComingSoon title="Không tìm thấy trang" />}
-          />
-        </Route>
-      </Routes>
+                <Route path="movies" element={<AdminMovies />} />
+                <Route path="genres" element={<AdminGenres />} />
+                <Route path="cinemas" element={<AdminCinemas />} />
+                <Route path="rooms" element={<AdminRooms />} />
+                <Route path="seats" element={<AdminSeats />} />
+                <Route path="showtimes" element={<AdminShowtimes />} />
+                <Route path="bookings" element={<AdminBookings />} />
+                <Route path="tickets" element={<AdminTickets />} />
+                <Route path="payments" element={<AdminPayments />} />
+                <Route path="customers" element={<AdminCustomers />} />
+                <Route path="products" element={<AdminProducts />} />
+                <Route path="categories" element={<AdminCategories />} />
+                <Route path="combos" element={<AdminCombos />} />
+                <Route path="promotions" element={<AdminPromotions />} />
+
+                <Route path="reports" element={<AdminReports />} />
+
+                <Route
+                    path="settings"
+                    element={<AdminComingSoon title="Cài đặt hệ thống" />}
+                />
+
+                <Route
+                    path="*"
+                    element={<AdminComingSoon title="Không tìm thấy trang" />}
+                />
+            </Route>
+        </Routes>
     );
 }
 
