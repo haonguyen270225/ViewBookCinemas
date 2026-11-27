@@ -6,7 +6,13 @@ import { getRoomById } from "./roomService.js";
 import { getSeatsByRoomId } from "./seatService.js";
 
 import { seatTypes } from "../data/seatTypes.js";
-import { getActiveProducts } from "./productService.js";
+
+import {
+    getActiveProducts,
+    decreaseProductStock,
+    restoreProductStock
+} from "./productService.js";
+
 import { getActiveCombos } from "./comboService.js";
 
 const STORAGE_KEY = "viewbook-bookings";
@@ -116,7 +122,9 @@ const buildSelectedItems = (quantities, catalog, idField, nameField) => {
                 !Number.isInteger(normalizedQuantity) ||
                 normalizedQuantity <= 0
             ) {
-                throw new Error("Số lượng sản phẩm hoặc combo không hợp lệ.");
+                throw new Error(
+                    "Số lượng sản phẩm hoặc combo không hợp lệ."
+                );
             }
 
             const item = catalog.find(
@@ -162,7 +170,9 @@ export const createBooking = async (bookingData) => {
 
     if (
         new Set(seatIds.map(Number)).size !== seatIds.length ||
-        seatIds.some((id) => !Number.isInteger(Number(id)) || Number(id) <= 0)
+        seatIds.some(
+            (id) => !Number.isInteger(Number(id)) || Number(id) <= 0
+        )
     ) {
         throw new Error("Danh sách ghế không hợp lệ hoặc bị trùng.");
     }
@@ -180,7 +190,9 @@ export const createBooking = async (bookingData) => {
     const showtime = await getShowtimeById(showtimeId);
 
     if (!showtime || showtime.status !== "Scheduled") {
-        throw new Error("Suất chiếu không tồn tại hoặc không khả dụng.");
+        throw new Error(
+            "Suất chiếu không tồn tại hoặc không khả dụng."
+        );
     }
 
     // 3. Lấy thông tin phim, rạp và phòng
@@ -204,7 +216,9 @@ export const createBooking = async (bookingData) => {
     }
 
     if (String(room.cinemaId) !== String(showtime.cinemaId)) {
-        throw new Error("Phòng chiếu không thuộc rạp của suất chiếu.");
+        throw new Error(
+            "Phòng chiếu không thuộc rạp của suất chiếu."
+        );
     }
 
     // 4. Kiểm tra ghế
@@ -233,7 +247,8 @@ export const createBooking = async (bookingData) => {
         }
 
         const unitPrice =
-            Number(showtime.basePrice) + Number(seatType.additionalPrice || 0);
+            Number(showtime.basePrice) +
+            Number(seatType.additionalPrice || 0);
 
         return {
             seatId: seat.seatId,
@@ -272,7 +287,7 @@ export const createBooking = async (bookingData) => {
 
     // 6. Chuẩn hóa sản phẩm và combo
 
-    // Lấy danh sách sản phẩm đang kinh doanh từ Product Service
+    // Lấy danh sách sản phẩm đang kinh doanh
 
     const activeProducts = await getActiveProducts();
 
@@ -283,7 +298,7 @@ export const createBooking = async (bookingData) => {
         "productName"
     );
 
-    // Lấy danh sách Combo đang kinh doanh từ Combo Service
+    // Lấy danh sách Combo đang kinh doanh
 
     const activeCombos = await getActiveCombos();
 
@@ -329,7 +344,9 @@ export const createBooking = async (bookingData) => {
     const newId =
         Math.max(
             0,
-            ...bookings.map((booking) => Number(booking.bookingId) || 0)
+            ...bookings.map(
+                (booking) => Number(booking.bookingId) || 0
+            )
         ) + 1;
 
     const bookingCode = `VBC-${Date.now()}-${newId}`;
@@ -383,11 +400,38 @@ export const createBooking = async (bookingData) => {
         paidAt: new Date().toISOString()
     };
 
-    // 10. Lưu đơn đặt vé
+    // 10. Trừ tồn kho sản phẩm và lưu đơn đặt vé
 
-    saveBookings([...bookings, newBooking]);
+    // Product Service sẽ kiểm tra lại tồn kho thực tế
+    // trước khi trừ số lượng sản phẩm.
 
-    return newBooking;
+    await decreaseProductStock(selectedProductQuantities);
+
+    try {
+        // Lưu đơn đặt vé
+
+        saveBookings([...bookings, newBooking]);
+
+        return newBooking;
+    } catch (error) {
+        console.error(
+            "Không thể lưu đơn đặt vé, đang hoàn lại tồn kho:",
+            error
+        );
+
+        // Nếu lưu đơn thất bại, hoàn lại số lượng sản phẩm
+
+        try {
+            await restoreProductStock(selectedProductQuantities);
+        } catch (restoreError) {
+            console.error(
+                "Không thể hoàn lại tồn kho sản phẩm:",
+                restoreError
+            );
+        }
+
+        throw error;
+    }
 };
 
 //=================== Cập nhật trạng thái đơn đặt vé ========================
@@ -404,7 +448,9 @@ export const updateBookingStatus = async (id, status) => {
     );
 
     if (!existingBooking) {
-        throw new Error("Không tìm thấy đơn đặt vé cần cập nhật.");
+        throw new Error(
+            "Không tìm thấy đơn đặt vé cần cập nhật."
+        );
     }
 
     const updatedBookings = bookings.map((booking) =>

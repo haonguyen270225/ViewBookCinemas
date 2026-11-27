@@ -273,3 +273,150 @@ export const deactivateProduct = async (id) => {
 export const activateProduct = async (id) => {
     return updateProductStatus(id, "Active");
 };
+
+//=================== Trừ số lượng tồn kho sản phẩm ========================
+
+export const decreaseProductStock = async (quantities) => {
+    if (!quantities || typeof quantities !== "object") {
+        throw new Error("Danh sách sản phẩm cần cập nhật không hợp lệ.");
+    }
+
+    const products = await getProducts();
+
+    const selectedItems = Object.entries(quantities)
+        .filter(([, quantity]) => Number(quantity) > 0)
+        .map(([id, quantity]) => {
+            const normalizedQuantity = Number(quantity);
+
+            if (
+                !Number.isSafeInteger(normalizedQuantity) ||
+                normalizedQuantity <= 0
+            ) {
+                throw new Error("Số lượng sản phẩm không hợp lệ.");
+            }
+
+            const product = products.find(
+                (item) => String(item.productId) === String(id)
+            );
+
+            if (!product || product.status !== "Active") {
+                throw new Error(
+                    `Sản phẩm có ID ${id} không còn khả dụng.`
+                );
+            }
+
+            const stockQuantity = Number(product.stockQuantity);
+
+            if (
+                !Number.isSafeInteger(stockQuantity) ||
+                stockQuantity < 0
+            ) {
+                throw new Error(
+                    `Tồn kho của sản phẩm "${product.productName}" không hợp lệ.`
+                );
+            }
+
+            if (normalizedQuantity > stockQuantity) {
+                throw new Error(
+                    `Sản phẩm "${product.productName}" chỉ còn ${stockQuantity} sản phẩm trong kho.`
+                );
+            }
+
+            return {
+                productId: product.productId,
+                quantity: normalizedQuantity
+            };
+        });
+
+    // Kiểm tra toàn bộ sản phẩm trước khi cập nhật
+
+    if (selectedItems.length === 0) {
+        return products;
+    }
+
+    const updatedProducts = products.map((product) => {
+        const selectedItem = selectedItems.find(
+            (item) =>
+                String(item.productId) === String(product.productId)
+        );
+
+        if (!selectedItem) {
+            return product;
+        }
+
+        return {
+            ...product,
+            stockQuantity:
+                Number(product.stockQuantity) - selectedItem.quantity,
+            updatedAt: new Date().toISOString()
+        };
+    });
+
+    saveProducts(updatedProducts);
+
+    return updatedProducts;
+};
+
+//=================== Hoàn lại số lượng tồn kho sản phẩm ========================
+
+export const restoreProductStock = async (quantities) => {
+    if (!quantities || typeof quantities !== "object") {
+        throw new Error("Danh sách sản phẩm cần hoàn kho không hợp lệ.");
+    }
+
+    const products = await getProducts();
+
+    const selectedItems = Object.entries(quantities)
+        .filter(([, quantity]) => Number(quantity) > 0)
+        .map(([id, quantity]) => {
+            const normalizedQuantity = Number(quantity);
+
+            if (
+                !Number.isSafeInteger(normalizedQuantity) ||
+                normalizedQuantity <= 0
+            ) {
+                throw new Error("Số lượng sản phẩm cần hoàn không hợp lệ.");
+            }
+
+            const product = products.find(
+                (item) => String(item.productId) === String(id)
+            );
+
+            if (!product) {
+                throw new Error(
+                    `Không tìm thấy sản phẩm có ID ${id} để hoàn kho.`
+                );
+            }
+
+            return {
+                productId: product.productId,
+                quantity: normalizedQuantity
+            };
+        });
+
+    if (selectedItems.length === 0) {
+        return products;
+    }
+
+    const updatedProducts = products.map((product) => {
+        const selectedItem = selectedItems.find(
+            (item) =>
+                String(item.productId) === String(product.productId)
+        );
+
+        if (!selectedItem) {
+            return product;
+        }
+
+        return {
+            ...product,
+            stockQuantity:
+                Number(product.stockQuantity) + selectedItem.quantity,
+            updatedAt: new Date().toISOString()
+        };
+    });
+
+    saveProducts(updatedProducts);
+
+    return updatedProducts;
+};
