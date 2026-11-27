@@ -40,6 +40,8 @@ const getCategoryName = (categoryId) => {
     return category?.categoryName || "Chưa phân loại";
 };
 
+//=================== Trang quản lý sản phẩm ========================
+
 function AdminProducts() {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -286,6 +288,16 @@ function AdminProducts() {
                             : product
                     )
                 );
+
+                // Đồng bộ dữ liệu nếu đang xem chi tiết sản phẩm
+
+                setDetailProduct((current) =>
+                    current &&
+                    String(current.productId) ===
+                    String(updatedProduct.productId)
+                        ? updatedProduct
+                        : current
+                );
             } else {
                 const newProduct = await createProduct(productData);
 
@@ -339,6 +351,7 @@ function AdminProducts() {
             );
 
             // Đồng bộ dữ liệu chi tiết nếu đang mở sản phẩm đó
+
             setDetailProduct((current) =>
                 current &&
                 String(current.productId) ===
@@ -583,12 +596,12 @@ function AdminProducts() {
                                                 <img
                                                     src={
                                                         product.imageUrl ||
-                                                        "https://placehold.co/100x100?text=Product"
+                                                        DEFAULT_PRODUCT_IMAGE
                                                     }
                                                     alt={product.productName}
                                                     onError={(event) => {
                                                         event.currentTarget.src =
-                                                            "https://placehold.co/100x100?text=Product";
+                                                            DEFAULT_PRODUCT_IMAGE;
                                                     }}
                                                 />
 
@@ -628,7 +641,9 @@ function AdminProducts() {
                                                         : "normal"
                                                 }`}
                                             >
-                                                {Number(product.stockQuantity).toLocaleString("vi-VN")}
+                                                {Number(
+                                                    product.stockQuantity
+                                                ).toLocaleString("vi-VN")}
                                             </span>
                                         </td>
 
@@ -870,6 +885,8 @@ function AdminProducts() {
                                     />
                                 </div>
 
+                                {/* URL và xem trước hình ảnh */}
+
                                 <div className="admin-product-form-group full">
                                     <label htmlFor="productImage">
                                         Đường dẫn hình ảnh
@@ -883,6 +900,34 @@ function AdminProducts() {
                                         onChange={handleChange}
                                         placeholder="https://example.com/product.jpg"
                                     />
+
+                                    <small>
+                                        Nhập URL hình ảnh để xem trước trước khi lưu sản phẩm.
+                                    </small>
+
+                                    <div className="admin-product-form-image-preview">
+                                        <img
+                                            src={
+                                                formData.imageUrl.trim() ||
+                                                DEFAULT_PRODUCT_IMAGE
+                                            }
+                                            alt="Xem trước sản phẩm"
+                                            onError={(event) => {
+                                                event.currentTarget.src =
+                                                    DEFAULT_PRODUCT_IMAGE;
+                                            }}
+                                        />
+
+                                        <div>
+                                            <strong>Xem trước hình ảnh</strong>
+
+                                            <span>
+                                                {formData.imageUrl.trim()
+                                                    ? "Hình ảnh sẽ được sử dụng cho sản phẩm."
+                                                    : "Chưa nhập URL hình ảnh."}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="admin-product-form-group full">

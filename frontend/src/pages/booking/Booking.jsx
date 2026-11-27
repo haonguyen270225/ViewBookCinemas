@@ -311,10 +311,34 @@ function Booking() {
     //=================== Thay đổi số lượng sản phẩm ========================
 
     const handleChangeProductQuantity = (productId, change) => {
+        const product = activeProducts.find(
+            (item) =>
+                String(item.productId) === String(productId)
+        );
+
+        if (!product || product.status !== "Active") {
+            return;
+        }
+
+        const stockQuantity = Number(product.stockQuantity);
+
+        if (
+            !Number.isSafeInteger(stockQuantity) ||
+            stockQuantity <= 0
+        ) {
+            return;
+        }
+
         setSelectedProductQuantities((current) => {
+            const currentQuantity =
+                Number(current[productId]) || 0;
+
             const nextQuantity = Math.max(
                 0,
-                (current[productId] || 0) + change
+                Math.min(
+                    stockQuantity,
+                    currentQuantity + change
+                )
             );
 
             return {
@@ -332,7 +356,7 @@ function Booking() {
         setSelectedComboQuantities((current) => {
             const nextQuantity = Math.max(
                 0,
-                (current[comboId] || 0) + change
+                (Number(current[comboId]) || 0) + change
             );
 
             return {
@@ -350,11 +374,13 @@ function Booking() {
         return activeProducts
             .filter(
                 (product) =>
-                    selectedProductQuantities[product.productId] > 0
+                    Number(selectedProductQuantities[product.productId]) > 0
             )
             .map((product) => ({
                 ...product,
-                quantity: selectedProductQuantities[product.productId]
+                quantity: Number(
+                    selectedProductQuantities[product.productId]
+                )
             }));
     }, [activeProducts, selectedProductQuantities]);
 
@@ -364,11 +390,13 @@ function Booking() {
         return activeCombos
             .filter(
                 (combo) =>
-                    selectedComboQuantities[combo.comboId] > 0
+                    Number(selectedComboQuantities[combo.comboId]) > 0
             )
             .map((combo) => ({
                 ...combo,
-                quantity: selectedComboQuantities[combo.comboId]
+                quantity: Number(
+                    selectedComboQuantities[combo.comboId]
+                )
             }));
     }, [activeCombos, selectedComboQuantities]);
 
@@ -407,6 +435,52 @@ function Booking() {
 
     const totalPrice = seatTotal + productTotal + comboTotal;
 
+    //=================== Kiểm tra tồn kho mới nhất ========================
+
+    const validateLatestProductStock = async () => {
+        const latestProducts = await getActiveProducts();
+
+        setActiveProducts(latestProducts);
+
+        for (const [productId, quantity] of Object.entries(
+            selectedProductQuantities
+        )) {
+            const selectedQuantity = Number(quantity);
+
+            if (selectedQuantity <= 0) {
+                continue;
+            }
+
+            const product = latestProducts.find(
+                (item) =>
+                    String(item.productId) === String(productId)
+            );
+
+            if (!product || product.status !== "Active") {
+                throw new Error(
+                    "Một sản phẩm bạn chọn hiện không còn kinh doanh."
+                );
+            }
+
+            const stockQuantity = Number(product.stockQuantity);
+
+            if (
+                !Number.isSafeInteger(stockQuantity) ||
+                stockQuantity < selectedQuantity
+            ) {
+                throw new Error(
+                    `Sản phẩm "${product.productName}" chỉ còn ${
+                        Number.isSafeInteger(stockQuantity)
+                            ? stockQuantity
+                            : 0
+                    } sản phẩm trong kho. Vui lòng điều chỉnh lại số lượng.`
+                );
+            }
+        }
+
+        return latestProducts;
+    };
+
     //=================== Chuyển sang bước chọn bắp nước ========================
 
     const handleConfirmSeats = () => {
@@ -427,14 +501,23 @@ function Booking() {
 
     //=================== Chuyển sang bước thanh toán ========================
 
-    const handleConfirmProducts = () => {
+    const handleConfirmProducts = async () => {
         if (selectedSeats.length === 0) {
             setActiveStep(1);
             return;
         }
 
         setBookingSaveError("");
-        setActiveStep(3);
+
+        try {
+            await validateLatestProductStock();
+            setActiveStep(3);
+        } catch (error) {
+            setBookingSaveError(
+                error.message ||
+                "Không thể kiểm tra tồn kho sản phẩm."
+            );
+        }
     };
 
     //=================== Quay lại bước bắp nước ========================
@@ -459,7 +542,11 @@ function Booking() {
         setBookingSaveError("");
 
         try {
-            // 1. Tạo đơn đặt vé và lưu thông tin vào Booking Service
+            // 1. Kiểm tra tồn kho mới nhất trước khi tạo đơn
+
+            await validateLatestProductStock();
+
+            // 2. Tạo đơn đặt vé và lưu thông tin vào Booking Service
 
             const booking = await createBooking({
                 showtimeId: showtime.id,
@@ -479,7 +566,7 @@ function Booking() {
                 );
             }
 
-            // 2. Cập nhật giao diện sau khi lưu thành công
+            // 3. Cập nhật giao diện sau khi lưu thành công
 
             setSavedBooking(booking);
 
@@ -489,7 +576,7 @@ function Booking() {
 
             setActiveStep(4);
 
-            // 3. Cập nhật ghế đã đặt trong trạng thái hiện tại
+            // 4. Cập nhật ghế đã đặt trong trạng thái hiện tại
 
             const updatedBookedSeatIds =
                 await getBookedSeatIdsByShowtimeId(showtime.id);
@@ -504,6 +591,16 @@ function Booking() {
                 "Không thể tạo đơn đặt vé:",
                 error
             );
+
+            // Nếu tồn kho thay đổi, đưa khách về bước chọn sản phẩm
+
+            if (
+                error.message?.toLowerCase().includes("sản phẩm") ||
+                error.message?.toLowerCase().includes("tồn kho") ||
+                error.message?.toLowerCase().includes("khả dụng")
+            ) {
+                setActiveStep(2);
+            }
 
             setBookingSaveError(
                 error.message ||
@@ -652,6 +749,16 @@ function Booking() {
                                         <i className="bi bi-arrow-left"></i>
                                         Quay lại chọn ghế
                                     </button>
+
+                                    {bookingSaveError && (
+                                        <div
+                                            className="alert alert-danger"
+                                            role="alert"
+                                        >
+                                            <i className="bi bi-exclamation-circle me-2"></i>
+                                            {bookingSaveError}
+                                        </div>
+                                    )}
 
                                     <ProductSelection
                                         selectedProductQuantities={
