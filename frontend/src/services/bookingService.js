@@ -436,6 +436,9 @@ export const createBooking = async (bookingData) => {
 
 //=================== Cập nhật trạng thái đơn đặt vé ========================
 
+
+//=================== Cập nhật trạng thái đơn đặt vé ========================
+
 export const updateBookingStatus = async (id, status) => {
     const bookings = await getBookings();
 
@@ -448,27 +451,86 @@ export const updateBookingStatus = async (id, status) => {
     );
 
     if (!existingBooking) {
-        throw new Error(
-            "Không tìm thấy đơn đặt vé cần cập nhật."
-        );
+        throw new Error("Không tìm thấy đơn đặt vé cần cập nhật.");
     }
+
+    // Không cho phép hoàn kho lần thứ hai khi đơn đã bị hủy.
+
+    if (existingBooking.bookingStatus === "Cancelled") {
+        if (status === "Cancelled") {
+            throw new Error("Đơn đặt vé này đã được hủy trước đó.");
+        }
+    }
+
+    const updatedBooking = {
+        ...existingBooking,
+        bookingStatus: status,
+        updatedAt: new Date().toISOString()
+    };
 
     const updatedBookings = bookings.map((booking) =>
         String(booking.bookingId) === String(id)
-            ? {
-                ...booking,
-                bookingStatus: status,
-                updatedAt: new Date().toISOString()
-            }
+            ? updatedBooking
             : booking
     );
 
+    // Chỉ hoàn kho khi chuyển từ Confirmed sang Cancelled.
+
+    const shouldRestoreStock =
+        existingBooking.bookingStatus === "Confirmed" &&
+        status === "Cancelled" &&
+        existingBooking.paymentStatus === "Success";
+
+    if (shouldRestoreStock) {
+        const productQuantities = {};
+
+        (existingBooking.products || []).forEach((product) => {
+            const productId = String(product.productId);
+            const quantity = Number(product.quantity);
+
+            if (
+                !Number.isSafeInteger(quantity) ||
+                quantity <= 0
+            ) {
+                throw new Error(
+                    `Số lượng sản phẩm "${product.productName}" trong đơn không hợp lệ.`
+                );
+            }
+
+            productQuantities[productId] =
+                (productQuantities[productId] || 0) + quantity;
+        });
+
+        // Lưu trạng thái đơn trước, sau đó hoàn kho.
+        // Nếu hoàn kho thất bại, khôi phục trạng thái đơn ban đầu.
+
+        saveBookings(updatedBookings);
+
+        try {
+            if (Object.keys(productQuantities).length > 0) {
+                await restoreProductStock(productQuantities);
+            }
+        } catch (error) {
+            try {
+                saveBookings(bookings);
+            } catch (rollbackError) {
+                console.error(
+                    "Không thể khôi phục trạng thái đơn đặt vé:",
+                    rollbackError
+                );
+            }
+
+            throw error;
+        }
+
+        return updatedBooking;
+    }
+
     saveBookings(updatedBookings);
 
-    return updatedBookings.find(
-        (booking) => String(booking.bookingId) === String(id)
-    );
+    return updatedBooking;
 };
+
 
 //=================== Hủy đơn đặt vé ========================
 
