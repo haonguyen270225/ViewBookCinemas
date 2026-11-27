@@ -19,16 +19,41 @@ const saveProducts = (products) => {
 
 //=================== Kiểm tra danh mục ========================
 
-const validateCategory = (categoryId) => {
+// Cho phép giữ danh mục ngừng hoạt động khi chỉnh sửa sản phẩm cũ.
+// Không cho phép tạo sản phẩm mới hoặc chuyển sang danh mục ngừng hoạt động.
+const validateCategory = (categoryId, existingProduct = null) => {
     const category = getCategoryById(categoryId);
 
-    if (!category || !category.status) {
+    if (!category) {
+        throw new Error("Danh mục sản phẩm không tồn tại.");
+    }
+
+    const isKeepingCurrentInactiveCategory =
+        existingProduct &&
+        Number(existingProduct.categoryId) === Number(categoryId);
+
+    if (!category.status && !isKeepingCurrentInactiveCategory) {
         throw new Error(
-            "Danh mục không tồn tại hoặc đang ngừng hoạt động."
+            "Danh mục đang ngừng sử dụng. Vui lòng chọn danh mục đang hoạt động."
         );
     }
 
     return category;
+};
+
+// Kiểm tra sản phẩm có thuộc danh mục đang hoạt động không
+const isProductCategoryActive = (product) => {
+    const category = getCategoryById(product.categoryId);
+
+    return Boolean(category && category.status);
+};
+
+// Kiểm tra sản phẩm có đủ điều kiện kinh doanh không
+const isProductAvailable = (product) => {
+    return (
+        product.status === "Active" &&
+        isProductCategoryActive(product)
+    );
 };
 
 //=================== Kiểm tra dữ liệu sản phẩm ========================
@@ -59,7 +84,14 @@ const validateProduct = (data, products, currentId = null) => {
         throw new Error("Tên sản phẩm đã tồn tại.");
     }
 
-    validateCategory(categoryId);
+    const existingProduct = currentId
+        ? products.find(
+            (product) =>
+                String(product.productId) === String(currentId)
+        )
+        : null;
+
+    validateCategory(categoryId, existingProduct);
 
     if (!description || !description.trim()) {
         throw new Error("Vui lòng nhập mô tả sản phẩm.");
@@ -81,7 +113,7 @@ const validateProduct = (data, products, currentId = null) => {
     }
 
     if (
-        !Number.isInteger(Number(stockQuantity)) ||
+        !Number.isSafeInteger(Number(stockQuantity)) ||
         Number(stockQuantity) < 0
     ) {
         throw new Error("Số lượng tồn kho phải là số nguyên không âm.");
@@ -142,12 +174,12 @@ export const getProducts = async () => {
 
 //=================== Lấy danh sách sản phẩm đang kinh doanh ========================
 
+// Chỉ lấy sản phẩm đang hoạt động và danh mục cũng đang hoạt động.
+// Hàm này được sử dụng tại giao diện đặt vé.
 export const getActiveProducts = async () => {
     const products = await getProducts();
 
-    return products.filter(
-        (product) => product.status === "Active"
-    );
+    return products.filter(isProductAvailable);
 };
 
 //=================== Lấy sản phẩm theo ID ========================
@@ -245,6 +277,16 @@ export const updateProductStatus = async (id, status) => {
         throw new Error("Không tìm thấy sản phẩm.");
     }
 
+    // Không cho kích hoạt sản phẩm nếu danh mục đang ngừng sử dụng.
+    if (
+        status === "Active" &&
+        !isProductCategoryActive(existingProduct)
+    ) {
+        throw new Error(
+            "Không thể kích hoạt sản phẩm vì danh mục đang ngừng sử dụng. Vui lòng kích hoạt danh mục trước."
+        );
+    }
+
     const updatedProducts = products.map((product) =>
         String(product.productId) === String(id)
             ? {
@@ -299,9 +341,9 @@ export const decreaseProductStock = async (quantities) => {
                 (item) => String(item.productId) === String(id)
             );
 
-            if (!product || product.status !== "Active") {
+            if (!product || !isProductAvailable(product)) {
                 throw new Error(
-                    `Sản phẩm có ID ${id} không còn khả dụng.`
+                    `Sản phẩm có ID ${id} không còn khả dụng hoặc danh mục đã ngừng sử dụng.`
                 );
             }
 
