@@ -1,26 +1,29 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
     getCustomers,
     getCustomerStatistics,
     updateCustomer,
-    updateCustomerStatus
+    updateCustomerStatus,
+    resetCustomerLoginName,
+    resetCustomerLoginPassword
 } from "../../../services/customerService.js";
 
 import "./AdminCustomers.css";
 
+const DEFAULT_AVATAR = "https://placehold.co/120x120?text=User";
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
+
 const EMPTY_FORM = {
     fullName: "",
+    username: "",
     email: "",
     phoneNumber: "",
     dateOfBirth: "",
     gender: "",
     avatarUrl: ""
 };
-
-const DEFAULT_AVATAR =
-    "https://placehold.co/120x120?text=User";
 
 const formatDate = (value) => {
     if (!value) return "—";
@@ -30,22 +33,6 @@ const formatDate = (value) => {
     if (Number.isNaN(date.getTime())) return "—";
 
     return new Intl.DateTimeFormat("vi-VN").format(date);
-};
-
-const formatDateTime = (value) => {
-    if (!value) return "—";
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) return "—";
-
-    return new Intl.DateTimeFormat("vi-VN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-    }).format(date);
 };
 
 const getStatusLabel = (status) =>
@@ -58,9 +45,12 @@ const getGenderLabel = (gender) => {
     return "Chưa cập nhật";
 };
 
-//=================== Trang quản lý khách hàng ========================
+const getCustomerName = (customer) =>
+    customer?.fullName || "Khách hàng";
 
 function AdminCustomers() {
+    const avatarInputRef = useRef(null);
+
     const [customers, setCustomers] = useState([]);
     const [statistics, setStatistics] = useState({
         total: 0,
@@ -85,7 +75,20 @@ function AdminCustomers() {
     // Modal chi tiết
     const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-    //=================== Tải dữ liệu ========================
+    // Modal xem ảnh
+    const [isAvatarPreviewOpen, setIsAvatarPreviewOpen] = useState(false);
+    const [avatarPreviewUrl, setAvatarPreviewUrl] = useState("");
+
+    // Reset mật khẩu
+    const [isResettingPassword, setIsResettingPassword] = useState(false);
+    const [temporaryPasswordInfo, setTemporaryPasswordInfo] = useState(null);
+
+    // Reset username
+    const [isResettingUsername, setIsResettingUsername] = useState(false);
+
+    //====================================================
+    // Tải dữ liệu
+    //====================================================
 
     const loadCustomers = async () => {
         setIsLoading(true);
@@ -100,8 +103,7 @@ function AdminCustomers() {
             setCustomers(customerData);
             setStatistics(statisticData);
         } catch (error) {
-            console.error("Không thể tải danh sách khách hàng:", error);
-
+            console.error("Không thể tải khách hàng:", error);
             setErrorMessage(
                 error.message || "Không thể tải danh sách khách hàng."
             );
@@ -114,7 +116,9 @@ function AdminCustomers() {
         loadCustomers();
     }, []);
 
-    //=================== Tìm kiếm và lọc ========================
+    //====================================================
+    // Tìm kiếm và lọc
+    //====================================================
 
     const filteredCustomers = useMemo(() => {
         const keyword = searchTerm.trim().toLocaleLowerCase("vi");
@@ -135,20 +139,69 @@ function AdminCustomers() {
         });
     }, [customers, searchTerm, selectedStatus]);
 
-    //=================== Xóa bộ lọc ========================
-
     const handleClearFilters = () => {
         setSearchTerm("");
         setSelectedStatus("Tất cả");
     };
 
-    //=================== Mở form chỉnh sửa ========================
+    //====================================================
+    // Đồng bộ dữ liệu sau cập nhật
+    //====================================================
+
+    const replaceCustomer = (updatedCustomer) => {
+        if (!updatedCustomer) return;
+
+        setCustomers((current) =>
+            current.map((customer) =>
+                String(customer.userId) === String(updatedCustomer.userId)
+                    ? updatedCustomer
+                    : customer
+            )
+        );
+
+        setSelectedCustomer((current) =>
+            current &&
+            String(current.userId) === String(updatedCustomer.userId)
+                ? updatedCustomer
+                : current
+        );
+
+        setEditingCustomer((current) =>
+            current &&
+            String(current.userId) === String(updatedCustomer.userId)
+                ? updatedCustomer
+                : current
+        );
+    };
+
+    const refreshStatistics = async () => {
+        try {
+            const result = await getCustomerStatistics();
+            setStatistics(result);
+        } catch (error) {
+            console.error("Không thể cập nhật thống kê:", error);
+        }
+    };
+
+    //====================================================
+    // Xem avatar
+    //====================================================
+
+    const handleOpenAvatarPreview = (imageUrl) => {
+        setAvatarPreviewUrl(imageUrl || DEFAULT_AVATAR);
+        setIsAvatarPreviewOpen(true);
+    };
+
+    //====================================================
+    // Mở form chỉnh sửa
+    //====================================================
 
     const handleOpenEdit = (customer) => {
         setEditingCustomer(customer);
 
         setFormData({
             fullName: customer.fullName || "",
+            username: customer.username || "",
             email: customer.email || "",
             phoneNumber: customer.phoneNumber || "",
             dateOfBirth: customer.dateOfBirth || "",
@@ -156,11 +209,9 @@ function AdminCustomers() {
             avatarUrl: customer.avatarUrl || ""
         });
 
-        setIsModalOpen(true);
         setSelectedCustomer(null);
+        setIsModalOpen(true);
     };
-
-    //=================== Đóng form ========================
 
     const handleCloseModal = () => {
         if (isSaving) return;
@@ -169,8 +220,6 @@ function AdminCustomers() {
         setEditingCustomer(null);
         setFormData({ ...EMPTY_FORM });
     };
-
-    //=================== Thay đổi form ========================
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -181,26 +230,89 @@ function AdminCustomers() {
         }));
     };
 
-    //=================== Cập nhật khách hàng ========================
+    //====================================================
+    // Chọn avatar từ máy
+    //====================================================
+
+    const handleSelectAvatar = (event) => {
+        const file = event.target.files?.[0];
+
+        if (!file) return;
+
+        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+            alert("Chỉ hỗ trợ ảnh JPG, PNG hoặc WEBP.");
+            event.target.value = "";
+            return;
+        }
+
+        if (file.size > MAX_AVATAR_SIZE) {
+            alert("Dung lượng ảnh không được vượt quá 2MB.");
+            event.target.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            setFormData((current) => ({
+                ...current,
+                avatarUrl: reader.result
+            }));
+        };
+
+        reader.onerror = () => {
+            alert("Không thể đọc ảnh. Vui lòng thử lại.");
+        };
+
+        reader.readAsDataURL(file);
+        event.target.value = "";
+    };
+
+    const handleRemoveAvatar = () => {
+        setFormData((current) => ({
+            ...current,
+            avatarUrl: ""
+        }));
+
+        if (avatarInputRef.current) {
+            avatarInputRef.current.value = "";
+        }
+    };
+
+    //====================================================
+    // Cập nhật khách hàng
+    //====================================================
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
         if (!editingCustomer) return;
 
-        if (!formData.fullName.trim()) {
-            alert("Vui lòng nhập họ và tên khách hàng.");
+        const fullName = formData.fullName.trim();
+        const username = formData.username.trim();
+        const email = formData.email.trim().toLowerCase();
+
+        if (!fullName) {
+            alert("Vui lòng nhập họ và tên.");
             return;
         }
 
-        if (!formData.email.trim()) {
-            alert("Vui lòng nhập email khách hàng.");
+        if (username.length < 4 || username.length > 30) {
+            alert("Tên đăng nhập phải có từ 4 đến 30 ký tự.");
             return;
         }
 
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!/^[a-zA-Z0-9_.]+$/.test(username)) {
+            alert("Tên đăng nhập chỉ được chứa chữ, số, dấu chấm và dấu gạch dưới.");
+            return;
+        }
 
-        if (!emailPattern.test(formData.email.trim())) {
+        if (!email) {
+            alert("Vui lòng nhập email.");
+            return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             alert("Email không đúng định dạng.");
             return;
         }
@@ -212,59 +324,51 @@ function AdminCustomers() {
                 editingCustomer.userId,
                 {
                     ...formData,
-                    fullName: formData.fullName.trim(),
-                    email: formData.email.trim().toLowerCase(),
-                    phoneNumber: formData.phoneNumber.trim(),
-                    avatarUrl: formData.avatarUrl.trim()
+                    fullName,
+                    username,
+                    email,
+                    phoneNumber: formData.phoneNumber.trim()
                 }
             );
 
-            setCustomers((current) =>
-                current.map((customer) =>
-                    String(customer.userId) ===
-                    String(updatedCustomer.userId)
-                        ? updatedCustomer
-                        : customer
-                )
-            );
-
-            setSelectedCustomer(updatedCustomer);
+            replaceCustomer(updatedCustomer);
 
             setIsModalOpen(false);
             setEditingCustomer(null);
             setFormData({ ...EMPTY_FORM });
 
+            await refreshStatistics();
+
             alert("Cập nhật thông tin khách hàng thành công.");
         } catch (error) {
-            console.error("Không thể cập nhật khách hàng:", error);
-
-            alert(
-                error.message || "Không thể cập nhật thông tin khách hàng."
-            );
+            console.error("Lỗi cập nhật khách hàng:", error);
+            alert(error.message || "Không thể cập nhật khách hàng.");
         } finally {
             setIsSaving(false);
         }
     };
 
-    //=================== Xem chi tiết ========================
+    //====================================================
+    // Xem chi tiết
+    //====================================================
 
     const handleViewDetail = (customer) => {
         setSelectedCustomer(customer);
     };
 
-    //=================== Khóa / mở khóa tài khoản ========================
+    //====================================================
+    // Khóa / mở khóa
+    //====================================================
 
     const handleToggleStatus = async (customer) => {
         const currentStatus = customer.status || "Active";
-
-        const nextStatus =
-            currentStatus === "Active" ? "Inactive" : "Active";
+        const nextStatus = currentStatus === "Active" ? "Inactive" : "Active";
 
         const actionText =
             nextStatus === "Inactive" ? "khóa" : "mở khóa";
 
         const confirmed = window.confirm(
-            `Bạn có chắc chắn muốn ${actionText} tài khoản của "${customer.fullName}" không?`
+            `Bạn có chắc muốn ${actionText} tài khoản "${getCustomerName(customer)}" không?`
         );
 
         if (!confirmed) return;
@@ -277,58 +381,114 @@ function AdminCustomers() {
                 nextStatus
             );
 
-            setCustomers((current) =>
-                current.map((item) =>
-                    String(item.userId) ===
-                    String(updatedCustomer.userId)
-                        ? updatedCustomer
-                        : item
-                )
-            );
-
-            setSelectedCustomer((current) =>
-                current &&
-                String(current.userId) ===
-                String(updatedCustomer.userId)
-                    ? updatedCustomer
-                    : current
-            );
-
-            const updatedCustomers = customers.map((item) =>
-                String(item.userId) === String(updatedCustomer.userId)
-                    ? updatedCustomer
-                    : item
-            );
-
-            setStatistics({
-                total: updatedCustomers.length,
-                active: updatedCustomers.filter(
-                    (item) => (item.status || "Active") === "Active"
-                ).length,
-                inactive: updatedCustomers.filter(
-                    (item) => item.status === "Inactive"
-                ).length,
-                newToday: statistics.newToday
-            });
+            replaceCustomer(updatedCustomer);
+            await refreshStatistics();
         } catch (error) {
-            console.error("Không thể cập nhật trạng thái:", error);
-
-            alert(
-                error.message || "Không thể cập nhật trạng thái tài khoản."
-            );
+            alert(error.message || "Không thể cập nhật trạng thái tài khoản.");
         } finally {
             setUpdatingId(null);
         }
     };
 
-    //=================== Trạng thái tải ========================
+    //====================================================
+    // Reset username
+    //====================================================
+
+    const handleResetUsername = async (customer) => {
+        const newUsername = window.prompt(
+            `Nhập tên đăng nhập mới cho ${getCustomerName(customer)}:`,
+            customer.username || ""
+        );
+
+        if (newUsername === null) return;
+
+        const username = newUsername.trim();
+
+        if (username.length < 4 || username.length > 30) {
+            alert("Tên đăng nhập phải có từ 4 đến 30 ký tự.");
+            return;
+        }
+
+        if (!/^[a-zA-Z0-9_.]+$/.test(username)) {
+            alert("Tên đăng nhập chỉ được chứa chữ, số, dấu chấm và dấu gạch dưới.");
+            return;
+        }
+
+        setIsResettingUsername(true);
+
+        try {
+            const updatedCustomer = await resetCustomerLoginName(
+                customer.userId,
+                username
+            );
+
+            replaceCustomer(updatedCustomer);
+
+            alert(`Đã cập nhật username thành công: ${updatedCustomer.username}`);
+        } catch (error) {
+            alert(error.message || "Không thể cập nhật username.");
+        } finally {
+            setIsResettingUsername(false);
+        }
+    };
+
+    //====================================================
+    // Reset mật khẩu
+    //====================================================
+
+    const handleResetPassword = async (customer) => {
+        const confirmed = window.confirm(
+            `Bạn có chắc muốn tạo mật khẩu tạm thời mới cho "${getCustomerName(customer)}"?\n\nMật khẩu hiện tại sẽ không còn sử dụng được.`
+        );
+
+        if (!confirmed) return;
+
+        setIsResettingPassword(true);
+
+        try {
+            const result = await resetCustomerLoginPassword(customer.userId);
+
+            replaceCustomer(result.customer);
+
+            setTemporaryPasswordInfo({
+                customerName: customer.fullName,
+                username: result.customer.username,
+                password: result.temporaryPassword
+            });
+        } catch (error) {
+            alert(error.message || "Không thể đặt lại mật khẩu.");
+        } finally {
+            setIsResettingPassword(false);
+        }
+    };
+
+    const handleCopyTemporaryPassword = async () => {
+        if (!temporaryPasswordInfo?.password) return;
+
+        try {
+            await navigator.clipboard.writeText(
+                temporaryPasswordInfo.password
+            );
+
+            alert("Đã sao chép mật khẩu tạm thời.");
+        } catch {
+            window.prompt(
+                "Sao chép mật khẩu tạm thời:",
+                temporaryPasswordInfo.password
+            );
+        }
+    };
+
+    //====================================================
+    // Loading / Error
+    //====================================================
 
     if (isLoading) {
         return (
             <div className="admin-customers">
-                <div className="admin-customers-empty">
-                    <i className="bi bi-hourglass-split"></i>
-                    <h5>Đang tải danh sách khách hàng...</h5>
+                <div className="admin-customers-state">
+                    <span className="spinner-border"></span>
+                    <p>Đang tải danh sách khách hàng...</p>
                 </div>
             </div>
         );
@@ -337,11 +497,10 @@ function AdminCustomers() {
     if (errorMessage) {
         return (
             <div className="admin-customers">
-                <div className="admin-customers-empty">
+                <div className="admin-customers-state">
                     <i className="bi bi-exclamation-circle"></i>
                     <h5>Không thể tải dữ liệu</h5>
                     <p>{errorMessage}</p>
-
                     <button type="button" onClick={loadCustomers}>
                         <i className="bi bi-arrow-clockwise"></i>
                         Thử lại
@@ -351,15 +510,15 @@ function AdminCustomers() {
         );
     }
 
+    //====================================================
+    // Render
+    //====================================================
+
     return (
         <div className="admin-customers">
-
-            {/* Tiêu đề */}
-
             <div className="admin-page-intro admin-customers-intro">
                 <div>
                     <h3>Quản lý khách hàng</h3>
-
                     <p>
                         Theo dõi thông tin và quản lý tài khoản khách hàng
                         trong hệ thống ViewBookCinemas.
@@ -370,12 +529,10 @@ function AdminCustomers() {
             {/* Thống kê */}
 
             <div className="admin-customers-statistics">
-
                 <div className="admin-customer-stat-card">
                     <div className="admin-customer-stat-icon blue">
                         <i className="bi bi-people"></i>
                     </div>
-
                     <div>
                         <span>Tổng khách hàng</span>
                         <strong>{statistics.total}</strong>
@@ -386,7 +543,6 @@ function AdminCustomers() {
                     <div className="admin-customer-stat-icon green">
                         <i className="bi bi-person-check"></i>
                     </div>
-
                     <div>
                         <span>Đang hoạt động</span>
                         <strong>{statistics.active}</strong>
@@ -397,7 +553,6 @@ function AdminCustomers() {
                     <div className="admin-customer-stat-icon orange">
                         <i className="bi bi-person-lock"></i>
                     </div>
-
                     <div>
                         <span>Đã khóa</span>
                         <strong>{statistics.inactive}</strong>
@@ -408,33 +563,24 @@ function AdminCustomers() {
                     <div className="admin-customer-stat-icon purple">
                         <i className="bi bi-person-plus"></i>
                     </div>
-
                     <div>
                         <span>Đăng ký hôm nay</span>
                         <strong>{statistics.newToday}</strong>
                     </div>
                 </div>
-
             </div>
 
-            {/* Danh sách khách hàng */}
+            {/* Danh sách */}
 
             <section className="admin-panel admin-customers-panel">
-
-                {/* Bộ lọc */}
-
                 <div className="admin-customers-toolbar">
-
                     <div className="admin-customers-search">
                         <i className="bi bi-search"></i>
-
                         <input
                             type="search"
                             placeholder="Tìm tên, username, email hoặc số điện thoại..."
                             value={searchTerm}
-                            onChange={(event) =>
-                                setSearchTerm(event.target.value)
-                            }
+                            onChange={(event) => setSearchTerm(event.target.value)}
                         />
                     </div>
 
@@ -446,9 +592,7 @@ function AdminCustomers() {
                         <select
                             id="adminCustomerStatus"
                             value={selectedStatus}
-                            onChange={(event) =>
-                                setSelectedStatus(event.target.value)
-                            }
+                            onChange={(event) => setSelectedStatus(event.target.value)}
                         >
                             <option value="Tất cả">Tất cả trạng thái</option>
                             <option value="Active">Đang hoạt động</option>
@@ -464,10 +608,7 @@ function AdminCustomers() {
                     >
                         <i className="bi bi-arrow-counterclockwise"></i>
                     </button>
-
                 </div>
-
-                {/* Tiêu đề danh sách */}
 
                 <div className="admin-customers-list-heading">
                     <div>
@@ -480,8 +621,6 @@ function AdminCustomers() {
                         {customers.length} khách hàng
                     </span>
                 </div>
-
-                {/* Bảng khách hàng */}
 
                 <div className="admin-table-wrapper">
                     <table className="admin-table admin-customers-table">
@@ -500,34 +639,34 @@ function AdminCustomers() {
                         <tbody>
                             {filteredCustomers.length > 0 ? (
                                 filteredCustomers.map((customer) => {
-                                    const status =
-                                        customer.status || "Active";
+                                    const status = customer.status || "Active";
 
                                     return (
                                         <tr key={customer.userId}>
                                             <td>
                                                 <div className="admin-customer-info">
-                                                    <img
-                                                        src={
-                                                            customer.avatarUrl ||
-                                                            DEFAULT_AVATAR
+                                                    <button
+                                                        type="button"
+                                                        className="admin-customer-avatar-button"
+                                                        onClick={() =>
+                                                            handleOpenAvatarPreview(customer.avatarUrl)
                                                         }
-                                                        alt={customer.fullName}
-                                                        onError={(event) => {
-                                                            event.currentTarget.src =
-                                                                DEFAULT_AVATAR;
-                                                        }}
-                                                    />
+                                                        title="Xem ảnh đại diện"
+                                                    >
+                                                        <img
+                                                            src={customer.avatarUrl || DEFAULT_AVATAR}
+                                                            alt={customer.fullName}
+                                                            onError={(event) => {
+                                                                event.currentTarget.src = DEFAULT_AVATAR;
+                                                            }}
+                                                        />
+                                                    </button>
 
                                                     <div>
                                                         <strong>
-                                                            {customer.fullName ||
-                                                                "Chưa cập nhật"}
+                                                            {customer.fullName || "Chưa cập nhật"}
                                                         </strong>
-
-                                                        <span>
-                                                            ID: {customer.userId}
-                                                        </span>
+                                                        <span>ID: {customer.userId}</span>
                                                     </div>
                                                 </div>
                                             </td>
@@ -544,20 +683,13 @@ function AdminCustomers() {
                                                 </span>
                                             </td>
 
-                                            <td>
-                                                {customer.phoneNumber || "—"}
-                                            </td>
-
-                                            <td>
-                                                {formatDate(customer.createdAt)}
-                                            </td>
+                                            <td>{customer.phoneNumber || "—"}</td>
+                                            <td>{formatDate(customer.createdAt)}</td>
 
                                             <td>
                                                 <span
                                                     className={`admin-customer-status ${
-                                                        status === "Active"
-                                                            ? "active"
-                                                            : "inactive"
+                                                        status === "Active" ? "active" : "inactive"
                                                     }`}
                                                 >
                                                     {getStatusLabel(status)}
@@ -570,9 +702,7 @@ function AdminCustomers() {
                                                         type="button"
                                                         className="detail"
                                                         title="Xem chi tiết"
-                                                        onClick={() =>
-                                                            handleViewDetail(customer)
-                                                        }
+                                                        onClick={() => handleViewDetail(customer)}
                                                     >
                                                         <i className="bi bi-eye"></i>
                                                     </button>
@@ -581,42 +711,22 @@ function AdminCustomers() {
                                                         type="button"
                                                         className="edit"
                                                         title="Chỉnh sửa"
-                                                        onClick={() =>
-                                                            handleOpenEdit(customer)
-                                                        }
+                                                        onClick={() => handleOpenEdit(customer)}
                                                     >
                                                         <i className="bi bi-pencil"></i>
                                                     </button>
 
                                                     <button
                                                         type="button"
-                                                        className={
-                                                            status === "Active"
-                                                                ? "deactivate"
-                                                                : "activate"
-                                                        }
-                                                        title={
-                                                            status === "Active"
-                                                                ? "Khóa tài khoản"
-                                                                : "Mở khóa tài khoản"
-                                                        }
-                                                        disabled={
-                                                            updatingId === customer.userId
-                                                        }
-                                                        onClick={() =>
-                                                            handleToggleStatus(customer)
-                                                        }
+                                                        className={status === "Active" ? "deactivate" : "activate"}
+                                                        title={status === "Active" ? "Khóa tài khoản" : "Mở khóa tài khoản"}
+                                                        disabled={updatingId === customer.userId}
+                                                        onClick={() => handleToggleStatus(customer)}
                                                     >
                                                         {updatingId === customer.userId ? (
                                                             <span className="spinner-border spinner-border-sm"></span>
                                                         ) : (
-                                                            <i
-                                                                className={
-                                                                    status === "Active"
-                                                                        ? "bi bi-lock"
-                                                                        : "bi bi-unlock"
-                                                                }
-                                                            ></i>
+                                                            <i className={status === "Active" ? "bi bi-lock" : "bi bi-unlock"}></i>
                                                         )}
                                                     </button>
                                                 </div>
@@ -629,12 +739,9 @@ function AdminCustomers() {
                                     <td colSpan="7">
                                         <div className="admin-customers-no-result">
                                             <i className="bi bi-people"></i>
-                                            <strong>
-                                                Không tìm thấy khách hàng
-                                            </strong>
+                                            <strong>Không tìm thấy khách hàng</strong>
                                             <span>
-                                                Không có khách hàng phù hợp với
-                                                điều kiện tìm kiếm hiện tại.
+                                                Không có khách hàng phù hợp với điều kiện tìm kiếm.
                                             </span>
                                         </div>
                                     </td>
@@ -645,7 +752,7 @@ function AdminCustomers() {
                 </div>
             </section>
 
-            {/* Modal chi tiết khách hàng */}
+            {/* Modal chi tiết */}
 
             {selectedCustomer && (
                 <div
@@ -656,23 +763,18 @@ function AdminCustomers() {
                         className="admin-customer-detail-modal"
                         role="dialog"
                         aria-modal="true"
-                        aria-labelledby="adminCustomerDetailTitle"
                         onClick={(event) => event.stopPropagation()}
                     >
                         <div className="admin-customer-modal-header">
                             <div>
-                                <h4 id="adminCustomerDetailTitle">
-                                    Chi tiết khách hàng
-                                </h4>
-                                <p>
-                                    Thông tin tài khoản khách hàng trong hệ thống
-                                </p>
+                                <h4>Chi tiết khách hàng</h4>
+                                <p>Thông tin tài khoản trong hệ thống</p>
                             </div>
 
                             <button
                                 type="button"
-                                aria-label="Đóng"
                                 onClick={() => setSelectedCustomer(null)}
+                                aria-label="Đóng"
                             >
                                 <i className="bi bi-x-lg"></i>
                             </button>
@@ -680,38 +782,31 @@ function AdminCustomers() {
 
                         <div className="admin-customer-detail-body">
                             <div className="admin-customer-profile">
-                                <img
-                                    src={
-                                        selectedCustomer.avatarUrl ||
-                                        DEFAULT_AVATAR
+                                <button
+                                    type="button"
+                                    className="admin-customer-detail-avatar-button"
+                                    onClick={() =>
+                                        handleOpenAvatarPreview(selectedCustomer.avatarUrl)
                                     }
-                                    alt={selectedCustomer.fullName}
-                                    onError={(event) => {
-                                        event.currentTarget.src = DEFAULT_AVATAR;
-                                    }}
-                                />
+                                >
+                                    <img
+                                        src={selectedCustomer.avatarUrl || DEFAULT_AVATAR}
+                                        alt={selectedCustomer.fullName}
+                                        onError={(event) => {
+                                            event.currentTarget.src = DEFAULT_AVATAR;
+                                        }}
+                                    />
+                                </button>
 
                                 <div>
-                                    <h5>
-                                        {selectedCustomer.fullName ||
-                                            "Chưa cập nhật"}
-                                    </h5>
-
-                                    <span>
-                                        @{selectedCustomer.username || "unknown"}
-                                    </span>
-
+                                    <h5>{getCustomerName(selectedCustomer)}</h5>
+                                    <span>@{selectedCustomer.username || "—"}</span>
                                     <span
                                         className={`admin-customer-status ${
-                                            (selectedCustomer.status || "Active") ===
-                                            "Active"
-                                                ? "active"
-                                                : "inactive"
+                                            selectedCustomer.status === "Inactive" ? "inactive" : "active"
                                         }`}
                                     >
-                                        {getStatusLabel(
-                                            selectedCustomer.status || "Active"
-                                        )}
+                                        {getStatusLabel(selectedCustomer.status)}
                                     </span>
                                 </div>
                             </div>
@@ -721,58 +816,43 @@ function AdminCustomers() {
 
                                 <div className="admin-customer-detail-grid">
                                     <div>
-                                        <span>Mã khách hàng</span>
-                                        <strong>{selectedCustomer.userId}</strong>
+                                        <span>Họ và tên</span>
+                                        <strong>{selectedCustomer.fullName || "—"}</strong>
+                                    </div>
+
+                                    <div>
+                                        <span>Tên đăng nhập</span>
+                                        <strong>{selectedCustomer.username || "—"}</strong>
                                     </div>
 
                                     <div>
                                         <span>Email</span>
-                                        <strong>
-                                            {selectedCustomer.email || "—"}
-                                        </strong>
+                                        <strong>{selectedCustomer.email || "—"}</strong>
                                     </div>
 
                                     <div>
                                         <span>Số điện thoại</span>
-                                        <strong>
-                                            {selectedCustomer.phoneNumber || "—"}
-                                        </strong>
+                                        <strong>{selectedCustomer.phoneNumber || "—"}</strong>
                                     </div>
 
                                     <div>
                                         <span>Ngày sinh</span>
-                                        <strong>
-                                            {formatDate(
-                                                selectedCustomer.dateOfBirth
-                                            )}
-                                        </strong>
+                                        <strong>{formatDate(selectedCustomer.dateOfBirth)}</strong>
                                     </div>
 
                                     <div>
                                         <span>Giới tính</span>
-                                        <strong>
-                                            {getGenderLabel(
-                                                selectedCustomer.gender
-                                            )}
-                                        </strong>
+                                        <strong>{getGenderLabel(selectedCustomer.gender)}</strong>
                                     </div>
 
                                     <div>
                                         <span>Ngày đăng ký</span>
-                                        <strong>
-                                            {formatDateTime(
-                                                selectedCustomer.createdAt
-                                            )}
-                                        </strong>
+                                        <strong>{formatDate(selectedCustomer.createdAt)}</strong>
                                     </div>
 
                                     <div>
-                                        <span>Cập nhật gần nhất</span>
-                                        <strong>
-                                            {formatDateTime(
-                                                selectedCustomer.updatedAt
-                                            )}
-                                        </strong>
+                                        <span>Cập nhật lần cuối</span>
+                                        <strong>{formatDate(selectedCustomer.updatedAt)}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -781,18 +861,28 @@ function AdminCustomers() {
                         <div className="admin-customer-modal-footer">
                             <button
                                 type="button"
-                                className="close"
-                                onClick={() => setSelectedCustomer(null)}
+                                className="reset-username"
+                                disabled={isResettingUsername}
+                                onClick={() => handleResetUsername(selectedCustomer)}
                             >
-                                Đóng
+                                <i className="bi bi-person-gear"></i>
+                                {isResettingUsername ? "Đang cập nhật..." : "Đặt lại username"}
+                            </button>
+
+                            <button
+                                type="button"
+                                className="reset-password"
+                                disabled={isResettingPassword}
+                                onClick={() => handleResetPassword(selectedCustomer)}
+                            >
+                                <i className="bi bi-key"></i>
+                                {isResettingPassword ? "Đang tạo..." : "Đặt lại mật khẩu"}
                             </button>
 
                             <button
                                 type="button"
                                 className="edit"
-                                onClick={() =>
-                                    handleOpenEdit(selectedCustomer)
-                                }
+                                onClick={() => handleOpenEdit(selectedCustomer)}
                             >
                                 <i className="bi bi-pencil"></i>
                                 Chỉnh sửa
@@ -800,39 +890,17 @@ function AdminCustomers() {
 
                             <button
                                 type="button"
-                                className={
-                                    (selectedCustomer.status || "Active") ===
-                                    "Active"
-                                        ? "danger"
-                                        : "success"
-                                }
-                                disabled={
-                                    updatingId === selectedCustomer.userId
-                                }
-                                onClick={() =>
-                                    handleToggleStatus(selectedCustomer)
-                                }
+                                className="close"
+                                onClick={() => setSelectedCustomer(null)}
                             >
-                                <i
-                                    className={
-                                        (selectedCustomer.status || "Active") ===
-                                        "Active"
-                                            ? "bi bi-lock"
-                                            : "bi bi-unlock"
-                                    }
-                                ></i>
-
-                                {(selectedCustomer.status || "Active") ===
-                                "Active"
-                                    ? "Khóa tài khoản"
-                                    : "Mở khóa"}
+                                Đóng
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Modal chỉnh sửa khách hàng */}
+            {/* Modal chỉnh sửa */}
 
             {isModalOpen && editingCustomer && (
                 <div
@@ -843,110 +911,147 @@ function AdminCustomers() {
                         className="admin-customer-modal"
                         role="dialog"
                         aria-modal="true"
-                        aria-labelledby="adminCustomerFormTitle"
                         onClick={(event) => event.stopPropagation()}
                     >
                         <div className="admin-customer-modal-header">
                             <div>
-                                <h4 id="adminCustomerFormTitle">
-                                    Chỉnh sửa khách hàng
-                                </h4>
-
-                                <p>
-                                    Cập nhật thông tin tài khoản khách hàng
-                                </p>
+                                <h4>Chỉnh sửa khách hàng</h4>
+                                <p>Cập nhật thông tin tài khoản khách hàng</p>
                             </div>
 
                             <button
                                 type="button"
-                                aria-label="Đóng"
-                                disabled={isSaving}
                                 onClick={handleCloseModal}
+                                disabled={isSaving}
                             >
                                 <i className="bi bi-x-lg"></i>
                             </button>
                         </div>
 
-                        <form
-                            className="admin-customer-form"
-                            onSubmit={handleSubmit}
-                        >
+                        <form className="admin-customer-form" onSubmit={handleSubmit}>
                             <div className="admin-customer-form-grid">
-
                                 <div className="admin-customer-form-group full">
-                                    <label htmlFor="customerFullName">
-                                        Họ và tên <span>*</span>
-                                    </label>
+                                    <label>Ảnh đại diện</label>
 
+                                    <div className="admin-customer-form-preview">
+                                        <button
+                                            type="button"
+                                            className="admin-customer-avatar-preview-button"
+                                            onClick={() =>
+                                                handleOpenAvatarPreview(formData.avatarUrl)
+                                            }
+                                        >
+                                            <img
+                                                src={formData.avatarUrl || DEFAULT_AVATAR}
+                                                alt="Avatar preview"
+                                                onError={(event) => {
+                                                    event.currentTarget.src = DEFAULT_AVATAR;
+                                                }}
+                                            />
+                                            <span><i className="bi bi-zoom-in"></i></span>
+                                        </button>
+
+                                        <div>
+                                            <strong>Xem trước ảnh đại diện</strong>
+                                            <span>
+                                                Chọn ảnh từ máy hoặc nhập đường dẫn ảnh bên dưới.
+                                            </span>
+
+                                            <div className="admin-customer-avatar-upload-actions">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => avatarInputRef.current?.click()}
+                                                >
+                                                    <i className="bi bi-upload"></i>
+                                                    Chọn ảnh từ máy
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="remove"
+                                                    disabled={!formData.avatarUrl}
+                                                    onClick={handleRemoveAvatar}
+                                                >
+                                                    <i className="bi bi-trash3"></i>
+                                                    Xóa ảnh
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <input
+                                        ref={avatarInputRef}
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/webp"
+                                        hidden
+                                        onChange={handleSelectAvatar}
+                                    />
+
+                                    <input
+                                        name="avatarUrl"
+                                        type="text"
+                                        value={formData.avatarUrl}
+                                        onChange={handleChange}
+                                        placeholder="Nhập URL ảnh đại diện..."
+                                    />
+
+                                    <small>JPG, PNG, WEBP. Tối đa 2MB khi tải từ máy.</small>
+                                </div>
+
+                                <div className="admin-customer-form-group">
+                                    <label htmlFor="customerFullName">Họ và tên *</label>
                                     <input
                                         id="customerFullName"
                                         name="fullName"
-                                        type="text"
                                         value={formData.fullName}
                                         onChange={handleChange}
-                                        placeholder="Nhập họ và tên"
-                                        maxLength="100"
+                                        maxLength={100}
                                         required
                                     />
                                 </div>
 
                                 <div className="admin-customer-form-group">
-                                    <label htmlFor="customerUsername">
-                                        Username
-                                    </label>
-
+                                    <label htmlFor="customerUsername">Tên đăng nhập *</label>
                                     <input
                                         id="customerUsername"
-                                        type="text"
-                                        value={editingCustomer.username || ""}
-                                        disabled
+                                        name="username"
+                                        value={formData.username}
+                                        onChange={handleChange}
+                                        minLength={4}
+                                        maxLength={30}
+                                        required
                                     />
-
-                                    <small>
-                                        Username không thể thay đổi.
-                                    </small>
+                                    <small>4–30 ký tự; chữ, số, dấu chấm và gạch dưới.</small>
                                 </div>
 
                                 <div className="admin-customer-form-group">
-                                    <label htmlFor="customerEmail">
-                                        Email <span>*</span>
-                                    </label>
-
+                                    <label htmlFor="customerEmail">Email *</label>
                                     <input
                                         id="customerEmail"
                                         name="email"
                                         type="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        placeholder="example@email.com"
-                                        maxLength="150"
+                                        maxLength={150}
                                         required
                                     />
                                 </div>
 
                                 <div className="admin-customer-form-group">
-                                    <label htmlFor="customerPhone">
-                                        Số điện thoại
-                                    </label>
-
+                                    <label htmlFor="customerPhone">Số điện thoại</label>
                                     <input
                                         id="customerPhone"
                                         name="phoneNumber"
-                                        type="tel"
                                         value={formData.phoneNumber}
                                         onChange={handleChange}
-                                        placeholder="Nhập số điện thoại"
-                                        maxLength="20"
+                                        maxLength={15}
                                     />
                                 </div>
 
                                 <div className="admin-customer-form-group">
-                                    <label htmlFor="customerDateOfBirth">
-                                        Ngày sinh
-                                    </label>
-
+                                    <label htmlFor="customerBirth">Ngày sinh</label>
                                     <input
-                                        id="customerDateOfBirth"
+                                        id="customerBirth"
                                         name="dateOfBirth"
                                         type="date"
                                         value={formData.dateOfBirth}
@@ -955,66 +1060,18 @@ function AdminCustomers() {
                                 </div>
 
                                 <div className="admin-customer-form-group">
-                                    <label htmlFor="customerGender">
-                                        Giới tính
-                                    </label>
-
+                                    <label htmlFor="customerGender">Giới tính</label>
                                     <select
                                         id="customerGender"
                                         name="gender"
                                         value={formData.gender}
                                         onChange={handleChange}
                                     >
-                                        <option value="">
-                                            Chưa cập nhật
-                                        </option>
+                                        <option value="">Chưa cập nhật</option>
                                         <option value="Male">Nam</option>
                                         <option value="Female">Nữ</option>
                                         <option value="Other">Khác</option>
                                     </select>
-                                </div>
-
-                                <div className="admin-customer-form-group full">
-                                    <label htmlFor="customerAvatar">
-                                        Đường dẫn ảnh đại diện
-                                    </label>
-
-                                    <input
-                                        id="customerAvatar"
-                                        name="avatarUrl"
-                                        type="url"
-                                        value={formData.avatarUrl}
-                                        onChange={handleChange}
-                                        placeholder="https://example.com/avatar.jpg"
-                                    />
-
-                                    <small>
-                                        Có thể để trống nếu khách hàng chưa có ảnh.
-                                    </small>
-                                </div>
-
-                                <div className="admin-customer-form-group full">
-                                    <div className="admin-customer-form-preview">
-                                        <img
-                                            src={
-                                                formData.avatarUrl ||
-                                                DEFAULT_AVATAR
-                                            }
-                                            alt="Ảnh đại diện xem trước"
-                                            onError={(event) => {
-                                                event.currentTarget.src =
-                                                    DEFAULT_AVATAR;
-                                            }}
-                                        />
-
-                                        <div>
-                                            <strong>Xem trước ảnh đại diện</strong>
-                                            <span>
-                                                Ảnh sẽ được cập nhật sau khi lưu
-                                                thông tin.
-                                            </span>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
@@ -1022,17 +1079,13 @@ function AdminCustomers() {
                                 <button
                                     type="button"
                                     className="cancel"
-                                    disabled={isSaving}
                                     onClick={handleCloseModal}
+                                    disabled={isSaving}
                                 >
                                     Hủy
                                 </button>
 
-                                <button
-                                    type="submit"
-                                    className="submit"
-                                    disabled={isSaving}
-                                >
+                                <button type="submit" disabled={isSaving}>
                                     {isSaving ? (
                                         <>
                                             <span className="spinner-border spinner-border-sm"></span>
@@ -1051,6 +1104,97 @@ function AdminCustomers() {
                 </div>
             )}
 
+            {/* Modal xem ảnh lớn */}
+
+            {isAvatarPreviewOpen && (
+                <div
+                    className="admin-customer-avatar-overlay"
+                    onClick={() => setIsAvatarPreviewOpen(false)}
+                >
+                    <div
+                        className="admin-customer-avatar-modal"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <button
+                            type="button"
+                            className="admin-customer-avatar-close"
+                            onClick={() => setIsAvatarPreviewOpen(false)}
+                        >
+                            <i className="bi bi-x-lg"></i>
+                        </button>
+
+                        <img
+                            src={avatarPreviewUrl || DEFAULT_AVATAR}
+                            alt="Ảnh đại diện kích thước lớn"
+                            onError={(event) => {
+                                event.currentTarget.src = DEFAULT_AVATAR;
+                            }}
+                        />
+
+                        <span>Ảnh đại diện khách hàng</span>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal mật khẩu tạm thời */}
+
+            {temporaryPasswordInfo && (
+                <div
+                    className="admin-customer-avatar-overlay"
+                    onClick={() => setTemporaryPasswordInfo(null)}
+                >
+                    <div
+                        className="admin-customer-password-modal"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="admin-customer-password-icon">
+                            <i className="bi bi-shield-lock"></i>
+                        </div>
+
+                        <h4>Đặt lại mật khẩu thành công</h4>
+
+                        <p>
+                            Mật khẩu tạm thời dành cho{" "}
+                            <strong>{temporaryPasswordInfo.customerName}</strong>
+                        </p>
+
+                        <div className="admin-customer-password-field">
+                            <span>Tên đăng nhập</span>
+                            <strong>{temporaryPasswordInfo.username}</strong>
+                        </div>
+
+                        <div className="admin-customer-password-field">
+                            <span>Mật khẩu tạm thời</span>
+                            <div>
+                                <strong>{temporaryPasswordInfo.password}</strong>
+                                <button
+                                    type="button"
+                                    onClick={handleCopyTemporaryPassword}
+                                    title="Sao chép mật khẩu"
+                                >
+                                    <i className="bi bi-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="admin-customer-password-warning">
+                            <i className="bi bi-exclamation-triangle"></i>
+                            <span>
+                                Hãy sao chép và cung cấp mật khẩu này cho khách hàng.
+                                Mật khẩu sẽ không được hiển thị lại sau khi đóng cửa sổ.
+                            </span>
+                        </div>
+
+                        <button
+                            type="button"
+                            className="admin-customer-password-confirm"
+                            onClick={() => setTemporaryPasswordInfo(null)}
+                        >
+                            Đã hiểu
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

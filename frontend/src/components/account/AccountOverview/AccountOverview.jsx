@@ -1,36 +1,19 @@
 
 import "./AccountOverview.css";
 
-//========================= Component AccountOverview ========================
+const DEFAULT_AVATAR = "https://placehold.co/120x120?text=User";
 
 function AccountOverview({ user }) {
-
-    //========================= Lấy chữ cái đại diện ========================
-
-    const getInitials = (fullName) => {
-        if (!fullName) return "U";
-
-        const words = fullName.trim().split(/\s+/);
-
-        if (words.length === 1) {
-            return words[0].charAt(0).toUpperCase();
-        }
-
-        return (
-            words[0].charAt(0) +
-            words[words.length - 1].charAt(0)
-        ).toUpperCase();
-    };
-
-    //========================= Render giao diện ========================
-
     return (
         <div className="account-overview-content">
-
             <div className="account-overview-welcome">
                 <div>
                     <span>WELCOME BACK</span>
-                    <h2>Xin chào, {user?.fullName || "bạn"}!</h2>
+
+                    <h2>
+                        Xin chào, {user?.fullName || "bạn"}!
+                    </h2>
+
                     <p>
                         Chào mừng bạn quay trở lại ViewBookCinemas.
                         Quản lý tài khoản của bạn tại đây.
@@ -43,7 +26,6 @@ function AccountOverview({ user }) {
             </div>
 
             <div className="account-overview-card">
-
                 <div className="account-overview-card-header">
                     <div>
                         <h3>Thông tin tài khoản</h3>
@@ -58,7 +40,13 @@ function AccountOverview({ user }) {
 
                 <div className="account-overview-user">
                     <div className="account-overview-avatar">
-                        {getInitials(user?.fullName)}
+                        <img
+                            src={user?.avatarUrl || DEFAULT_AVATAR}
+                            alt="Ảnh đại diện"
+                            onError={(event) => {
+                                event.currentTarget.src = DEFAULT_AVATAR;
+                            }}
+                        />
                     </div>
 
                     <div>
@@ -68,7 +56,6 @@ function AccountOverview({ user }) {
                 </div>
 
                 <div className="account-overview-information">
-
                     <div className="account-overview-information-item">
                         <span>Email</span>
                         <strong>{user?.email || "Chưa cập nhật"}</strong>
@@ -76,21 +63,25 @@ function AccountOverview({ user }) {
 
                     <div className="account-overview-information-item">
                         <span>Số điện thoại</span>
-                        <strong>{user?.phoneNumber || "Chưa cập nhật"}</strong>
+                        <strong>
+                            {user?.phoneNumber || "Chưa cập nhật"}
+                        </strong>
                     </div>
 
                     <div className="account-overview-information-item">
                         <span>Tên đăng nhập</span>
-                        <strong>{user?.username || "Chưa cập nhật"}</strong>
+                        <strong>
+                            {user?.username || "Chưa cập nhật"}
+                        </strong>
                     </div>
 
                     <div className="account-overview-information-item">
                         <span>Ngày sinh</span>
-                        <strong>{user?.dateOfBirth || "Chưa cập nhật"}</strong>
+                        <strong>
+                            {user?.dateOfBirth || "Chưa cập nhật"}
+                        </strong>
                     </div>
-
                 </div>
-
             </div>
 
             <div className="account-overview-tips">
@@ -100,13 +91,13 @@ function AccountOverview({ user }) {
 
                 <div>
                     <h4>Mẹo dành cho bạn</h4>
+
                     <p>
                         Hãy cập nhật thông tin cá nhân và sử dụng
                         mật khẩu mạnh để bảo vệ tài khoản của bạn.
                     </p>
                 </div>
             </div>
-
         </div>
     );
 }

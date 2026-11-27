@@ -3,7 +3,9 @@ import {
     getAllUsers,
     getUserById,
     updateUserByAdmin,
-    updateUserStatus
+    updateUserStatus,
+    resetCustomerUsername,
+    resetCustomerPassword
 } from "./authService.js";
 
 //=================== Lấy danh sách khách hàng ========================
@@ -31,6 +33,18 @@ export const updateCustomer = async (id, customerData) => {
     return updateUserByAdmin(id, customerData);
 };
 
+//=================== Đặt lại tên đăng nhập ========================
+
+export const resetCustomerLoginName = async (id, newUsername) => {
+    return resetCustomerUsername(id, newUsername);
+};
+
+//=================== Đặt lại mật khẩu ========================
+
+export const resetCustomerLoginPassword = async (id) => {
+    return resetCustomerPassword(id);
+};
+
 //=================== Cập nhật trạng thái khách hàng ========================
 
 export const updateCustomerStatus = async (id, status) => {
@@ -43,21 +57,22 @@ export const getCustomerStatistics = async () => {
     const customers = await getCustomers();
 
     const activeCustomers = customers.filter(
-        (customer) => customer.status === "Active"
+        customer => customer.status === "Active"
     );
 
     const inactiveCustomers = customers.filter(
-        (customer) => customer.status === "Inactive"
+        customer => customer.status === "Inactive"
     );
 
     const today = new Date();
+
     const startOfToday = new Date(
         today.getFullYear(),
         today.getMonth(),
         today.getDate()
     );
 
-    const newCustomersToday = customers.filter((customer) => {
+    const newCustomersToday = customers.filter(customer => {
         if (!customer.createdAt) return false;
 
         return new Date(customer.createdAt) >= startOfToday;

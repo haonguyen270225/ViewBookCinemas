@@ -2,12 +2,8 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
-//========================= Import Layout ========================
-
 import Navbar from "../../components/layout/Navbar.jsx";
 import Footer from "../../components/layout/Footer.jsx";
-
-//========================= Import Account Components ========================
 
 import AccountSidebar from "../../components/account/AccountSidebar/AccountSidebar.jsx";
 import AccountOverview from "../../components/account/AccountOverview/AccountOverview.jsx";
@@ -15,18 +11,21 @@ import AccountProfile from "../../components/account/AccountProfile/AccountProfi
 import AccountPassword from "../../components/account/AccountPassword/AccountPassword.jsx";
 import TicketHistory from "../../components/account/TicketHistory/TicketHistory.jsx";
 
-//========================= Import Context ========================
-
 import { useAuth } from "../../contexts/AuthContext.jsx";
-
-//========================= Import CSS ========================
 
 import "./Account.css";
 
-//========================= Component Account ========================
+const getProfileData = (user) => ({
+    fullName: user?.fullName || "",
+    username: user?.username || "",
+    email: user?.email || "",
+    phoneNumber: user?.phoneNumber || "",
+    dateOfBirth: user?.dateOfBirth || "",
+    gender: user?.gender || "",
+    avatarUrl: user?.avatarUrl || ""
+});
 
 function Account() {
-
     const {
         user,
         isAuthenticated,
@@ -35,25 +34,14 @@ function Account() {
         showNotification
     } = useAuth();
 
-    //========================= State điều hướng ========================
-
     const [activeTab, setActiveTab] = useState("overview");
 
-    //========================= State thông tin cá nhân ========================
-
-    const [profileData, setProfileData] = useState({
-        fullName: "",
-        username: "",
-        email: "",
-        phoneNumber: "",
-        dateOfBirth: "",
-        gender: ""
-    });
+    const [profileData, setProfileData] = useState(
+        () => getProfileData(user)
+    );
 
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-
-    //========================= State đổi mật khẩu ========================
 
     const [passwordData, setPasswordData] = useState({
         oldPassword: "",
@@ -63,54 +51,30 @@ function Account() {
 
     const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-    //========================= Đồng bộ thông tin người dùng ========================
-
+    // Đồng bộ thông tin người dùng sau khi cập nhật.
     useEffect(() => {
         if (user) {
-            setProfileData({
-                fullName: user.fullName || "",
-                username: user.username || "",
-                email: user.email || "",
-                phoneNumber: user.phoneNumber || "",
-                dateOfBirth: user.dateOfBirth || "",
-                gender: user.gender || ""
-            });
+            setProfileData(getProfileData(user));
         }
     }, [user]);
-
-    //========================= Kiểm tra đăng nhập ========================
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
     }
 
-    //========================= Xử lý thay đổi thông tin cá nhân ========================
-
     const handleProfileChange = (event) => {
         const { name, value } = event.target;
 
-        setProfileData((previousData) => ({
-            ...previousData,
+        setProfileData(previous => ({
+            ...previous,
             [name]: value
         }));
     };
 
-    //========================= Hủy chỉnh sửa thông tin ========================
-
     const handleCancelEdit = () => {
-        setProfileData({
-            fullName: user.fullName || "",
-            username: user.username || "",
-            email: user.email || "",
-            phoneNumber: user.phoneNumber || "",
-            dateOfBirth: user.dateOfBirth || "",
-            gender: user.gender || ""
-        });
-
+        setProfileData(getProfileData(user));
         setIsEditing(false);
     };
-
-    //========================= Lưu thông tin cá nhân ========================
 
     const handleSaveProfile = (event) => {
         event.preventDefault();
@@ -133,7 +97,8 @@ function Account() {
                 email: profileData.email,
                 phoneNumber: profileData.phoneNumber,
                 dateOfBirth: profileData.dateOfBirth,
-                gender: profileData.gender
+                gender: profileData.gender,
+                avatarUrl: profileData.avatarUrl
             });
 
             setIsEditing(false);
@@ -152,18 +117,14 @@ function Account() {
         }
     };
 
-    //========================= Xử lý thay đổi mật khẩu ========================
-
     const handlePasswordChange = (event) => {
         const { name, value } = event.target;
 
-        setPasswordData((previousData) => ({
-            ...previousData,
+        setPasswordData(previous => ({
+            ...previous,
             [name]: value
         }));
     };
-
-    //========================= Đổi mật khẩu ========================
 
     const handleChangePassword = (event) => {
         event.preventDefault();
@@ -214,52 +175,46 @@ function Account() {
         }
     };
 
-    //========================= Nội dung theo tab ========================
-
     const renderAccountContent = () => {
         switch (activeTab) {
-          case "profile":
-            return (
-              <AccountProfile
-                profileData={profileData}
-                isEditing={isEditing}
-                isSaving={isSaving}
-                onProfileChange={handleProfileChange}
-                onEdit={() => setIsEditing(true)}
-                onCancel={handleCancelEdit}
-                onSave={handleSaveProfile}
-              />
-            );
+            case "profile":
+                return (
+                    <AccountProfile
+                        profileData={profileData}
+                        isEditing={isEditing}
+                        isSaving={isSaving}
+                        onProfileChange={handleProfileChange}
+                        onEdit={() => setIsEditing(true)}
+                        onCancel={handleCancelEdit}
+                        onSave={handleSaveProfile}
+                    />
+                );
 
-          case "password":
-            return (
-              <AccountPassword
-                passwordData={passwordData}
-                isChangingPassword={isChangingPassword}
-                onPasswordChange={handlePasswordChange}
-                onChangePassword={handleChangePassword}
-              />
-            );
-          case "tickets":
-            return <TicketHistory />;
-          case "overview":
-          default:
-            return <AccountOverview user={user} />;
+            case "password":
+                return (
+                    <AccountPassword
+                        passwordData={passwordData}
+                        isChangingPassword={isChangingPassword}
+                        onPasswordChange={handlePasswordChange}
+                        onChangePassword={handleChangePassword}
+                    />
+                );
+
+            case "tickets":
+                return <TicketHistory />;
+
+            case "overview":
+            default:
+                return <AccountOverview user={user} />;
         }
     };
-
-    //========================= Render giao diện ========================
 
     return (
         <>
             <Navbar />
 
             <main className="account-page">
-
                 <div className="container account-container">
-
-                    {/*========================= Page Header ========================*/}
-
                     <div className="account-header">
                         <div>
                             <span className="account-subtitle">
@@ -275,36 +230,28 @@ function Account() {
                         </div>
                     </div>
 
-                    {/*========================= Account Layout ========================*/}
-
                     <div className="row g-4">
-
                         <div className="col-lg-3">
-
                             <AccountSidebar
                                 user={user}
                                 activeTab={activeTab}
                                 onTabChange={(tab) => {
                                     setActiveTab(tab);
                                     setIsEditing(false);
+                                    setProfileData(getProfileData(user));
                                 }}
                             />
-
                         </div>
 
                         <div className="col-lg-9">
-
                             <div className="account-content">
                                 {renderAccountContent()}
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
-                
             </main>
+
             <Footer />
         </>
     );

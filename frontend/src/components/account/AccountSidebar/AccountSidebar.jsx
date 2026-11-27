@@ -8,12 +8,9 @@ import {
     Ticket
 } from "lucide-react";
 
-//========================= Component AccountSidebar ========================
+const DEFAULT_AVATAR = "https://placehold.co/120x120?text=User";
 
 function AccountSidebar({ user, activeTab, onTabChange }) {
-
-    //========================= Lấy chữ cái đại diện ========================
-
     const getInitials = (fullName) => {
         if (!fullName) return "U";
 
@@ -28,8 +25,6 @@ function AccountSidebar({ user, activeTab, onTabChange }) {
             words[words.length - 1].charAt(0)
         ).toUpperCase();
     };
-
-    //========================= Danh sách điều hướng ========================
 
     const menuItems = [
         {
@@ -54,15 +49,22 @@ function AccountSidebar({ user, activeTab, onTabChange }) {
         }
     ];
 
-    //========================= Render giao diện ========================
-
     return (
         <aside className="account-sidebar">
-
             <div className="account-sidebar-user">
-
                 <div className="account-sidebar-avatar">
-                    {getInitials(user?.fullName)}
+                    <img
+                        src={user?.avatarUrl || DEFAULT_AVATAR}
+                        alt="Ảnh đại diện"
+                        onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                            event.currentTarget.parentElement.classList.add(
+                                "account-sidebar-avatar-fallback"
+                            );
+                            event.currentTarget.parentElement.textContent =
+                                getInitials(user?.fullName);
+                        }}
+                    />
                 </div>
 
                 <h3>{user?.fullName || "Người dùng"}</h3>
@@ -73,19 +75,16 @@ function AccountSidebar({ user, activeTab, onTabChange }) {
                     <i className="bi bi-patch-check-fill"></i>
                     Thành viên VBC
                 </span>
-
             </div>
 
             <div className="account-sidebar-divider"></div>
 
             <nav className="account-sidebar-menu">
-
                 <span className="account-sidebar-heading">
                     QUẢN LÝ TÀI KHOẢN
                 </span>
 
                 {menuItems.map((item) => {
-
                     const Icon = item.icon;
 
                     return (
@@ -97,35 +96,26 @@ function AccountSidebar({ user, activeTab, onTabChange }) {
                             }`}
                             onClick={() => onTabChange(item.id)}
                         >
-
-                            <Icon
-                                size={18}
-                                strokeWidth={2}
-                            />
+                            <Icon size={18} strokeWidth={2} />
 
                             <span>{item.label}</span>
 
                             {activeTab === item.id && (
                                 <i className="bi bi-chevron-right account-sidebar-arrow"></i>
                             )}
-
                         </button>
                     );
                 })}
-
             </nav>
 
             <div className="account-sidebar-note">
-
                 <i className="bi bi-info-circle"></i>
 
                 <p>
                     Quản lý thông tin và bảo mật tài khoản
                     để có trải nghiệm tốt hơn tại VBC.
                 </p>
-
             </div>
-
         </aside>
     );
 }

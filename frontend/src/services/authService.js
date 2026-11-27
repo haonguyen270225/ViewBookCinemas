@@ -4,6 +4,8 @@
 const USERS_STORAGE_KEY = "vbc_demo_users";
 const SESSION_STORAGE_KEY = "vbc_demo_session";
 
+const MAX_AVATAR_DATA_LENGTH = 3 * 1024 * 1024;
+
 //========================= Đọc và lưu dữ liệu ========================
 
 const getStoredUsers = () => {
@@ -41,6 +43,94 @@ const getPublicUser = (user) => {
     };
 };
 
+//========================= Đồng bộ phiên đăng nhập ========================
+
+const syncCurrentSession = (user) => {
+    const currentUser = getCurrentUser();
+
+    if (
+        currentUser &&
+        String(currentUser.userId) === String(user.userId)
+    ) {
+        localStorage.setItem(
+            SESSION_STORAGE_KEY,
+            JSON.stringify(getPublicUser(user))
+        );
+    }
+};
+
+//========================= Kiểm tra tên đăng nhập ========================
+
+const normalizeUsername = (username) => {
+    return String(username || "").trim();
+};
+
+const validateUsername = (username, users, currentIndex = -1) => {
+    const normalizedUsername = normalizeUsername(username);
+
+    if (!normalizedUsername) {
+        throw new Error("Tên đăng nhập không được để trống.");
+    }
+
+    if (normalizedUsername.length < 4) {
+        throw new Error("Tên đăng nhập phải có ít nhất 4 ký tự.");
+    }
+
+    if (normalizedUsername.length > 30) {
+        throw new Error("Tên đăng nhập không được vượt quá 30 ký tự.");
+    }
+
+    const isExists = users.some(
+        (user, index) =>
+            index !== currentIndex &&
+            user.username?.toLowerCase() === normalizedUsername.toLowerCase()
+    );
+
+    if (isExists) {
+        throw new Error("Tên đăng nhập đã được sử dụng.");
+    }
+
+    return normalizedUsername;
+};
+
+//========================= Kiểm tra avatar ========================
+
+const validateAvatar = (avatarValue) => {
+    const avatar = String(avatarValue || "").trim();
+
+    if (
+        avatar.startsWith("data:image/") &&
+        avatar.length > MAX_AVATAR_DATA_LENGTH
+    ) {
+        throw new Error(
+            "Ảnh đại diện quá lớn. Vui lòng chọn ảnh có dung lượng tối đa khoảng 2MB."
+        );
+    }
+
+    return avatar;
+};
+
+//========================= Tạo mật khẩu tạm thời ========================
+
+const generateTemporaryPassword = (length = 12) => {
+    const characters =
+        "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$";
+
+    const randomValues = new Uint32Array(length);
+
+    if (globalThis.crypto?.getRandomValues) {
+        globalThis.crypto.getRandomValues(randomValues);
+    } else {
+        for (let i = 0; i < length; i++) {
+            randomValues[i] = Math.floor(Math.random() * 0xffffffff);
+        }
+    }
+
+    return Array.from(randomValues)
+        .map(value => characters[value % characters.length])
+        .join("");
+};
+
 //========================= Lấy người dùng hiện tại ========================
 
 export const getCurrentUser = () => {
@@ -58,21 +148,11 @@ export const getCurrentUser = () => {
 export const registerUser = (formData) => {
     const users = getStoredUsers();
 
-    const username = formData.username.trim();
+    const username = validateUsername(formData.username, users);
     const email = formData.email.trim().toLowerCase();
 
-    const isUsernameExists = users.some(
-        (user) =>
-            user.username?.toLowerCase() === username.toLowerCase()
-    );
-
-    if (isUsernameExists) {
-        throw new Error("Tên đăng nhập đã được sử dụng.");
-    }
-
     const isEmailExists = users.some(
-        (user) =>
-            user.email?.toLowerCase() === email
+        user => user.email?.toLowerCase() === email
     );
 
     if (isEmailExists) {
@@ -107,7 +187,7 @@ export const loginUser = (account, password) => {
     const normalizedAccount = account.trim().toLowerCase();
 
     const user = users.find(
-        (item) =>
+        item =>
             item.username?.toLowerCase() === normalizedAccount ||
             item.email?.toLowerCase() === normalizedAccount
     );
@@ -152,16 +232,23 @@ export const updateUserProfile = (formData) => {
     const users = getStoredUsers();
 
     const userIndex = users.findIndex(
-        (user) =>
-            String(user.userId) === String(currentUser.userId)
+        user => String(user.userId) === String(currentUser.userId)
     );
 
     if (userIndex === -1) {
         throw new Error("Không tìm thấy tài khoản.");
     }
 
+    if ((users[userIndex].status || "Active") !== "Active") {
+        throw new Error("Tài khoản hiện đang bị khóa.");
+    }
+
     const updatedFullName = formData.fullName.trim();
     const updatedEmail = formData.email.trim().toLowerCase();
+
+    if (!updatedFullName) {
+        throw new Error("Họ và tên không được để trống.");
+    }
 
     const isEmailExists = users.some(
         (user, index) =>
@@ -170,9 +257,7 @@ export const updateUserProfile = (formData) => {
     );
 
     if (isEmailExists) {
-        throw new Error(
-            "Email đã được sử dụng bởi tài khoản khác."
-        );
+        throw new Error("Email đã được sử dụng bởi tài khoản khác.");
     }
 
     const updatedUser = {
@@ -182,7 +267,9 @@ export const updateUserProfile = (formData) => {
         phoneNumber: formData.phoneNumber?.trim() || "",
         dateOfBirth: formData.dateOfBirth || "",
         gender: formData.gender || "",
-        avatarUrl: formData.avatarUrl || "",
+        avatarUrl: validateAvatar(
+            formData.avatarUrl ?? users[userIndex].avatarUrl
+        ),
         status: users[userIndex].status || "Active",
         updatedAt: new Date().toISOString()
     };
@@ -200,7 +287,7 @@ export const updateUserProfile = (formData) => {
     return publicUser;
 };
 
-//========================= Đổi mật khẩu ========================
+//========================= Đổi mật khẩu khách hàng ========================
 
 export const changePassword = (oldPassword, newPassword) => {
     const currentUser = getCurrentUser();
@@ -212,8 +299,7 @@ export const changePassword = (oldPassword, newPassword) => {
     const users = getStoredUsers();
 
     const userIndex = users.findIndex(
-        (user) =>
-            String(user.userId) === String(currentUser.userId)
+        user => String(user.userId) === String(currentUser.userId)
     );
 
     if (userIndex === -1) {
@@ -229,9 +315,7 @@ export const changePassword = (oldPassword, newPassword) => {
     }
 
     if (!newPassword || newPassword.length < 8) {
-        throw new Error(
-            "Mật khẩu mới phải có ít nhất 8 ký tự."
-        );
+        throw new Error("Mật khẩu mới phải có ít nhất 8 ký tự.");
     }
 
     users[userIndex] = {
@@ -255,8 +339,7 @@ export const getAllUsers = () => {
 
 export const getUserById = (id) => {
     const user = getStoredUsers().find(
-        (item) =>
-            String(item.userId) === String(id)
+        item => String(item.userId) === String(id)
     );
 
     return getPublicUser(user);
@@ -268,8 +351,7 @@ export const updateUserByAdmin = (id, formData) => {
     const users = getStoredUsers();
 
     const userIndex = users.findIndex(
-        (user) =>
-            String(user.userId) === String(id)
+        user => String(user.userId) === String(id)
     );
 
     if (userIndex === -1) {
@@ -278,7 +360,6 @@ export const updateUserByAdmin = (id, formData) => {
 
     const fullName = formData.fullName?.trim();
     const email = formData.email?.trim().toLowerCase();
-    const phoneNumber = formData.phoneNumber?.trim() || "";
 
     if (!fullName) {
         throw new Error("Họ và tên không được để trống.");
@@ -295,41 +376,104 @@ export const updateUserByAdmin = (id, formData) => {
     );
 
     if (isEmailExists) {
-        throw new Error(
-            "Email đã được sử dụng bởi tài khoản khác."
-        );
+        throw new Error("Email đã được sử dụng bởi tài khoản khác.");
     }
+
+    // Nếu không truyền username thì giữ nguyên tên đăng nhập hiện tại.
+    const username = formData.username !== undefined
+        ? validateUsername(formData.username, users, userIndex)
+        : users[userIndex].username;
 
     const updatedUser = {
         ...users[userIndex],
+        username,
         fullName,
         email,
-        phoneNumber,
+        phoneNumber: formData.phoneNumber?.trim() || "",
         dateOfBirth: formData.dateOfBirth || "",
         gender: formData.gender || "",
-        avatarUrl: formData.avatarUrl?.trim() || "",
+        avatarUrl: validateAvatar(
+            formData.avatarUrl ?? users[userIndex].avatarUrl
+        ),
         updatedAt: new Date().toISOString()
     };
 
     users[userIndex] = updatedUser;
     saveUsers(users);
 
-    const publicUser = getPublicUser(updatedUser);
+    syncCurrentSession(updatedUser);
 
-    // Đồng bộ phiên đăng nhập nếu Admin đang chỉnh sửa chính tài khoản đó.
-    const currentUser = getCurrentUser();
+    return getPublicUser(updatedUser);
+};
 
-    if (
-        currentUser &&
-        String(currentUser.userId) === String(id)
-    ) {
-        localStorage.setItem(
-            SESSION_STORAGE_KEY,
-            JSON.stringify(publicUser)
+//========================= Admin đặt lại tên đăng nhập ========================
+
+export const resetCustomerUsername = (id, newUsername) => {
+    const users = getStoredUsers();
+
+    const userIndex = users.findIndex(
+        user => String(user.userId) === String(id)
+    );
+
+    if (userIndex === -1) {
+        throw new Error("Không tìm thấy khách hàng.");
+    }
+
+    const username = validateUsername(
+        newUsername,
+        users,
+        userIndex
+    );
+
+    const updatedUser = {
+        ...users[userIndex],
+        username,
+        updatedAt: new Date().toISOString()
+    };
+
+    users[userIndex] = updatedUser;
+    saveUsers(users);
+
+    syncCurrentSession(updatedUser);
+
+    return getPublicUser(updatedUser);
+};
+
+//========================= Admin tạo mật khẩu tạm thời ========================
+
+export const resetCustomerPassword = (id) => {
+    const users = getStoredUsers();
+
+    const userIndex = users.findIndex(
+        user => String(user.userId) === String(id)
+    );
+
+    if (userIndex === -1) {
+        throw new Error("Không tìm thấy khách hàng.");
+    }
+
+    if ((users[userIndex].status || "Active") !== "Active") {
+        throw new Error(
+            "Không thể đặt lại mật khẩu cho tài khoản đang bị khóa."
         );
     }
 
-    return publicUser;
+    const temporaryPassword = generateTemporaryPassword();
+
+    const updatedUser = {
+        ...users[userIndex],
+        password: temporaryPassword,
+        updatedAt: new Date().toISOString()
+    };
+
+    users[userIndex] = updatedUser;
+    saveUsers(users);
+
+    // Chỉ trả mật khẩu tạm thời ở lần thực hiện này.
+    return {
+        customer: getPublicUser(updatedUser),
+        temporaryPassword
+    };
 };
 
 //========================= Admin cập nhật trạng thái tài khoản ========================
@@ -344,8 +488,7 @@ export const updateUserStatus = (id, status) => {
     const users = getStoredUsers();
 
     const userIndex = users.findIndex(
-        (user) =>
-            String(user.userId) === String(id)
+        user => String(user.userId) === String(id)
     );
 
     if (userIndex === -1) {
@@ -363,26 +506,14 @@ export const updateUserStatus = (id, status) => {
 
     const currentUser = getCurrentUser();
 
-    // Nếu khóa tài khoản đang đăng nhập thì kết thúc phiên hiện tại.
     if (
         currentUser &&
         String(currentUser.userId) === String(id) &&
         status === "Inactive"
     ) {
         localStorage.removeItem(SESSION_STORAGE_KEY);
-    }
-
-    // Nếu cập nhật tài khoản hiện tại nhưng vẫn Active,
-    // đồng bộ lại thông tin phiên đăng nhập.
-    if (
-        currentUser &&
-        String(currentUser.userId) === String(id) &&
-        status === "Active"
-    ) {
-        localStorage.setItem(
-            SESSION_STORAGE_KEY,
-            JSON.stringify(getPublicUser(updatedUser))
-        );
+    } else {
+        syncCurrentSession(updatedUser);
     }
 
     return getPublicUser(updatedUser);
