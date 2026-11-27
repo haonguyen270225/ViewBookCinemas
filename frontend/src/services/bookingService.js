@@ -13,12 +13,19 @@ import {
     restoreProductStock
 } from "./productService.js";
 
-import { getActiveCombos } from "./comboService.js";
+import {
+    getActiveCombos,
+    decreaseComboStock,
+    restoreComboStock
+} from "./comboService.js";
 
 import {
     validatePromotionCode,
-    increasePromotionUsage
+    increasePromotionUsage,
+    decreasePromotionUsage
 } from "./promotionService.js";
+
+import { getCurrentUser } from "./authService.js";
 
 const STORAGE_KEY = "viewbook-bookings";
 
@@ -28,7 +35,9 @@ const BOOKING_STATUS_OPTIONS = [
     "Completed"
 ];
 
-//=================== Lưu danh sách đơn đặt vé ========================
+//====================================================
+// Lưu danh sách booking
+//====================================================
 
 const saveBookings = (bookings) => {
     try {
@@ -45,7 +54,9 @@ const saveBookings = (bookings) => {
     }
 };
 
-//=================== Lấy danh sách đơn đặt vé ========================
+//====================================================
+// Lấy danh sách booking
+//====================================================
 
 export const getBookings = async () => {
     try {
@@ -71,19 +82,41 @@ export const getBookings = async () => {
     }
 };
 
-//=================== Lấy đơn đặt vé theo ID ========================
+//====================================================
+// Lấy booking theo tài khoản khách hàng
+//====================================================
+
+export const getBookingsByUserId = async (userId) => {
+    if (userId === null || userId === undefined) {
+        return [];
+    }
+
+    const bookings = await getBookings();
+
+    return bookings.filter(
+        (booking) =>
+            String(booking.userId) === String(userId)
+    );
+};
+
+//====================================================
+// Lấy booking theo ID
+//====================================================
 
 export const getBookingById = async (id) => {
     const bookings = await getBookings();
 
     return (
         bookings.find(
-            (booking) => String(booking.bookingId) === String(id)
+            (booking) =>
+                String(booking.bookingId) === String(id)
         ) || null
     );
 };
 
-//=================== Lấy đơn đặt vé theo suất chiếu ========================
+//====================================================
+// Lấy booking theo suất chiếu
+//====================================================
 
 export const getBookingsByShowtimeId = async (showtimeId) => {
     const bookings = await getBookings();
@@ -94,7 +127,9 @@ export const getBookingsByShowtimeId = async (showtimeId) => {
     );
 };
 
-//=================== Lấy danh sách ghế đã đặt ========================
+//====================================================
+// Lấy danh sách ghế đã đặt
+//====================================================
 
 export const getBookedSeatIdsByShowtimeId = async (showtimeId) => {
     const bookings = await getBookings();
@@ -113,7 +148,9 @@ export const getBookedSeatIdsByShowtimeId = async (showtimeId) => {
         );
 };
 
-//=================== Chuẩn hóa danh sách sản phẩm ========================
+//====================================================
+// Chuẩn hóa danh sách sản phẩm và combo
+//====================================================
 
 const buildSelectedItems = (
     quantities,
@@ -161,17 +198,96 @@ const buildSelectedItems = (
                 );
             }
 
+            const totalPrice = price * normalizedQuantity;
+
+            if (!Number.isSafeInteger(totalPrice)) {
+                throw new Error(
+                    `Tổng tiền của "${item[nameField]}" không hợp lệ.`
+                );
+            }
+
             return {
                 [idField]: item[idField],
                 [nameField]: item[nameField],
                 price,
                 quantity: normalizedQuantity,
-                totalPrice: price * normalizedQuantity
+                totalPrice
             };
         });
 };
 
-//=================== Tạo đơn đặt vé ========================
+//====================================================
+// Tổng hợp số lượng theo ID từ booking snapshot
+//====================================================
+
+const aggregateItemQuantities = (
+    items,
+    idField,
+    nameField,
+    itemType
+) => {
+    const quantities = {};
+
+    (items || []).forEach((item) => {
+        const id = item[idField];
+        const quantity = Number(item.quantity);
+
+        if (
+            id === null ||
+            id === undefined ||
+            !Number.isSafeInteger(quantity) ||
+            quantity <= 0
+        ) {
+            throw new Error(
+                `Thông tin ${itemType} "${item[nameField] || ""}" trong đơn không hợp lệ.`
+            );
+        }
+
+        const key = String(id);
+
+        quantities[key] =
+            (quantities[key] || 0) + quantity;
+    });
+
+    return quantities;
+};
+
+//====================================================
+// Hoàn tồn kho theo booking snapshot
+//====================================================
+
+const restoreBookingInventory = async (booking) => {
+    const productQuantities = aggregateItemQuantities(
+        booking.products,
+        "productId",
+        "productName",
+        "sản phẩm"
+    );
+
+    const comboQuantities = aggregateItemQuantities(
+        booking.combos,
+        "comboId",
+        "comboName",
+        "combo"
+    );
+
+    if (Object.keys(productQuantities).length > 0) {
+        await restoreProductStock(productQuantities);
+    }
+
+    if (Object.keys(comboQuantities).length > 0) {
+        await restoreComboStock(comboQuantities);
+    }
+
+    return {
+        productQuantities,
+        comboQuantities
+    };
+};
+
+//====================================================
+// Tạo booking
+//====================================================
 
 export const createBooking = async (bookingData) => {
     const {
@@ -253,7 +369,10 @@ export const createBooking = async (bookingData) => {
         throw new Error("Phòng chiếu hiện không hoạt động.");
     }
 
-    if (String(room.cinemaId) !== String(showtime.cinemaId)) {
+    if (
+        String(room.cinemaId) !==
+        String(showtime.cinemaId)
+    ) {
         throw new Error(
             "Phòng chiếu không thuộc rạp của suất chiếu."
         );
@@ -358,7 +477,7 @@ export const createBooking = async (bookingData) => {
         "comboName"
     );
 
-    // 7. Tính tổng tiền từ dữ liệu gốc
+    // 7. Tính tổng tiền
 
     const seatTotal = selectedSeats.reduce(
         (total, seat) => total + seat.totalPrice,
@@ -387,7 +506,7 @@ export const createBooking = async (bookingData) => {
         );
     }
 
-    // 8. Xác minh mã khuyến mãi từ dữ liệu mới nhất
+    // 8. Xác minh khuyến mãi
 
     let promotionResult = null;
     let discountAmount = 0;
@@ -424,7 +543,7 @@ export const createBooking = async (bookingData) => {
         );
     }
 
-    // 10. Tạo mã đơn đặt vé
+    // 10. Tạo mã booking
 
     const newId =
         Math.max(
@@ -437,7 +556,7 @@ export const createBooking = async (bookingData) => {
 
     const bookingCode = `VBC-${Date.now()}-${newId}`;
 
-    // 11. Chuẩn bị thông tin khuyến mãi
+    // 11. Chuẩn bị snapshot khuyến mãi
 
     const promotionSnapshot = promotionResult
         ? {
@@ -454,13 +573,27 @@ export const createBooking = async (bookingData) => {
         }
         : null;
 
-    // 12. Tạo bản ghi đơn đặt vé
+    // 12. Thông tin khách hàng đang đăng nhập
+
+    const currentUser = getCurrentUser();
+
+    // 13. Tạo bản ghi booking
 
     const now = new Date().toISOString();
 
     const newBooking = {
         bookingId: newId,
         bookingCode,
+
+        userId: currentUser?.userId ?? null,
+
+        customer: currentUser
+            ? {
+                fullName: currentUser.fullName || "",
+                email: currentUser.email || "",
+                phoneNumber: currentUser.phoneNumber || ""
+            }
+            : null,
 
         showtimeId: showtime.id,
         bookingDate: now,
@@ -503,69 +636,120 @@ export const createBooking = async (bookingData) => {
         discountAmount,
         promotion: promotionSnapshot,
 
+        // Số tiền khách hàng thực tế thanh toán.
         totalPrice,
+        actualPaidAmount: totalPrice,
 
         paymentMethod: paymentResult.paymentMethod,
         paymentStatus: "Success",
         paidAt: now
     };
 
-    // 13. Trừ tồn kho và lưu booking
+    // 14. Cập nhật tồn kho và lượt khuyến mãi.
+    // Nếu một bước thất bại, cố gắng hoàn tác các bước trước đó.
 
-    await decreaseProductStock(selectedProductQuantities);
+    let productsDeducted = false;
+    let combosDeducted = false;
+    let promotionUsageIncreased = false;
 
     try {
-        // Lưu booking trước.
-        // Nếu lưu thất bại, tồn kho sẽ được hoàn lại.
+        if (Object.keys(selectedProductQuantities).length > 0) {
+            await decreaseProductStock(
+                selectedProductQuantities
+            );
+
+            productsDeducted = true;
+        }
+
+        if (Object.keys(selectedComboQuantities).length > 0) {
+            await decreaseComboStock(
+                selectedComboQuantities
+            );
+
+            combosDeducted = true;
+        }
+
+        if (promotionSnapshot) {
+            await increasePromotionUsage(
+                promotionSnapshot.promotionId,
+                bookingCode
+            );
+
+            promotionUsageIncreased = true;
+        }
 
         saveBookings([...bookings, newBooking]);
+
     } catch (error) {
         console.error(
-            "Không thể lưu đơn đặt vé, đang hoàn lại tồn kho:",
+            "Tạo booking thất bại. Đang thực hiện hoàn tác:",
             error
         );
 
-        try {
-            await restoreProductStock(
-                selectedProductQuantities
-            );
-        } catch (restoreError) {
-            console.error(
-                "Không thể hoàn lại tồn kho sản phẩm:",
-                restoreError
-            );
+        if (promotionUsageIncreased && promotionSnapshot) {
+            try {
+                await decreasePromotionUsage(
+                    promotionSnapshot.promotionId,
+                    bookingCode
+                );
+            } catch (rollbackError) {
+                console.error(
+                    "Không thể hoàn tác lượt khuyến mãi:",
+                    rollbackError
+                );
+            }
+        }
+
+        if (combosDeducted) {
+            try {
+                await restoreComboStock(
+                    selectedComboQuantities
+                );
+            } catch (rollbackError) {
+                console.error(
+                    "Không thể hoàn lại tồn kho combo:",
+                    rollbackError
+                );
+            }
+        }
+
+        if (productsDeducted) {
+            try {
+                await restoreProductStock(
+                    selectedProductQuantities
+                );
+            } catch (rollbackError) {
+                console.error(
+                    "Không thể hoàn lại tồn kho sản phẩm:",
+                    rollbackError
+                );
+            }
         }
 
         throw error;
     }
 
-    // 14. Ghi nhận lượt sử dụng khuyến mãi sau khi booking đã lưu
-
-    if (promotionSnapshot) {
-        try {
-            await increasePromotionUsage(
-                promotionSnapshot.promotionId,
-                bookingCode
-            );
-        } catch (promotionError) {
-            console.error(
-                "Booking đã được lưu nhưng không thể ghi nhận lượt sử dụng khuyến mãi:",
-                promotionError
-            );
-        }
-    }
-
     return newBooking;
 };
 
-//=================== Cập nhật trạng thái đơn đặt vé ========================
+//====================================================
+// Cập nhật trạng thái booking
+//====================================================
 
 export const updateBookingStatus = async (id, status) => {
-    const bookings = await getBookings();
-
     if (!BOOKING_STATUS_OPTIONS.includes(status)) {
-        throw new Error("Trạng thái đơn đặt vé không hợp lệ.");
+        throw new Error(
+            "Trạng thái đơn đặt vé không hợp lệ."
+        );
     }
+
+    // Chuyển trạng thái sang Cancelled phải đi qua quy trình
+    // hoàn tồn kho và hoàn lượt khuyến mãi.
+    if (status === "Cancelled") {
+        return cancelBooking(id);
+    }
+
+    const bookings = await getBookings();
 
     const existingBooking = bookings.find(
         (booking) =>
@@ -600,75 +784,160 @@ export const updateBookingStatus = async (id, status) => {
             : booking
     );
 
-    const shouldRestoreStock =
-        status === "Cancelled" &&
-        existingBooking.paymentStatus === "Success";
-
-    if (shouldRestoreStock) {
-        const productQuantities = {};
-
-        (existingBooking.products || []).forEach((product) => {
-            const productId = String(product.productId);
-            const quantity = Number(product.quantity);
-
-            if (
-                !Number.isSafeInteger(quantity) ||
-                quantity <= 0
-            ) {
-                throw new Error(
-                    `Số lượng sản phẩm "${product.productName}" trong đơn không hợp lệ.`
-                );
-            }
-
-            productQuantities[productId] =
-                (productQuantities[productId] || 0) + quantity;
-        });
-
-        // Lưu trạng thái đơn trước khi hoàn kho.
-
-        saveBookings(updatedBookings);
-
-        try {
-            if (Object.keys(productQuantities).length > 0) {
-                await restoreProductStock(productQuantities);
-            }
-        } catch (error) {
-            try {
-                saveBookings(bookings);
-            } catch (rollbackError) {
-                console.error(
-                    "Không thể khôi phục trạng thái đơn đặt vé:",
-                    rollbackError
-                );
-            }
-
-            throw error;
-        }
-
-        return updatedBooking;
-    }
-
     saveBookings(updatedBookings);
 
     return updatedBooking;
 };
 
-//=================== Hủy đơn đặt vé ========================
+//====================================================
+// Hủy booking và hoàn tồn kho
+//====================================================
 
 export const cancelBooking = async (id) => {
-    const booking = await getBookingById(id);
+    const bookings = await getBookings();
 
-    if (!booking) {
+    const existingBooking = bookings.find(
+        (booking) =>
+            String(booking.bookingId) === String(id)
+    );
+
+    if (!existingBooking) {
         throw new Error(
             "Không tìm thấy đơn đặt vé cần hủy."
         );
     }
 
-    if (booking.bookingStatus !== "Confirmed") {
+    // Đã hủy thì không thực hiện hoàn kho lần thứ hai.
+    if (existingBooking.bookingStatus === "Cancelled") {
+        return existingBooking;
+    }
+
+    if (existingBooking.bookingStatus !== "Confirmed") {
         throw new Error(
             "Chỉ có thể hủy đơn đặt vé đang được xác nhận."
         );
     }
 
-    return updateBookingStatus(id, "Cancelled");
+    if (existingBooking.paymentStatus !== "Success") {
+        throw new Error(
+            "Chỉ có thể hoàn tồn kho cho đơn đã thanh toán thành công."
+        );
+    }
+
+    const updatedBooking = {
+        ...existingBooking,
+        bookingStatus: "Cancelled",
+        cancelledAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+
+    const updatedBookings = bookings.map((booking) =>
+        String(booking.bookingId) === String(id)
+            ? updatedBooking
+            : booking
+    );
+
+    let productsRestored = false;
+    let combosRestored = false;
+    let promotionUsageDecreased = false;
+
+    let productQuantities = {};
+    let comboQuantities = {};
+
+    try {
+        // 1. Hoàn kho sản phẩm.
+
+        productQuantities = aggregateItemQuantities(
+            existingBooking.products,
+            "productId",
+            "productName",
+            "sản phẩm"
+        );
+
+        if (Object.keys(productQuantities).length > 0) {
+            await restoreProductStock(productQuantities);
+            productsRestored = true;
+        }
+
+        // 2. Hoàn kho combo độc lập.
+
+        comboQuantities = aggregateItemQuantities(
+            existingBooking.combos,
+            "comboId",
+            "comboName",
+            "combo"
+        );
+
+        if (Object.keys(comboQuantities).length > 0) {
+            await restoreComboStock(comboQuantities);
+            combosRestored = true;
+        }
+
+        // 3. Hoàn lượt sử dụng khuyến mãi.
+
+        if (existingBooking.promotion?.promotionId) {
+            await decreasePromotionUsage(
+                existingBooking.promotion.promotionId,
+                existingBooking.bookingCode
+            );
+
+            promotionUsageDecreased = true;
+        }
+
+        // 4. Chỉ cập nhật trạng thái sau khi các bước hoàn trả thành công.
+
+        saveBookings(updatedBookings);
+
+        return updatedBooking;
+
+    } catch (error) {
+        console.error(
+            "Hủy booking thất bại. Đang cố gắng khôi phục dữ liệu:",
+            error
+        );
+
+        // Khôi phục lượt khuyến mãi nếu bước lưu booking thất bại.
+        if (
+            promotionUsageDecreased &&
+            existingBooking.promotion?.promotionId
+        ) {
+            try {
+                await increasePromotionUsage(
+                    existingBooking.promotion.promotionId,
+                    existingBooking.bookingCode
+                );
+            } catch (rollbackError) {
+                console.error(
+                    "Không thể khôi phục lượt khuyến mãi:",
+                    rollbackError
+                );
+            }
+        }
+
+        // Trừ lại combo đã hoàn trước đó.
+        if (combosRestored) {
+            try {
+                await decreaseComboStock(comboQuantities);
+            } catch (rollbackError) {
+                console.error(
+                    "Không thể khôi phục tồn kho combo:",
+                    rollbackError
+                );
+            }
+        }
+
+        // Trừ lại sản phẩm đã hoàn trước đó.
+        if (productsRestored) {
+            try {
+                await decreaseProductStock(productQuantities);
+            } catch (rollbackError) {
+                console.error(
+                    "Không thể khôi phục tồn kho sản phẩm:",
+                    rollbackError
+                );
+            }
+        }
+
+        throw error;
+    }
 };

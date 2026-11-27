@@ -60,11 +60,17 @@ const isValidDate = (value) => {
 const isPromotionInDateRange = (promotion) => {
     const today = getTodayDate();
 
-    if (promotion.startDate && today < promotion.startDate) {
+    if (
+        promotion.startDate &&
+        today < promotion.startDate
+    ) {
         return false;
     }
 
-    if (promotion.endDate && today > promotion.endDate) {
+    if (
+        promotion.endDate &&
+        today > promotion.endDate
+    ) {
         return false;
     }
 
@@ -195,7 +201,10 @@ const validatePromotion = (
         );
     }
 
-    if (discountType === "Percentage" && discountValue > 100) {
+    if (
+        discountType === "Percentage" &&
+        discountValue > 100
+    ) {
         throw new Error(
             "Mức giảm theo phần trăm không được vượt quá 100%."
         );
@@ -288,7 +297,9 @@ const normalizeStoredPromotion = (promotion) => ({
 
     usedCount: Number(promotion.usedCount) || 0,
 
-    usedBookingCodes: Array.isArray(promotion.usedBookingCodes)
+    usedBookingCodes: Array.isArray(
+        promotion.usedBookingCodes
+    )
         ? promotion.usedBookingCodes
         : [],
 
@@ -337,8 +348,8 @@ const initializePromotions = () => {
         }
     }
 
-    const initialPromotions = promotionsData.map((promotion) =>
-        normalizeStoredPromotion(promotion)
+    const initialPromotions = promotionsData.map(
+        (promotion) => normalizeStoredPromotion(promotion)
     );
 
     savePromotions(initialPromotions);
@@ -459,13 +470,26 @@ export const updatePromotion = async (id, promotionData) => {
         id
     );
 
+    // Không được đặt giới hạn thấp hơn số lượt đã sử dụng.
+    const usedCount =
+        Number(existingPromotion.usedCount) || 0;
+
+    if (
+        normalized.usageLimit !== null &&
+        normalized.usageLimit < usedCount
+    ) {
+        throw new Error(
+            `Giới hạn sử dụng không thể thấp hơn ${usedCount} lượt đã được sử dụng.`
+        );
+    }
+
     const updatedPromotion = {
         ...existingPromotion,
 
         ...normalized,
 
-        // Không cho phép chỉnh sửa làm mất lịch sử lượt sử dụng.
-        usedCount: Number(existingPromotion.usedCount) || 0,
+        // Giữ nguyên lịch sử sử dụng.
+        usedCount,
 
         usedBookingCodes: Array.isArray(
             existingPromotion.usedBookingCodes
@@ -577,7 +601,9 @@ export const calculatePromotionDiscount = (
         );
     }
 
-    const discountValue = Number(promotion.discountValue);
+    const discountValue = Number(
+        promotion.discountValue
+    );
 
     if (
         !Number.isSafeInteger(discountValue) ||
@@ -678,7 +704,9 @@ export const validatePromotionCode = async (
         );
     }
 
-    if (amount < Number(promotion.minOrderValue || 0)) {
+    if (
+        amount < Number(promotion.minOrderValue || 0)
+    ) {
         throw new Error(
             `Đơn hàng phải có giá trị tối thiểu ${new Intl.NumberFormat("vi-VN").format(
                 promotion.minOrderValue
@@ -729,10 +757,14 @@ export const increasePromotionUsage = async (
         ? existingPromotion.usedBookingCodes
         : [];
 
-    // Nếu bookingCode đã được ghi nhận thì không tăng lượt lần nữa.
+    const normalizedBookingCode = bookingCode
+        ? String(bookingCode)
+        : null;
+
+    // Booking đã được ghi nhận thì không tăng lượt lần nữa.
     if (
-        bookingCode &&
-        usedBookingCodes.includes(String(bookingCode))
+        normalizedBookingCode &&
+        usedBookingCodes.includes(normalizedBookingCode)
     ) {
         return existingPromotion;
     }
@@ -766,12 +798,80 @@ export const increasePromotionUsage = async (
 
         usedCount: usedCount + 1,
 
-        usedBookingCodes: bookingCode
+        usedBookingCodes: normalizedBookingCode
             ? [
                 ...usedBookingCodes,
-                String(bookingCode)
+                normalizedBookingCode
             ]
             : usedBookingCodes,
+
+        updatedAt: new Date().toISOString()
+    };
+
+    const updatedPromotions = promotions.map((promotion) =>
+        String(promotion.promotionId) === String(id)
+            ? updatedPromotion
+            : promotion
+    );
+
+    savePromotions(updatedPromotions);
+
+    return updatedPromotion;
+};
+
+//====================================================
+// Hoàn lại lượt sử dụng khuyến mãi khi hủy booking
+//====================================================
+
+export const decreasePromotionUsage = async (
+    id,
+    bookingCode
+) => {
+    if (!bookingCode) {
+        throw new Error(
+            "Thiếu mã đơn đặt vé để hoàn lượt khuyến mãi."
+        );
+    }
+
+    const promotions = await getPromotions();
+
+    const existingPromotion = promotions.find(
+        (promotion) =>
+            String(promotion.promotionId) === String(id)
+    );
+
+    if (!existingPromotion) {
+        throw new Error(
+            "Không tìm thấy khuyến mãi cần hoàn lượt."
+        );
+    }
+
+    const usedBookingCodes = Array.isArray(
+        existingPromotion.usedBookingCodes
+    )
+        ? existingPromotion.usedBookingCodes
+        : [];
+
+    const normalizedBookingCode = String(bookingCode);
+
+    // Chưa ghi nhận hoặc đã hoàn trước đó thì không trừ tiếp.
+    if (
+        !usedBookingCodes.includes(normalizedBookingCode)
+    ) {
+        return existingPromotion;
+    }
+
+    const updatedPromotion = {
+        ...existingPromotion,
+
+        usedCount: Math.max(
+            0,
+            (Number(existingPromotion.usedCount) || 0) - 1
+        ),
+
+        usedBookingCodes: usedBookingCodes.filter(
+            (code) => code !== normalizedBookingCode
+        ),
 
         updatedAt: new Date().toISOString()
     };

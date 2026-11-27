@@ -19,6 +19,7 @@ const INITIAL_FORM = {
     comboName: "",
     description: "",
     price: "",
+    stockQuantity: "20",
     imageUrl: "",
     status: "Active",
     startDate: "",
@@ -31,12 +32,19 @@ const formatCurrency = (value) =>
         currency: "VND"
     }).format(Number(value) || 0);
 
+const formatNumber = (value) =>
+    new Intl.NumberFormat("vi-VN").format(
+        Number(value) || 0
+    );
+
 const formatDate = (value) => {
     if (!value) return "Không giới hạn";
 
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) return "Không hợp lệ";
+    if (Number.isNaN(date.getTime())) {
+        return "Không hợp lệ";
+    }
 
     return date.toLocaleDateString("vi-VN");
 };
@@ -86,7 +94,10 @@ function AdminCombos() {
 
             setCombos(data);
         } catch (error) {
-            console.error("Không thể tải danh sách combo:", error);
+            console.error(
+                "Không thể tải danh sách combo:",
+                error
+            );
 
             setErrorMessage(
                 error.message || "Không thể tải danh sách combo."
@@ -105,13 +116,19 @@ function AdminCombos() {
     // =========================================
 
     const filteredCombos = useMemo(() => {
-        const keyword = searchTerm.trim().toLocaleLowerCase("vi");
+        const keyword = searchTerm
+            .trim()
+            .toLocaleLowerCase("vi");
 
         return combos.filter((combo) => {
             const matchesSearch =
                 !keyword ||
-                combo.comboName?.toLocaleLowerCase("vi").includes(keyword) ||
-                combo.description?.toLocaleLowerCase("vi").includes(keyword) ||
+                combo.comboName
+                    ?.toLocaleLowerCase("vi")
+                    .includes(keyword) ||
+                combo.description
+                    ?.toLocaleLowerCase("vi")
+                    .includes(keyword) ||
                 String(combo.comboId).includes(keyword);
 
             const matchesStatus =
@@ -124,12 +141,25 @@ function AdminCombos() {
 
     const statistics = useMemo(() => ({
         total: combos.length,
+
         active: combos.filter(
             (combo) => combo.status === "Active"
         ).length,
+
         inactive: combos.filter(
             (combo) => combo.status === "Inactive"
-        ).length
+        ).length,
+
+        outOfStock: combos.filter(
+            (combo) =>
+                Number(combo.stockQuantity ?? 0) === 0
+        ).length,
+
+        totalStock: combos.reduce(
+            (total, combo) =>
+                total + (Number(combo.stockQuantity) || 0),
+            0
+        )
     }), [combos]);
 
     // =========================================
@@ -167,6 +197,9 @@ function AdminCombos() {
             comboName: combo.comboName || "",
             description: combo.description || "",
             price: String(combo.price ?? ""),
+            stockQuantity: String(
+                combo.stockQuantity ?? 0
+            ),
             imageUrl: combo.imageUrl || "",
             status: combo.status || "Active",
             startDate: toDateInputValue(combo.startDate),
@@ -202,8 +235,16 @@ function AdminCombos() {
             return "Vui lòng nhập tên combo.";
         }
 
+        if (formData.comboName.trim().length > 100) {
+            return "Tên combo không được vượt quá 100 ký tự.";
+        }
+
         if (!formData.description.trim()) {
             return "Vui lòng nhập mô tả combo.";
+        }
+
+        if (formData.description.trim().length > 500) {
+            return "Mô tả combo không được vượt quá 500 ký tự.";
         }
 
         const price = Number(formData.price);
@@ -213,7 +254,18 @@ function AdminCombos() {
             price < 1000 ||
             price % 1000 !== 0
         ) {
-            return "Giá combo phải là số nguyên dương và chia hết cho 1.000 VNĐ. Ví dụ: 45000, 46000, 47000.";
+            return "Giá combo phải là số nguyên dương và chia hết cho 1.000 VNĐ.";
+        }
+
+        const stockQuantity = Number(
+            formData.stockQuantity
+        );
+
+        if (
+            !Number.isSafeInteger(stockQuantity) ||
+            stockQuantity < 0
+        ) {
+            return "Số lượng tồn kho phải là số nguyên không âm.";
         }
 
         if (
@@ -248,7 +300,11 @@ function AdminCombos() {
 
             const payload = {
                 ...formData,
+                comboName: formData.comboName.trim(),
+                description: formData.description.trim(),
                 price: Number(formData.price),
+                stockQuantity: Number(formData.stockQuantity),
+                imageUrl: formData.imageUrl.trim(),
                 startDate: formData.startDate || null,
                 endDate: formData.endDate || null
             };
@@ -259,11 +315,15 @@ function AdminCombos() {
                     payload
                 );
 
-                setSuccessMessage("Cập nhật combo thành công.");
+                setSuccessMessage(
+                    "Cập nhật combo thành công."
+                );
             } else {
                 await createCombo(payload);
 
-                setSuccessMessage("Thêm combo mới thành công.");
+                setSuccessMessage(
+                    "Thêm combo mới thành công."
+                );
             }
 
             const data = await getCombos();
@@ -277,7 +337,8 @@ function AdminCombos() {
             console.error("Lỗi khi lưu combo:", error);
 
             setErrorMessage(
-                error.message || "Không thể lưu thông tin combo."
+                error.message ||
+                "Không thể lưu thông tin combo."
             );
         } finally {
             setIsSaving(false);
@@ -290,7 +351,9 @@ function AdminCombos() {
 
     const handleToggleStatus = async (combo) => {
         const nextStatus =
-            combo.status === "Active" ? "Inactive" : "Active";
+            combo.status === "Active"
+                ? "Inactive"
+                : "Active";
 
         const confirmed = window.confirm(
             `Bạn có chắc muốn chuyển combo "${combo.comboName}" sang trạng thái ${
@@ -318,7 +381,10 @@ function AdminCombos() {
                 "Cập nhật trạng thái combo thành công."
             );
         } catch (error) {
-            console.error("Lỗi cập nhật trạng thái:", error);
+            console.error(
+                "Lỗi cập nhật trạng thái:",
+                error
+            );
 
             setErrorMessage(
                 error.message ||
@@ -504,6 +570,17 @@ function AdminCombos() {
                     </div>
                 </div>
 
+                <div className="admin-combo-stat-card">
+                    <div className="admin-combo-stat-icon inactive">
+                        <i className="bi bi-exclamation-triangle"></i>
+                    </div>
+
+                    <div>
+                        <span>Combo hết hàng</span>
+                        <strong>{statistics.outOfStock}</strong>
+                    </div>
+                </div>
+
             </div>
 
             {/* TOOLBAR */}
@@ -531,9 +608,17 @@ function AdminCombos() {
                     }
                     aria-label="Lọc theo trạng thái"
                 >
-                    <option value="All">Tất cả trạng thái</option>
-                    <option value="Active">Đang hoạt động</option>
-                    <option value="Inactive">Ngừng hoạt động</option>
+                    <option value="All">
+                        Tất cả trạng thái
+                    </option>
+
+                    <option value="Active">
+                        Đang hoạt động
+                    </option>
+
+                    <option value="Inactive">
+                        Ngừng hoạt động
+                    </option>
                 </select>
 
             </div>
@@ -549,6 +634,7 @@ function AdminCombos() {
                             <th>Hình ảnh</th>
                             <th>Thông tin combo</th>
                             <th>Giá bán</th>
+                            <th>Tồn kho</th>
                             <th>Thời gian áp dụng</th>
                             <th>Trạng thái</th>
                             <th>Thao tác</th>
@@ -560,7 +646,7 @@ function AdminCombos() {
                         {isLoading ? (
                             <tr>
                                 <td
-                                    colSpan="7"
+                                    colSpan="8"
                                     className="admin-combo-empty"
                                 >
                                     <div className="admin-combo-loading">
@@ -572,7 +658,7 @@ function AdminCombos() {
                         ) : filteredCombos.length === 0 ? (
                             <tr>
                                 <td
-                                    colSpan="7"
+                                    colSpan="8"
                                     className="admin-combo-empty"
                                 >
                                     {combos.length === 0
@@ -619,6 +705,22 @@ function AdminCombos() {
                                         <strong className="admin-combo-price">
                                             {formatCurrency(combo.price)}
                                         </strong>
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            {formatNumber(
+                                                combo.stockQuantity ?? 0
+                                            )}
+                                        </strong>
+
+                                        <span> phần</span>
+
+                                        {Number(combo.stockQuantity ?? 0) === 0 && (
+                                            <small className="d-block text-danger">
+                                                Hết hàng
+                                            </small>
+                                        )}
                                     </td>
 
                                     <td>
@@ -807,7 +909,7 @@ function AdminCombos() {
                                     />
                                 </div>
 
-                                {/* PRICE AND STATUS */}
+                                {/* PRICE, STOCK AND STATUS */}
 
                                 <div className="admin-combo-form-row">
 
@@ -834,26 +936,48 @@ function AdminCombos() {
                                     </div>
 
                                     <div className="admin-combo-form-group">
-                                        <label htmlFor="status">
-                                            Trạng thái
+                                        <label htmlFor="stockQuantity">
+                                            Số lượng tồn kho <span>*</span>
                                         </label>
 
-                                        <select
-                                            id="status"
-                                            name="status"
-                                            value={formData.status}
+                                        <input
+                                            id="stockQuantity"
+                                            name="stockQuantity"
+                                            type="number"
+                                            min="0"
+                                            step="1"
+                                            value={formData.stockQuantity}
                                             onChange={handleChange}
-                                        >
-                                            <option value="Active">
-                                                Hoạt động
-                                            </option>
+                                            placeholder="20"
+                                            required
+                                        />
 
-                                            <option value="Inactive">
-                                                Ngừng hoạt động
-                                            </option>
-                                        </select>
+                                        <small>
+                                            Số lượng combo hiện có trong kho.
+                                        </small>
                                     </div>
 
+                                </div>
+
+                                <div className="admin-combo-form-group">
+                                    <label htmlFor="status">
+                                        Trạng thái
+                                    </label>
+
+                                    <select
+                                        id="status"
+                                        name="status"
+                                        value={formData.status}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="Active">
+                                            Hoạt động
+                                        </option>
+
+                                        <option value="Inactive">
+                                            Ngừng hoạt động
+                                        </option>
+                                    </select>
                                 </div>
 
                                 {/* IMAGE URL */}
@@ -1072,6 +1196,16 @@ function AdminCombos() {
 
                                         <strong className="price">
                                             {formatCurrency(detailCombo.price)}
+                                        </strong>
+                                    </div>
+
+                                    <div>
+                                        <span>Tồn kho hiện tại</span>
+
+                                        <strong>
+                                            {formatNumber(
+                                                detailCombo.stockQuantity ?? 0
+                                            )} phần
                                         </strong>
                                     </div>
 

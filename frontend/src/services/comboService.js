@@ -9,12 +9,46 @@ const COMBO_STATUS_OPTIONS = ["Active", "Inactive"];
 
 const saveCombos = (combos) => {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(combos));
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(combos)
+        );
     } catch (error) {
         console.error("Không thể lưu danh sách combo:", error);
         throw new Error("Không thể lưu dữ liệu combo.");
     }
 };
+
+//=================== Chuẩn hóa tồn kho ========================
+
+const normalizeStockQuantity = (value) => {
+    const quantity = Number(value);
+
+    if (
+        !Number.isSafeInteger(quantity) ||
+        quantity < 0
+    ) {
+        throw new Error(
+            "Số lượng tồn kho combo phải là số nguyên không âm."
+        );
+    }
+
+    return quantity;
+};
+
+//=================== Chuẩn hóa combo cũ ========================
+
+const normalizeStoredCombo = (combo) => ({
+    ...combo,
+    stockQuantity:
+        combo.stockQuantity === undefined ||
+        combo.stockQuantity === null
+            ? 20
+            : normalizeStockQuantity(combo.stockQuantity),
+    status: combo.status || "Active",
+    startDate: combo.startDate || null,
+    endDate: combo.endDate || null
+});
 
 //=================== Kiểm tra ngày ========================
 
@@ -31,6 +65,7 @@ const validateCombo = (data, combos, currentId = null) => {
         comboName,
         description,
         price,
+        stockQuantity,
         status,
         startDate,
         endDate
@@ -62,17 +97,19 @@ const validateCombo = (data, combos, currentId = null) => {
     const numericPrice = Number(price);
 
     if (
-      !Number.isSafeInteger(numericPrice) ||
-      numericPrice < 1000 ||
-      numericPrice % 1000 !== 0
+        !Number.isSafeInteger(numericPrice) ||
+        numericPrice < 1000 ||
+        numericPrice % 1000 !== 0
     ) {
-      throw new Error(
-        "Giá combo phải là số nguyên dương và chia hết cho 1.000 VNĐ. Ví dụ: 45000, 46000, 47000.",
-      );
+        throw new Error(
+            "Giá combo phải là số nguyên dương và chia hết cho 1.000 VNĐ."
+        );
     }
 
+    normalizeStockQuantity(stockQuantity ?? 0);
+
     if (!COMBO_STATUS_OPTIONS.includes(status)) {
-      throw new Error("Trạng thái combo không hợp lệ.");
+        throw new Error("Trạng thái combo không hợp lệ.");
     }
 
     if (!isValidDate(startDate)) {
@@ -101,6 +138,9 @@ const normalizeCombo = (data) => ({
     comboName: data.comboName.trim(),
     description: data.description.trim(),
     price: Number(data.price),
+    stockQuantity: normalizeStockQuantity(
+        data.stockQuantity ?? 0
+    ),
     imageUrl: data.imageUrl?.trim() || "",
     status: data.status,
     startDate: data.startDate || null,
@@ -120,22 +160,35 @@ const initializeCombos = () => {
                 throw new Error("Dữ liệu combo không hợp lệ.");
             }
 
-            return parsedCombos;
+            const normalizedCombos = parsedCombos.map(
+                normalizeStoredCombo
+            );
+
+            // Tự động cập nhật dữ liệu combo cũ.
+            const hasChanged = parsedCombos.some(
+                (combo, index) =>
+                    combo.stockQuantity !==
+                        normalizedCombos[index].stockQuantity
+            );
+
+            if (hasChanged) {
+                saveCombos(normalizedCombos);
+            }
+
+            return normalizedCombos;
         } catch (error) {
             console.error("Không thể đọc dữ liệu combo:", error);
 
             throw new Error(
+                error.message ||
                 "Dữ liệu combo trong trình duyệt không hợp lệ."
             );
         }
     }
 
-    const initialCombos = combosData.map((combo) => ({
-        ...combo,
-        status: combo.status || "Active",
-        startDate: combo.startDate || null,
-        endDate: combo.endDate || null
-    }));
+    const initialCombos = combosData.map((combo) =>
+        normalizeStoredCombo(combo)
+    );
 
     saveCombos(initialCombos);
 
@@ -169,7 +222,10 @@ export const getActiveCombos = async () => {
     today.setHours(0, 0, 0, 0);
 
     return combos.filter((combo) => {
-        if (combo.status !== "Active") {
+        if (
+            combo.status !== "Active" ||
+            Number(combo.stockQuantity) <= 0
+        ) {
             return false;
         }
 
@@ -285,6 +341,120 @@ export const updateComboStatus = async (id, status) => {
     return updatedCombos.find(
         (combo) => String(combo.comboId) === String(id)
     );
+};
+
+//=================== Trừ tồn kho combo ========================
+
+export const decreaseComboStock = async (quantities = {}) => {
+    if (
+        !quantities ||
+        typeof quantities !== "object" ||
+        Array.isArray(quantities)
+    ) {
+        throw new Error("Danh sách số lượng combo không hợp lệ.");
+    }
+
+    const combos = await getCombos();
+
+    const updatedCombos = combos.map((combo) => ({
+        ...combo
+    }));
+
+    for (const [comboId, rawQuantity] of Object.entries(quantities)) {
+        const quantity = Number(rawQuantity);
+
+        if (quantity <= 0) {
+            continue;
+        }
+
+        if (!Number.isSafeInteger(quantity)) {
+            throw new Error("Số lượng combo phải là số nguyên dương.");
+        }
+
+        const combo = updatedCombos.find(
+            (item) => String(item.comboId) === String(comboId)
+        );
+
+        if (!combo || combo.status !== "Active") {
+            throw new Error(
+                `Combo có ID ${comboId} hiện không khả dụng.`
+            );
+        }
+
+        const stockQuantity = normalizeStockQuantity(
+            combo.stockQuantity
+        );
+
+        if (stockQuantity < quantity) {
+            throw new Error(
+                `Combo "${combo.comboName}" chỉ còn ${stockQuantity} phần trong kho. Vui lòng điều chỉnh số lượng.`
+            );
+        }
+
+        combo.stockQuantity = stockQuantity - quantity;
+        combo.updatedAt = new Date().toISOString();
+    }
+
+    saveCombos(updatedCombos);
+
+    return updatedCombos;
+};
+
+//=================== Hoàn tồn kho combo ========================
+
+export const restoreComboStock = async (quantities = {}) => {
+    if (
+        !quantities ||
+        typeof quantities !== "object" ||
+        Array.isArray(quantities)
+    ) {
+        throw new Error("Danh sách số lượng combo cần hoàn không hợp lệ.");
+    }
+
+    const combos = await getCombos();
+
+    const updatedCombos = combos.map((combo) => ({
+        ...combo
+    }));
+
+    for (const [comboId, rawQuantity] of Object.entries(quantities)) {
+        const quantity = Number(rawQuantity);
+
+        if (quantity <= 0) {
+            continue;
+        }
+
+        if (!Number.isSafeInteger(quantity)) {
+            throw new Error("Số lượng combo cần hoàn không hợp lệ.");
+        }
+
+        const combo = updatedCombos.find(
+            (item) => String(item.comboId) === String(comboId)
+        );
+
+        if (!combo) {
+            throw new Error(
+                `Không tìm thấy combo có ID ${comboId} để hoàn kho.`
+            );
+        }
+
+        const currentStock = normalizeStockQuantity(
+            combo.stockQuantity
+        );
+
+        const nextStock = currentStock + quantity;
+
+        if (!Number.isSafeInteger(nextStock)) {
+            throw new Error("Số lượng tồn kho combo vượt giới hạn.");
+        }
+
+        combo.stockQuantity = nextStock;
+        combo.updatedAt = new Date().toISOString();
+    }
+
+    saveCombos(updatedCombos);
+
+    return updatedCombos;
 };
 
 //=================== Xóa combo ========================
