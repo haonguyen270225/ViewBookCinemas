@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import PaymentModal from "./PaymentModal.jsx";
 
@@ -23,6 +23,16 @@ function PaymentSelection({
 }) {
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
+    // State riêng cho ô nhập, không phụ thuộc trực tiếp vào mã đã áp dụng.
+    const [inputPromotionCode, setInputPromotionCode] = useState(
+        promotionCode
+    );
+
+    // Đồng bộ khi mã được áp dụng thành công hoặc bị gỡ.
+    useEffect(() => {
+        setInputPromotionCode(promotionCode || "");
+    }, [promotionCode]);
+
     const formatPrice = (price) => {
         return new Intl.NumberFormat("vi-VN").format(
             Number(price) || 0
@@ -30,7 +40,7 @@ function PaymentSelection({
     };
 
     const handleOpenPayment = () => {
-        if (isSavingBooking || totalPrice <= 0) {
+        if (isSavingBooking || totalPrice <= 0 || isApplyingPromotion) {
             return;
         }
 
@@ -47,9 +57,15 @@ function PaymentSelection({
     };
 
     const handlePromotionInputChange = (event) => {
-        onPromotionCodeChange?.(
-            event.target.value.toUpperCase()
-        );
+        const value = event.target.value.toUpperCase();
+
+        setInputPromotionCode(value);
+        onPromotionCodeChange?.(value);
+    };
+
+    const handleRemovePromotion = () => {
+        setInputPromotionCode("");
+        onRemovePromotion?.();
     };
 
     const hasAppliedPromotion =
@@ -70,6 +86,7 @@ function PaymentSelection({
                     </p>
                 </div>
 
+                {/* Phương thức thanh toán */}
                 <div className="payment-method-list">
                     <button
                         type="button"
@@ -124,6 +141,7 @@ function PaymentSelection({
                     </button>
                 </div>
 
+                {/* Xem trước phương thức thanh toán */}
                 <div className="payment-preview">
                     {selectedMethod === "momo" ? (
                         <div className="payment-momo-preview">
@@ -179,8 +197,7 @@ function PaymentSelection({
                     )}
                 </div>
 
-                {/*=================== Mã khuyến mãi ===================*/}
-
+                {/* Mã khuyến mãi */}
                 <div className="payment-promotion">
                     <div className="payment-promotion-heading">
                         <h3>
@@ -196,11 +213,12 @@ function PaymentSelection({
                     <div className="payment-promotion-input">
                         <input
                             type="text"
-                            value={promotionCode}
+                            value={inputPromotionCode}
                             onChange={handlePromotionInputChange}
                             placeholder="Nhập mã khuyến mãi"
                             maxLength={20}
                             autoComplete="off"
+                            spellCheck={false}
                             disabled={
                                 hasAppliedPromotion ||
                                 isApplyingPromotion ||
@@ -212,7 +230,7 @@ function PaymentSelection({
                             <button
                                 type="button"
                                 className="payment-promotion-remove"
-                                onClick={onRemovePromotion}
+                                onClick={handleRemovePromotion}
                                 disabled={isSavingBooking}
                             >
                                 <i className="bi bi-x-circle"></i>
@@ -225,7 +243,7 @@ function PaymentSelection({
                                 disabled={
                                     isApplyingPromotion ||
                                     isSavingBooking ||
-                                    !promotionCode.trim()
+                                    !inputPromotionCode.trim()
                                 }
                             >
                                 {isApplyingPromotion ? (
@@ -261,8 +279,7 @@ function PaymentSelection({
                     )}
                 </div>
 
-                {/*=================== Chi tiết thanh toán ===================*/}
-
+                {/* Chi tiết thanh toán */}
                 <div className="payment-total">
                     <div className="payment-total-row">
                         <span>Tạm tính</span>
@@ -287,6 +304,7 @@ function PaymentSelection({
                     </div>
                 </div>
 
+                {/* Nút thao tác */}
                 <div className="payment-actions">
                     <button
                         type="button"
