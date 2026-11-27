@@ -1,3 +1,4 @@
+
 import promotionsData from "../data/promotions.js";
 
 const STORAGE_KEY = "viewbook-admin-promotions";
@@ -5,10 +6,7 @@ const STORAGE_KEY = "viewbook-admin-promotions";
 const PROMOTION_STATUS_OPTIONS = ["Active", "Inactive"];
 const DISCOUNT_TYPE_OPTIONS = ["Percentage", "Fixed"];
 
-//====================================================
-// Lưu dữ liệu
-//====================================================
-
+// Lưu dữ liệu.
 const savePromotions = (promotions) => {
     try {
         localStorage.setItem(
@@ -24,10 +22,7 @@ const savePromotions = (promotions) => {
     }
 };
 
-//====================================================
-// Ngày tháng
-//====================================================
-
+// Ngày tháng.
 const getTodayDate = () => {
     const today = new Date();
 
@@ -79,18 +74,12 @@ const isPromotionInDateRange = (promotion) => {
     return true;
 };
 
-//====================================================
-// Chuẩn hóa mã khuyến mãi
-//====================================================
-
+// Chuẩn hóa mã khuyến mãi.
 const normalizePromotionCode = (code) => {
     return String(code || "").trim().toUpperCase();
 };
 
-//====================================================
-// Chuẩn hóa dữ liệu đầu vào
-//====================================================
-
+// Chuẩn hóa dữ liệu đầu vào.
 const normalizePromotion = (data) => ({
     promotionCode: normalizePromotionCode(
         data.promotionCode
@@ -132,10 +121,7 @@ const normalizePromotion = (data) => ({
     status: data.status
 });
 
-//====================================================
-// Kiểm tra dữ liệu khuyến mãi
-//====================================================
-
+// Kiểm tra dữ liệu khuyến mãi.
 const validatePromotion = (
     data,
     promotions,
@@ -315,10 +301,7 @@ const validatePromotion = (
     return normalized;
 };
 
-//====================================================
-// Chuẩn hóa bản ghi khuyến mãi khi đọc
-//====================================================
-
+// Chuẩn hóa bản ghi khuyến mãi khi đọc.
 const normalizeStoredPromotion = (promotion) => {
     const rawUsedCount = Number(promotion.usedCount);
 
@@ -371,10 +354,7 @@ const normalizeStoredPromotion = (promotion) => {
     };
 };
 
-//====================================================
-// Khởi tạo dữ liệu
-//====================================================
-
+// Khởi tạo dữ liệu.
 const initializePromotions = () => {
     const savedPromotions = localStorage.getItem(
         STORAGE_KEY
@@ -417,18 +397,12 @@ const initializePromotions = () => {
     return initialPromotions;
 };
 
-//====================================================
-// Lấy danh sách khuyến mãi
-//====================================================
-
+// Lấy danh sách khuyến mãi.
 export const getPromotions = async () => {
     return initializePromotions();
 };
 
-//====================================================
-// Lấy khuyến mãi theo ID
-//====================================================
-
+// Lấy khuyến mãi theo ID.
 export const getPromotionById = async (id) => {
     const promotions = await getPromotions();
 
@@ -440,10 +414,7 @@ export const getPromotionById = async (id) => {
     );
 };
 
-//====================================================
-// Lấy danh sách khuyến mãi đang có hiệu lực
-//====================================================
-
+// Lấy danh sách khuyến mãi đang có hiệu lực.
 export const getActivePromotions = async () => {
     const promotions = await getPromotions();
 
@@ -468,10 +439,7 @@ export const getActivePromotions = async () => {
     });
 };
 
-//====================================================
-// Thêm khuyến mãi
-//====================================================
-
+// Thêm khuyến mãi.
 export const createPromotion = async (promotionData) => {
     const promotions = await getPromotions();
 
@@ -509,10 +477,7 @@ export const createPromotion = async (promotionData) => {
     return newPromotion;
 };
 
-//====================================================
-// Cập nhật khuyến mãi
-//====================================================
-
+// Cập nhật khuyến mãi.
 export const updatePromotion = async (
     id,
     promotionData
@@ -578,10 +543,7 @@ export const updatePromotion = async (
     return updatedPromotion;
 };
 
-//====================================================
-// Cập nhật trạng thái
-//====================================================
-
+// Cập nhật trạng thái.
 export const updatePromotionStatus = async (
     id,
     status
@@ -625,10 +587,7 @@ export const updatePromotionStatus = async (
     return updatedPromotion;
 };
 
-//====================================================
-// Xóa khuyến mãi
-//====================================================
-
+// Xóa khuyến mãi.
 export const deletePromotion = async (id) => {
     const promotions = await getPromotions();
 
@@ -653,8 +612,7 @@ export const deletePromotion = async (id) => {
         : [];
 
     // Không xóa promotion đã được booking sử dụng.
-    // Việc giữ lại bản ghi giúp booking cũ vẫn tham chiếu
-    // được đến promotion khi cần kiểm tra hoặc hoàn lượt.
+    // Giữ bản ghi để booking cũ vẫn tham chiếu được.
     if (
         usedCount > 0 ||
         usedBookingCodes.length > 0
@@ -677,10 +635,7 @@ export const deletePromotion = async (id) => {
     return existingPromotion;
 };
 
-//====================================================
-// Tính số tiền được giảm
-//====================================================
-
+// Tính số tiền được giảm.
 export const calculatePromotionDiscount = (
     promotion,
     orderAmount
@@ -750,10 +705,7 @@ export const calculatePromotionDiscount = (
     return Math.min(amount, discountAmount);
 };
 
-//====================================================
-// Kiểm tra mã khuyến mãi
-//====================================================
-
+// Kiểm tra mã khuyến mãi.
 export const validatePromotionCode = async (
     code,
     orderAmount
@@ -846,10 +798,7 @@ export const validatePromotionCode = async (
     };
 };
 
-//====================================================
-// Ghi nhận lượt sử dụng mã khuyến mãi
-//====================================================
-
+// Ghi nhận lượt sử dụng mã khuyến mãi.
 export const increasePromotionUsage = async (
     id,
     bookingCode = null
@@ -936,10 +885,7 @@ export const increasePromotionUsage = async (
     return updatedPromotion;
 };
 
-//====================================================
-// Hoàn lại lượt sử dụng khuyến mãi khi hủy booking
-//====================================================
-
+// Hoàn lại lượt sử dụng khuyến mãi khi hủy booking.
 export const decreasePromotionUsage = async (
     id,
     bookingCode
@@ -1008,10 +954,7 @@ export const decreasePromotionUsage = async (
     return updatedPromotion;
 };
 
-//====================================================
-// Thống kê khuyến mãi
-//====================================================
-
+// Thống kê khuyến mãi.
 export const getPromotionStatistics = async () => {
     const promotions = await getPromotions();
 
