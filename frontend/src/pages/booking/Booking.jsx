@@ -13,7 +13,6 @@ import ProductSelection from "../../components/booking/ProductSelection.jsx";
 import PaymentSelection from "../../components/booking/PaymentSelection.jsx";
 
 import { seatTypes } from "../../data/seatTypes.js";
-import products from "../../data/products.js";
 
 import { getShowtimeById } from "../../services/showtimeService.js";
 import { getMovieById } from "../../services/movieService.js";
@@ -21,6 +20,7 @@ import { getCinemaById } from "../../services/cinemaService.js";
 import { getRoomById } from "../../services/roomService.js";
 import { getSeatsByRoomId } from "../../services/seatService.js";
 import { getActiveCombos } from "../../services/comboService.js";
+import { getActiveProducts } from "../../services/productService.js";
 
 import {
     createBooking,
@@ -64,6 +64,8 @@ function Booking() {
 
     const [bookingData, setBookingData] = useState(null);
 
+    const [activeProducts, setActiveProducts] = useState([]);
+
     const [activeCombos, setActiveCombos] = useState([]);
 
     const [roomSeats, setRoomSeats] = useState([]);
@@ -98,6 +100,7 @@ function Booking() {
             setBookingError("");
 
             setBookingData(null);
+            setActiveProducts([]);
             setActiveCombos([]);
             setRoomSeats([]);
             setBookedSeatIds([]);
@@ -161,16 +164,18 @@ function Booking() {
                     );
                 }
 
-                // 3. Tải ghế, ghế đã đặt và Combo đang kinh doanh
+                // 3. Tải ghế, ghế đã đặt, Combo và sản phẩm đang kinh doanh
 
                 const [
                     seatsData,
                     bookedIds,
-                    availableCombos
+                    availableCombos,
+                    availableProducts
                 ] = await Promise.all([
                     getSeatsByRoomId(selectedShowtime.roomId),
                     getBookedSeatIdsByShowtimeId(selectedShowtime.id),
-                    getActiveCombos()
+                    getActiveCombos(),
+                    getActiveProducts()
                 ]);
 
                 if (!isMounted) return;
@@ -205,6 +210,12 @@ function Booking() {
                 setActiveCombos(
                     Array.isArray(availableCombos)
                         ? availableCombos
+                        : []
+                );
+
+                setActiveProducts(
+                    Array.isArray(availableProducts)
+                        ? availableProducts
                         : []
                 );
             } catch (error) {
@@ -336,17 +347,16 @@ function Booking() {
     //=================== Lấy sản phẩm đã chọn ========================
 
     const selectedProducts = useMemo(() => {
-        return products
+        return activeProducts
             .filter(
                 (product) =>
-                    product.status === "Active" &&
                     selectedProductQuantities[product.productId] > 0
             )
             .map((product) => ({
                 ...product,
                 quantity: selectedProductQuantities[product.productId]
             }));
-    }, [selectedProductQuantities]);
+    }, [activeProducts, selectedProductQuantities]);
 
     //=================== Lấy Combo đã chọn ========================
 
@@ -656,6 +666,7 @@ function Booking() {
                                         onChangeComboQuantity={
                                             handleChangeComboQuantity
                                         }
+                                        products={activeProducts}
                                         combos={activeCombos}
                                     />
                                 </div>

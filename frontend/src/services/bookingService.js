@@ -6,7 +6,7 @@ import { getRoomById } from "./roomService.js";
 import { getSeatsByRoomId } from "./seatService.js";
 
 import { seatTypes } from "../data/seatTypes.js";
-import productsData from "../data/products.js";
+import { getActiveProducts } from "./productService.js";
 import { getActiveCombos } from "./comboService.js";
 
 const STORAGE_KEY = "viewbook-bookings";
@@ -142,226 +142,253 @@ const buildSelectedItems = (quantities, catalog, idField, nameField) => {
 //=================== Tạo đơn đặt vé ========================
 
 export const createBooking = async (bookingData) => {
-  const {
-    showtimeId,
-    seatIds,
-    selectedProductQuantities = {},
-    selectedComboQuantities = {},
-    paymentResult,
-  } = bookingData || {};
+    const {
+        showtimeId,
+        seatIds,
+        selectedProductQuantities = {},
+        selectedComboQuantities = {},
+        paymentResult
+    } = bookingData || {};
 
-  // 1. Kiểm tra dữ liệu đầu vào
-  if (!showtimeId) {
-    throw new Error("Không tìm thấy suất chiếu.");
-  }
+    // 1. Kiểm tra dữ liệu đầu vào
 
-  if (!Array.isArray(seatIds) || seatIds.length === 0) {
-    throw new Error("Vui lòng chọn ít nhất một ghế.");
-  }
-
-  if (
-    new Set(seatIds.map(Number)).size !== seatIds.length ||
-    seatIds.some((id) => !Number.isInteger(Number(id)) || Number(id) <= 0)
-  ) {
-    throw new Error("Danh sách ghế không hợp lệ hoặc bị trùng.");
-  }
-
-  if (
-    !paymentResult ||
-    paymentResult.paymentStatus !== "Success" ||
-    !["MoMo", "Card"].includes(paymentResult.paymentMethod)
-  ) {
-    throw new Error("Thông tin thanh toán không hợp lệ.");
-  }
-
-  // 2. Lấy thông tin suất chiếu
-  const showtime = await getShowtimeById(showtimeId);
-
-  if (!showtime || showtime.status !== "Scheduled") {
-    throw new Error("Suất chiếu không tồn tại hoặc không khả dụng.");
-  }
-
-  // 3. Lấy thông tin phim, rạp và phòng
-  const [movie, cinema, room] = await Promise.all([
-    getMovieById(showtime.movieId),
-    getCinemaById(showtime.cinemaId),
-    getRoomById(showtime.roomId),
-  ]);
-
-  if (!movie) {
-    throw new Error("Không tìm thấy thông tin phim.");
-  }
-
-  if (!cinema || cinema.status !== "Active") {
-    throw new Error("Rạp chiếu hiện không hoạt động.");
-  }
-
-  if (!room || room.status !== "Active") {
-    throw new Error("Phòng chiếu hiện không hoạt động.");
-  }
-
-  if (String(room.cinemaId) !== String(showtime.cinemaId)) {
-    throw new Error("Phòng chiếu không thuộc rạp của suất chiếu.");
-  }
-
-  // 4. Kiểm tra ghế
-  const roomSeats = await getSeatsByRoomId(showtime.roomId);
-
-  const selectedSeats = seatIds.map((seatId) => {
-    const seat = roomSeats.find(
-      (item) => String(item.seatId) === String(seatId),
-    );
-
-    if (!seat || seat.status !== "Active") {
-      throw new Error(`Ghế có ID ${seatId} không tồn tại hoặc không khả dụng.`);
+    if (!showtimeId) {
+        throw new Error("Không tìm thấy suất chiếu.");
     }
 
-    const seatType = seatTypes.find(
-      (item) => Number(item.seatTypeId) === Number(seat.seatTypeId),
-    );
-
-    if (!seatType) {
-      throw new Error(`Không tìm thấy loại ghế của ghế ${seat.seatCode}.`);
+    if (!Array.isArray(seatIds) || seatIds.length === 0) {
+        throw new Error("Vui lòng chọn ít nhất một ghế.");
     }
 
-    const unitPrice =
-      Number(showtime.basePrice) + Number(seatType.additionalPrice || 0);
+    if (
+        new Set(seatIds.map(Number)).size !== seatIds.length ||
+        seatIds.some((id) => !Number.isInteger(Number(id)) || Number(id) <= 0)
+    ) {
+        throw new Error("Danh sách ghế không hợp lệ hoặc bị trùng.");
+    }
 
-    return {
-      seatId: seat.seatId,
-      seatCode: seat.seatCode,
-      seatTypeId: seat.seatTypeId,
-      seatTypeName: seatType.seatTypeName,
-      unitPrice,
-      totalPrice: unitPrice,
+    if (
+        !paymentResult ||
+        paymentResult.paymentStatus !== "Success" ||
+        !["MoMo", "Card"].includes(paymentResult.paymentMethod)
+    ) {
+        throw new Error("Thông tin thanh toán không hợp lệ.");
+    }
+
+    // 2. Lấy thông tin suất chiếu
+
+    const showtime = await getShowtimeById(showtimeId);
+
+    if (!showtime || showtime.status !== "Scheduled") {
+        throw new Error("Suất chiếu không tồn tại hoặc không khả dụng.");
+    }
+
+    // 3. Lấy thông tin phim, rạp và phòng
+
+    const [movie, cinema, room] = await Promise.all([
+        getMovieById(showtime.movieId),
+        getCinemaById(showtime.cinemaId),
+        getRoomById(showtime.roomId)
+    ]);
+
+    if (!movie) {
+        throw new Error("Không tìm thấy thông tin phim.");
+    }
+
+    if (!cinema || cinema.status !== "Active") {
+        throw new Error("Rạp chiếu hiện không hoạt động.");
+    }
+
+    if (!room || room.status !== "Active") {
+        throw new Error("Phòng chiếu hiện không hoạt động.");
+    }
+
+    if (String(room.cinemaId) !== String(showtime.cinemaId)) {
+        throw new Error("Phòng chiếu không thuộc rạp của suất chiếu.");
+    }
+
+    // 4. Kiểm tra ghế
+
+    const roomSeats = await getSeatsByRoomId(showtime.roomId);
+
+    const selectedSeats = seatIds.map((seatId) => {
+        const seat = roomSeats.find(
+            (item) => String(item.seatId) === String(seatId)
+        );
+
+        if (!seat || seat.status !== "Active") {
+            throw new Error(
+                `Ghế có ID ${seatId} không tồn tại hoặc không khả dụng.`
+            );
+        }
+
+        const seatType = seatTypes.find(
+            (item) => Number(item.seatTypeId) === Number(seat.seatTypeId)
+        );
+
+        if (!seatType) {
+            throw new Error(
+                `Không tìm thấy loại ghế của ghế ${seat.seatCode}.`
+            );
+        }
+
+        const unitPrice =
+            Number(showtime.basePrice) + Number(seatType.additionalPrice || 0);
+
+        return {
+            seatId: seat.seatId,
+            seatCode: seat.seatCode,
+            seatTypeId: seat.seatTypeId,
+            seatTypeName: seatType.seatTypeName,
+            unitPrice,
+            totalPrice: unitPrice
+        };
+    });
+
+    // 5. Kiểm tra ghế đã được đặt trước đó
+
+    const bookings = await getBookings();
+
+    const bookedSeatIds = bookings
+        .filter(
+            (booking) =>
+                String(booking.showtimeId) === String(showtimeId) &&
+                booking.bookingStatus === "Confirmed" &&
+                booking.paymentStatus === "Success"
+        )
+        .flatMap((booking) =>
+            booking.seats.map((seat) => String(seat.seatId))
+        );
+
+    const hasBookedSeat = selectedSeats.some((seat) =>
+        bookedSeatIds.includes(String(seat.seatId))
+    );
+
+    if (hasBookedSeat) {
+        throw new Error(
+            "Một hoặc nhiều ghế bạn chọn đã được đặt. Vui lòng chọn lại."
+        );
+    }
+
+    // 6. Chuẩn hóa sản phẩm và combo
+
+    // Lấy danh sách sản phẩm đang kinh doanh từ Product Service
+
+    const activeProducts = await getActiveProducts();
+
+    const selectedProducts = buildSelectedItems(
+        selectedProductQuantities,
+        activeProducts,
+        "productId",
+        "productName"
+    );
+
+    // Lấy danh sách Combo đang kinh doanh từ Combo Service
+
+    const activeCombos = await getActiveCombos();
+
+    const selectedCombos = buildSelectedItems(
+        selectedComboQuantities,
+        activeCombos,
+        "comboId",
+        "comboName"
+    );
+
+    // 7. Tính tổng tiền từ dữ liệu gốc
+
+    const seatTotal = selectedSeats.reduce(
+        (total, seat) => total + seat.totalPrice,
+        0
+    );
+
+    const productTotal = selectedProducts.reduce(
+        (total, product) => total + product.totalPrice,
+        0
+    );
+
+    const comboTotal = selectedCombos.reduce(
+        (total, combo) => total + combo.totalPrice,
+        0
+    );
+
+    const totalPrice = seatTotal + productTotal + comboTotal;
+
+    // Không tin tưởng số tiền gửi lên từ giao diện
+
+    if (
+        !Number.isFinite(Number(paymentResult.amount)) ||
+        Number(paymentResult.amount) !== totalPrice
+    ) {
+        throw new Error(
+            "Số tiền thanh toán không khớp với tổng giá trị đơn hàng."
+        );
+    }
+
+    // 8. Tạo mã đơn đặt vé
+
+    const newId =
+        Math.max(
+            0,
+            ...bookings.map((booking) => Number(booking.bookingId) || 0)
+        ) + 1;
+
+    const bookingCode = `VBC-${Date.now()}-${newId}`;
+
+    // 9. Tạo bản ghi đơn đặt vé
+
+    const newBooking = {
+        bookingId: newId,
+        bookingCode,
+
+        showtimeId: showtime.id,
+        bookingDate: new Date().toISOString(),
+
+        bookingStatus: "Confirmed",
+
+        movie: {
+            movieId: movie.id,
+            title: movie.title,
+            poster: movie.poster
+        },
+
+        cinema: {
+            cinemaId: cinema.id,
+            name: cinema.name
+        },
+
+        room: {
+            roomId: room.roomId,
+            roomName: room.roomName,
+            roomType: room.roomType
+        },
+
+        showtime: {
+            startTime: showtime.startTime,
+            endTime: showtime.endTime,
+            movieVersion: showtime.movieVersion,
+            basePrice: showtime.basePrice
+        },
+
+        seats: selectedSeats,
+        products: selectedProducts,
+        combos: selectedCombos,
+
+        seatTotal,
+        productTotal,
+        comboTotal,
+        totalPrice,
+
+        paymentMethod: paymentResult.paymentMethod,
+        paymentStatus: "Success",
+        paidAt: new Date().toISOString()
     };
-  });
 
-  // 5. Kiểm tra ghế đã được đặt trước đó
-  const bookings = await getBookings();
+    // 10. Lưu đơn đặt vé
 
-  const bookedSeatIds = bookings
-    .filter(
-      (booking) =>
-        String(booking.showtimeId) === String(showtimeId) &&
-        booking.bookingStatus === "Confirmed" &&
-        booking.paymentStatus === "Success",
-    )
-    .flatMap((booking) => booking.seats.map((seat) => String(seat.seatId)));
+    saveBookings([...bookings, newBooking]);
 
-  const hasBookedSeat = selectedSeats.some((seat) =>
-    bookedSeatIds.includes(String(seat.seatId)),
-  );
-
-  if (hasBookedSeat) {
-    throw new Error(
-      "Một hoặc nhiều ghế bạn chọn đã được đặt. Vui lòng chọn lại.",
-    );
-  }
-
-  // 6. Chuẩn hóa sản phẩm và combo
-  const selectedProducts = buildSelectedItems(
-    selectedProductQuantities,
-    productsData,
-    "productId",
-    "productName",
-  );
-
-  // Lấy danh sách Combo đang kinh doanh từ Combo Service
-  const activeCombos = await getActiveCombos();
-
-  const selectedCombos = buildSelectedItems(
-    selectedComboQuantities,
-    activeCombos,
-    "comboId",
-    "comboName",
-  );
-  // 7. Tính tổng tiền từ dữ liệu gốc
-  const seatTotal = selectedSeats.reduce(
-    (total, seat) => total + seat.totalPrice,
-    0,
-  );
-
-  const productTotal = selectedProducts.reduce(
-    (total, product) => total + product.totalPrice,
-    0,
-  );
-
-  const comboTotal = selectedCombos.reduce(
-    (total, combo) => total + combo.totalPrice,
-    0,
-  );
-
-  const totalPrice = seatTotal + productTotal + comboTotal;
-
-  // Không tin tưởng số tiền gửi lên từ giao diện
-  if (
-    !Number.isFinite(Number(paymentResult.amount)) ||
-    Number(paymentResult.amount) !== totalPrice
-  ) {
-    throw new Error("Số tiền thanh toán không khớp với tổng giá trị đơn hàng.");
-  }
-
-  // 8. Tạo mã đơn đặt vé
-  const newId =
-    Math.max(0, ...bookings.map((booking) => Number(booking.bookingId) || 0)) +
-    1;
-
-  const bookingCode = `VBC-${Date.now()}-${newId}`;
-
-  // 9. Tạo bản ghi đơn đặt vé
-  const newBooking = {
-    bookingId: newId,
-    bookingCode,
-
-    showtimeId: showtime.id,
-    bookingDate: new Date().toISOString(),
-
-    bookingStatus: "Confirmed",
-
-    movie: {
-      movieId: movie.id,
-      title: movie.title,
-      poster: movie.poster,
-    },
-
-    cinema: {
-      cinemaId: cinema.id,
-      name: cinema.name,
-    },
-
-    room: {
-      roomId: room.roomId,
-      roomName: room.roomName,
-      roomType: room.roomType,
-    },
-
-    showtime: {
-      startTime: showtime.startTime,
-      endTime: showtime.endTime,
-      movieVersion: showtime.movieVersion,
-      basePrice: showtime.basePrice,
-    },
-
-    seats: selectedSeats,
-    products: selectedProducts,
-    combos: selectedCombos,
-
-    seatTotal,
-    productTotal,
-    comboTotal,
-    totalPrice,
-
-    paymentMethod: paymentResult.paymentMethod,
-    paymentStatus: "Success",
-    paidAt: new Date().toISOString(),
-  };
-
-  // 10. Lưu đơn đặt vé
-  saveBookings([...bookings, newBooking]);
-
-  return newBooking;
-};;
+    return newBooking;
+};
 
 //=================== Cập nhật trạng thái đơn đặt vé ========================
 

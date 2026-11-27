@@ -129,6 +129,16 @@ export const getProducts = async () => {
     return initializeProducts();
 };
 
+//=================== Lấy danh sách sản phẩm đang kinh doanh ========================
+
+export const getActiveProducts = async () => {
+    const products = await getProducts();
+
+    return products.filter(
+        (product) => product.status === "Active"
+    );
+};
+
 //=================== Lấy sản phẩm theo ID ========================
 
 export const getProductById = async (id) => {
