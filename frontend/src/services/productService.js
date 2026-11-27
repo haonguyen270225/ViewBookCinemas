@@ -65,8 +65,19 @@ const validateProduct = (data, products, currentId = null) => {
         throw new Error("Vui lòng nhập mô tả sản phẩm.");
     }
 
-    if (!Number.isFinite(Number(price)) || Number(price) <= 0) {
-        throw new Error("Giá sản phẩm phải lớn hơn 0.");
+    // Giá sản phẩm phải là số nguyên an toàn, tối thiểu 1.000đ
+    // và phải là bội số của 1.000đ.
+
+    const normalizedPrice = Number(price);
+
+    if (
+        !Number.isSafeInteger(normalizedPrice) ||
+        normalizedPrice < 1000 ||
+        normalizedPrice % 1000 !== 0
+    ) {
+        throw new Error(
+            "Giá sản phẩm phải là số nguyên từ 1.000đ và là bội số của 1.000đ."
+        );
     }
 
     if (
