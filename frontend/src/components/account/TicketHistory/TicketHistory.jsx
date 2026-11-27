@@ -27,6 +27,20 @@ const FILTERS = [
 ];
 
 //====================================================
+// Lấy ID phim từ booking
+// Hỗ trợ cả dữ liệu mới và dữ liệu cũ
+//====================================================
+
+const getBookingMovieId = (booking) => {
+    return (
+        booking?.movie?.movieId ??
+        booking?.movie?.id ??
+        booking?.movieId ??
+        null
+    );
+};
+
+//====================================================
 // Định dạng ngày giờ
 //====================================================
 
@@ -95,6 +109,7 @@ const mapBookingToTicket = (booking, movieDetail) => {
     const movie = movieDetail || {};
 
     const showtime = booking.showtime || {};
+
     const seats = Array.isArray(booking.seats)
         ? booking.seats
         : [];
@@ -106,19 +121,16 @@ const mapBookingToTicket = (booking, movieDetail) => {
     );
 
     const discountAmount = Number(
-        booking.discountAmount || 0
+        booking.discountAmount ?? 0
     );
 
     const paidAmount = Number(
         booking.actualPaidAmount ??
         booking.totalPrice ??
-        originalPrice - discountAmount
+        (originalPrice - discountAmount)
     );
 
-    const movieId =
-        booking.movie?.movieId ??
-        booking.movieId ??
-        null;
+    const movieId = getBookingMovieId(booking);
 
     return {
         ticketId: booking.bookingId,
@@ -155,15 +167,25 @@ const mapBookingToTicket = (booking, movieDetail) => {
             "Chưa xác định phòng",
 
         seat: seats.length > 0
-            ? seats.map((seat) => seat.seatCode).join(", ")
+            ? seats
+                .map((seat) => seat.seatCode)
+                .filter(Boolean)
+                .join(", ")
             : "--",
 
-        // Thông tin thanh toán.
+        //================================================
+        // Thông tin thanh toán
+        //================================================
+
         price: originalPrice,
+
         originalPrice,
+
         promotionCode:
             booking.promotion?.promotionCode || null,
+
         discountAmount,
+
         paidAmount,
 
         purchaseDate: formatDate(booking.bookingDate),
@@ -204,6 +226,7 @@ function TicketHistory() {
         const loadTicketHistory = async () => {
             if (!user?.userId) {
                 setTickets([]);
+                setErrorMessage("");
                 setIsLoading(false);
                 return;
             }
@@ -216,80 +239,105 @@ function TicketHistory() {
                     user.userId
                 );
 
-                // Lấy thông tin phim để bổ sung thể loại,
-                // thời lượng và poster cho lịch sử đặt vé.
+                if (!Array.isArray(bookings)) {
+                    throw new Error(
+                        "Dữ liệu lịch sử đặt vé không hợp lệ."
+                    );
+                }
+
+                //================================================
+                // Sắp xếp booking mới nhất lên đầu
+                //================================================
+
+                const sortedBookings = [...bookings].sort(
+                    (bookingA, bookingB) => {
+                        const dateA = new Date(
+                            bookingA.bookingDate || 0
+                        ).getTime();
+
+                        const dateB = new Date(
+                            bookingB.bookingDate || 0
+                        ).getTime();
+
+                        return dateB - dateA;
+                    }
+                );
+
+                //================================================
+                // Lấy danh sách ID phim từ tất cả booking
+                //================================================
 
                 const movieIds = [
                     ...new Set(
-                        bookings
-                            .map((booking) =>
-                                booking.movie?.movieId
+                        sortedBookings
+                            .map(getBookingMovieId)
+                            .filter(
+                                (id) =>
+                                    id !== null &&
+                                    id !== undefined &&
+                                    id !== ""
                             )
-                            .filter((id) => id !== null && id !== undefined)
                             .map(String)
                     )
                 ];
 
+                //================================================
+                // Tải thông tin bổ sung của các phim
+                //================================================
+
                 const movieResults = await Promise.all(
                     movieIds.map(async (movieId) => {
                         try {
-                            const movie = await getMovieById(movieId);
+                            const movie = await getMovieById(
+                                movieId
+                            );
 
-                            return [String(movieId), movie];
+                            return [
+                                String(movieId),
+                                movie || null
+                            ];
                         } catch (error) {
                             console.error(
                                 `Không thể tải thông tin phim ${movieId}:`,
                                 error
                             );
 
-                            return [String(movieId), null];
+                            return [
+                                String(movieId),
+                                null
+                            ];
                         }
                     })
                 );
 
                 const movieMap = new Map(movieResults);
 
-                const mappedTickets = bookings
-                    .map((booking) => {
-                        const movieId =
-                            booking.movie?.movieId ??
-                            booking.movieId;
+                //================================================
+                // Chuyển booking thành ticket
+                //================================================
 
-                        const movieDetail = movieMap.get(
-                            String(movieId)
+                const mappedTickets = sortedBookings.map(
+                    (booking) => {
+                        const movieId = getBookingMovieId(
+                            booking
                         );
+
+                        const movieDetail = movieId !== null
+                            ? movieMap.get(String(movieId))
+                            : null;
 
                         return mapBookingToTicket(
                             booking,
                             movieDetail
                         );
-                    })
-                    .sort((a, b) => {
-                        const bookingA = bookings.find(
-                            (item) =>
-                                String(item.bookingId) ===
-                                String(a.ticketId)
-                        );
-
-                        const bookingB = bookings.find(
-                            (item) =>
-                                String(item.bookingId) ===
-                                String(b.ticketId)
-                        );
-
-                        return (
-                            new Date(
-                                bookingB?.bookingDate || 0
-                            ).getTime() -
-                            new Date(
-                                bookingA?.bookingDate || 0
-                            ).getTime()
-                        );
-                    });
+                    }
+                );
 
                 if (isMounted) {
                     setTickets(mappedTickets);
+                    setCurrentPage(1);
                 }
+
             } catch (error) {
                 console.error(
                     "Không thể tải lịch sử đặt vé:",
@@ -297,11 +345,14 @@ function TicketHistory() {
                 );
 
                 if (isMounted) {
+                    setTickets([]);
+
                     setErrorMessage(
                         error.message ||
                         "Không thể tải lịch sử đặt vé."
                     );
                 }
+
             } finally {
                 if (isMounted) {
                     setIsLoading(false);
@@ -463,21 +514,13 @@ function TicketHistory() {
                 ) : (
 
                     <div className="ticket-history-empty">
-
                         <Film size={42} />
 
-                        <h3>
-                            {tickets.length === 0
-                                ? "Bạn chưa có lịch sử đặt vé"
-                                : "Không tìm thấy vé nào"}
-                        </h3>
+                        <h3>Chưa có vé nào</h3>
 
                         <p>
-                            {tickets.length === 0
-                                ? "Các vé bạn đặt thành công sẽ xuất hiện tại đây."
-                                : "Không tìm thấy vé trong danh mục bạn đang chọn."}
+                            Không tìm thấy vé phù hợp với bộ lọc hiện tại.
                         </p>
-
                     </div>
 
                 )}
@@ -486,13 +529,15 @@ function TicketHistory() {
 
             {/* Pagination */}
 
-            {!isLoading && !errorMessage && totalPages > 1 && (
-                <TicketPagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                />
-            )}
+            {!isLoading &&
+                !errorMessage &&
+                totalPages > 1 && (
+                    <TicketPagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                )}
 
         </section>
     );

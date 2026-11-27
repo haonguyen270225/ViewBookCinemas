@@ -1,4 +1,3 @@
-
 import promotionsData from "../data/promotions.js";
 
 const STORAGE_KEY = "viewbook-admin-promotions";
@@ -18,7 +17,10 @@ const savePromotions = (promotions) => {
         );
     } catch (error) {
         console.error("Không thể lưu khuyến mãi:", error);
-        throw new Error("Không thể lưu dữ liệu khuyến mãi.");
+
+        throw new Error(
+            "Không thể lưu dữ liệu khuyến mãi."
+        );
     }
 };
 
@@ -86,15 +88,21 @@ const normalizePromotionCode = (code) => {
 };
 
 //====================================================
-// Chuẩn hóa dữ liệu
+// Chuẩn hóa dữ liệu đầu vào
 //====================================================
 
 const normalizePromotion = (data) => ({
-    promotionCode: normalizePromotionCode(data.promotionCode),
+    promotionCode: normalizePromotionCode(
+        data.promotionCode
+    ),
 
-    promotionName: String(data.promotionName || "").trim(),
+    promotionName: String(
+        data.promotionName || ""
+    ).trim(),
 
-    description: String(data.description || "").trim(),
+    description: String(
+        data.description || ""
+    ).trim(),
 
     discountType: data.discountType,
 
@@ -134,7 +142,9 @@ const validatePromotion = (
     currentId = null
 ) => {
     if (!data || typeof data !== "object") {
-        throw new Error("Thông tin khuyến mãi không hợp lệ.");
+        throw new Error(
+            "Thông tin khuyến mãi không hợp lệ."
+        );
     }
 
     const normalized = normalizePromotion(data);
@@ -154,7 +164,9 @@ const validatePromotion = (
     } = normalized;
 
     if (!promotionCode) {
-        throw new Error("Vui lòng nhập mã khuyến mãi.");
+        throw new Error(
+            "Vui lòng nhập mã khuyến mãi."
+        );
     }
 
     if (!/^[A-Z0-9_-]{4,20}$/.test(promotionCode)) {
@@ -164,7 +176,9 @@ const validatePromotion = (
     }
 
     if (!promotionName) {
-        throw new Error("Vui lòng nhập tên chương trình.");
+        throw new Error(
+            "Vui lòng nhập tên chương trình."
+        );
     }
 
     if (promotionName.length > 100) {
@@ -175,21 +189,28 @@ const validatePromotion = (
 
     const duplicatedCode = promotions.some(
         (promotion) =>
-            normalizePromotionCode(promotion.promotionCode) ===
-                promotionCode &&
+            normalizePromotionCode(
+                promotion.promotionCode
+            ) === promotionCode &&
             String(promotion.promotionId) !== String(currentId)
     );
 
     if (duplicatedCode) {
-        throw new Error("Mã khuyến mãi đã tồn tại.");
+        throw new Error(
+            "Mã khuyến mãi đã tồn tại."
+        );
     }
 
     if (!description) {
-        throw new Error("Vui lòng nhập mô tả chương trình.");
+        throw new Error(
+            "Vui lòng nhập mô tả chương trình."
+        );
     }
 
     if (!DISCOUNT_TYPE_OPTIONS.includes(discountType)) {
-        throw new Error("Loại giảm giá không hợp lệ.");
+        throw new Error(
+            "Loại giảm giá không hợp lệ."
+        );
     }
 
     if (
@@ -252,11 +273,15 @@ const validatePromotion = (
     }
 
     if (!isValidDate(startDate)) {
-        throw new Error("Ngày bắt đầu không hợp lệ.");
+        throw new Error(
+            "Ngày bắt đầu không hợp lệ."
+        );
     }
 
     if (!isValidDate(endDate)) {
-        throw new Error("Ngày kết thúc không hợp lệ.");
+        throw new Error(
+            "Ngày kết thúc không hợp lệ."
+        );
     }
 
     if (
@@ -282,7 +307,9 @@ const validatePromotion = (
     }
 
     if (!PROMOTION_STATUS_OPTIONS.includes(status)) {
-        throw new Error("Trạng thái khuyến mãi không hợp lệ.");
+        throw new Error(
+            "Trạng thái khuyến mãi không hợp lệ."
+        );
     }
 
     return normalized;
@@ -292,40 +319,72 @@ const validatePromotion = (
 // Chuẩn hóa bản ghi khuyến mãi khi đọc
 //====================================================
 
-const normalizeStoredPromotion = (promotion) => ({
-    ...promotion,
+const normalizeStoredPromotion = (promotion) => {
+    const rawUsedCount = Number(promotion.usedCount);
 
-    usedCount: Number(promotion.usedCount) || 0,
+    const usedCount =
+        Number.isSafeInteger(rawUsedCount) &&
+        rawUsedCount >= 0
+            ? rawUsedCount
+            : 0;
 
-    usedBookingCodes: Array.isArray(
+    const usedBookingCodes = Array.isArray(
         promotion.usedBookingCodes
     )
-        ? promotion.usedBookingCodes
-        : [],
+        ? [
+            ...new Set(
+                promotion.usedBookingCodes
+                    .filter(Boolean)
+                    .map(String)
+            )
+        ]
+        : [];
 
-    status: promotion.status || "Active",
+    const rawUsageLimit = promotion.usageLimit;
 
-    startDate: promotion.startDate || null,
-
-    endDate: promotion.endDate || null,
-
-    usageLimit:
-        promotion.usageLimit === "" ||
-        promotion.usageLimit === undefined
+    const usageLimit =
+        rawUsageLimit === "" ||
+        rawUsageLimit === undefined ||
+        rawUsageLimit === null
             ? null
-            : promotion.usageLimit
-});
+            : Number(rawUsageLimit);
+
+    return {
+        ...promotion,
+
+        usedCount,
+
+        usedBookingCodes,
+
+        status: promotion.status || "Active",
+
+        startDate: promotion.startDate || null,
+
+        endDate: promotion.endDate || null,
+
+        usageLimit:
+            usageLimit === null ||
+            !Number.isSafeInteger(usageLimit) ||
+            usageLimit <= 0
+                ? null
+                : usageLimit
+    };
+};
 
 //====================================================
 // Khởi tạo dữ liệu
 //====================================================
 
 const initializePromotions = () => {
-    const savedPromotions = localStorage.getItem(STORAGE_KEY);
+    const savedPromotions = localStorage.getItem(
+        STORAGE_KEY
+    );
 
     if (savedPromotions !== null) {
         try {
-            const parsedPromotions = JSON.parse(savedPromotions);
+            const parsedPromotions = JSON.parse(
+                savedPromotions
+            );
 
             if (!Array.isArray(parsedPromotions)) {
                 throw new Error(
@@ -336,6 +395,7 @@ const initializePromotions = () => {
             return parsedPromotions.map(
                 normalizeStoredPromotion
             );
+
         } catch (error) {
             console.error(
                 "Không thể đọc dữ liệu khuyến mãi:",
@@ -349,7 +409,7 @@ const initializePromotions = () => {
     }
 
     const initialPromotions = promotionsData.map(
-        (promotion) => normalizeStoredPromotion(promotion)
+        normalizeStoredPromotion
     );
 
     savePromotions(initialPromotions);
@@ -441,7 +501,10 @@ export const createPromotion = async (promotionData) => {
         createdAt: new Date().toISOString()
     };
 
-    savePromotions([...promotions, newPromotion]);
+    savePromotions([
+        ...promotions,
+        newPromotion
+    ]);
 
     return newPromotion;
 };
@@ -450,7 +513,10 @@ export const createPromotion = async (promotionData) => {
 // Cập nhật khuyến mãi
 //====================================================
 
-export const updatePromotion = async (id, promotionData) => {
+export const updatePromotion = async (
+    id,
+    promotionData
+) => {
     const promotions = await getPromotions();
 
     const existingPromotion = promotions.find(
@@ -500,10 +566,11 @@ export const updatePromotion = async (id, promotionData) => {
         updatedAt: new Date().toISOString()
     };
 
-    const updatedPromotions = promotions.map((promotion) =>
-        String(promotion.promotionId) === String(id)
-            ? updatedPromotion
-            : promotion
+    const updatedPromotions = promotions.map(
+        (promotion) =>
+            String(promotion.promotionId) === String(id)
+                ? updatedPromotion
+                : promotion
     );
 
     savePromotions(updatedPromotions);
@@ -515,9 +582,14 @@ export const updatePromotion = async (id, promotionData) => {
 // Cập nhật trạng thái
 //====================================================
 
-export const updatePromotionStatus = async (id, status) => {
+export const updatePromotionStatus = async (
+    id,
+    status
+) => {
     if (!PROMOTION_STATUS_OPTIONS.includes(status)) {
-        throw new Error("Trạng thái khuyến mãi không hợp lệ.");
+        throw new Error(
+            "Trạng thái khuyến mãi không hợp lệ."
+        );
     }
 
     const promotions = await getPromotions();
@@ -528,7 +600,9 @@ export const updatePromotionStatus = async (id, status) => {
     );
 
     if (!existingPromotion) {
-        throw new Error("Không tìm thấy khuyến mãi.");
+        throw new Error(
+            "Không tìm thấy khuyến mãi."
+        );
     }
 
     const updatedPromotion = {
@@ -539,10 +613,11 @@ export const updatePromotionStatus = async (id, status) => {
         updatedAt: new Date().toISOString()
     };
 
-    const updatedPromotions = promotions.map((promotion) =>
-        String(promotion.promotionId) === String(id)
-            ? updatedPromotion
-            : promotion
+    const updatedPromotions = promotions.map(
+        (promotion) =>
+            String(promotion.promotionId) === String(id)
+                ? updatedPromotion
+                : promotion
     );
 
     savePromotions(updatedPromotions);
@@ -565,6 +640,30 @@ export const deletePromotion = async (id) => {
     if (!existingPromotion) {
         throw new Error(
             "Không tìm thấy khuyến mãi cần xóa."
+        );
+    }
+
+    const usedCount =
+        Number(existingPromotion.usedCount) || 0;
+
+    const usedBookingCodes = Array.isArray(
+        existingPromotion.usedBookingCodes
+    )
+        ? existingPromotion.usedBookingCodes
+        : [];
+
+    // Không xóa promotion đã được booking sử dụng.
+    // Việc giữ lại bản ghi giúp booking cũ vẫn tham chiếu
+    // được đến promotion khi cần kiểm tra hoặc hoàn lượt.
+    if (
+        usedCount > 0 ||
+        usedBookingCodes.length > 0
+    ) {
+        throw new Error(
+            `Không thể xóa khuyến mãi "${existingPromotion.promotionCode}" vì đã có ${Math.max(
+                usedCount,
+                usedBookingCodes.length
+            )} lượt sử dụng. Bạn có thể chuyển trạng thái sang Ngừng hoạt động thay vì xóa.`
         );
     }
 
@@ -592,7 +691,9 @@ export const calculatePromotionDiscount = (
         !Number.isSafeInteger(amount) ||
         amount < 0
     ) {
-        throw new Error("Giá trị đơn hàng không hợp lệ.");
+        throw new Error(
+            "Giá trị đơn hàng không hợp lệ."
+        );
     }
 
     if (!promotion) {
@@ -636,10 +737,14 @@ export const calculatePromotionDiscount = (
                 );
             }
         }
+
     } else if (promotion.discountType === "Fixed") {
         discountAmount = discountValue;
+
     } else {
-        throw new Error("Loại giảm giá không hợp lệ.");
+        throw new Error(
+            "Loại giảm giá không hợp lệ."
+        );
     }
 
     return Math.min(amount, discountAmount);
@@ -653,12 +758,16 @@ export const validatePromotionCode = async (
     code,
     orderAmount
 ) => {
-    const normalizedCode = normalizePromotionCode(code);
+    const normalizedCode = normalizePromotionCode(
+        code
+    );
 
     const amount = Number(orderAmount);
 
     if (!normalizedCode) {
-        throw new Error("Vui lòng nhập mã khuyến mãi.");
+        throw new Error(
+            "Vui lòng nhập mã khuyến mãi."
+        );
     }
 
     if (
@@ -674,12 +783,15 @@ export const validatePromotionCode = async (
 
     const promotion = promotions.find(
         (item) =>
-            normalizePromotionCode(item.promotionCode) ===
-            normalizedCode
+            normalizePromotionCode(
+                item.promotionCode
+            ) === normalizedCode
     );
 
     if (!promotion) {
-        throw new Error("Mã khuyến mãi không tồn tại.");
+        throw new Error(
+            "Mã khuyến mãi không tồn tại."
+        );
     }
 
     if (promotion.status !== "Active") {
@@ -708,7 +820,9 @@ export const validatePromotionCode = async (
         amount < Number(promotion.minOrderValue || 0)
     ) {
         throw new Error(
-            `Đơn hàng phải có giá trị tối thiểu ${new Intl.NumberFormat("vi-VN").format(
+            `Đơn hàng phải có giá trị tối thiểu ${new Intl.NumberFormat(
+                "vi-VN"
+            ).format(
                 promotion.minOrderValue
             )}đ để sử dụng mã này.`
         );
@@ -748,7 +862,9 @@ export const increasePromotionUsage = async (
     );
 
     if (!existingPromotion) {
-        throw new Error("Không tìm thấy khuyến mãi.");
+        throw new Error(
+            "Không tìm thấy khuyến mãi."
+        );
     }
 
     const usedBookingCodes = Array.isArray(
@@ -808,10 +924,11 @@ export const increasePromotionUsage = async (
         updatedAt: new Date().toISOString()
     };
 
-    const updatedPromotions = promotions.map((promotion) =>
-        String(promotion.promotionId) === String(id)
-            ? updatedPromotion
-            : promotion
+    const updatedPromotions = promotions.map(
+        (promotion) =>
+            String(promotion.promotionId) === String(id)
+                ? updatedPromotion
+                : promotion
     );
 
     savePromotions(updatedPromotions);
@@ -852,7 +969,9 @@ export const decreasePromotionUsage = async (
         ? existingPromotion.usedBookingCodes
         : [];
 
-    const normalizedBookingCode = String(bookingCode);
+    const normalizedBookingCode = String(
+        bookingCode
+    );
 
     // Chưa ghi nhận hoặc đã hoàn trước đó thì không trừ tiếp.
     if (
@@ -870,16 +989,18 @@ export const decreasePromotionUsage = async (
         ),
 
         usedBookingCodes: usedBookingCodes.filter(
-            (code) => code !== normalizedBookingCode
+            (code) =>
+                code !== normalizedBookingCode
         ),
 
         updatedAt: new Date().toISOString()
     };
 
-    const updatedPromotions = promotions.map((promotion) =>
-        String(promotion.promotionId) === String(id)
-            ? updatedPromotion
-            : promotion
+    const updatedPromotions = promotions.map(
+        (promotion) =>
+            String(promotion.promotionId) === String(id)
+                ? updatedPromotion
+                : promotion
     );
 
     savePromotions(updatedPromotions);
@@ -898,11 +1019,13 @@ export const getPromotionStatistics = async () => {
         total: promotions.length,
 
         active: promotions.filter(
-            (promotion) => promotion.status === "Active"
+            (promotion) =>
+                promotion.status === "Active"
         ).length,
 
         inactive: promotions.filter(
-            (promotion) => promotion.status === "Inactive"
+            (promotion) =>
+                promotion.status === "Inactive"
         ).length,
 
         totalUsed: promotions.reduce(
