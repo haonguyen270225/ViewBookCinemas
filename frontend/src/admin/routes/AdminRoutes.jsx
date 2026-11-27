@@ -17,6 +17,7 @@ import AdminProducts from "../pages/products/AdminProducts.jsx";
 import AdminCombos from "../pages/combos/AdminCombos.jsx";
 import AdminCustomers from "../pages/customers/AdminCustomers.jsx";
 import AdminPromotions from "../pages/promotions/AdminPromotions.jsx";
+import AdminCategories from "../pages/categories/AdminCategories.jsx";
 
 
 function AdminRoutes() {
@@ -36,13 +37,8 @@ function AdminRoutes() {
           <Route path="tickets" element={<AdminTickets />} />
           <Route path="payments" element={<AdminPayments />} />
           <Route path="customers" element={<AdminCustomers />} />
-
           <Route path="products" element={<AdminProducts />} />
-
-          <Route
-            path="categories"
-            element={<AdminComingSoon title="Quản lý danh mục" />}
-          />
+          <Route path="categories" element={<AdminCategories />} />
           <Route path="combos" element={<AdminCombos />} />
           <Route path="promotions" element={<AdminPromotions />} />
           <Route

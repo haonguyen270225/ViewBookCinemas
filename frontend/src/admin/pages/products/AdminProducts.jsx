@@ -8,7 +8,10 @@ import {
     updateProductStatus
 } from "../../../services/productService.js";
 
-import { productCategories } from "../../../data/productCategories.js";
+import {
+    getCategories,
+    getActiveCategories
+} from "../../../services/productCategoryService.js";
 
 import "./AdminProducts.css";
 
@@ -32,8 +35,9 @@ const formatCurrency = (value) => {
     }).format(Number(value) || 0);
 };
 
-const getCategoryName = (categoryId) => {
-    const category = productCategories.find(
+// Lấy tên danh mục từ danh sách danh mục hiện tại
+const getCategoryName = (categoryId, categories = []) => {
+    const category = categories.find(
         (item) => Number(item.categoryId) === Number(categoryId)
     );
 
@@ -44,6 +48,8 @@ const getCategoryName = (categoryId) => {
 
 function AdminProducts() {
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -71,10 +77,15 @@ function AdminProducts() {
         setErrorMessage("");
 
         try {
-            const data = await getProducts();
-            setProducts(data);
+            const [productData, categoryData] = await Promise.all([
+                getProducts(),
+                Promise.resolve(getCategories())
+            ]);
+
+            setProducts(productData);
+            setCategories(categoryData);
         } catch (error) {
-            console.error("Không thể tải sản phẩm:", error);
+            console.error("Không thể tải dữ liệu sản phẩm:", error);
 
             setErrorMessage(
                 error.message || "Không thể tải danh sách sản phẩm."
@@ -116,8 +127,12 @@ function AdminProducts() {
         return products.filter((product) => {
             const matchesSearch =
                 !keyword ||
-                product.productName?.toLocaleLowerCase("vi").includes(keyword) ||
-                product.description?.toLocaleLowerCase("vi").includes(keyword);
+                product.productName
+                    ?.toLocaleLowerCase("vi")
+                    .includes(keyword) ||
+                product.description
+                    ?.toLocaleLowerCase("vi")
+                    .includes(keyword);
 
             const matchesCategory =
                 selectedCategory === "Tất cả" ||
@@ -134,11 +149,15 @@ function AdminProducts() {
     //=================== Mở form thêm ========================
 
     const handleOpenCreate = () => {
+        const activeCategories = getActiveCategories();
+
         setEditingProduct(null);
 
         setFormData({
             ...EMPTY_FORM,
-            categoryId: String(productCategories[0]?.categoryId || "")
+            categoryId: String(
+                activeCategories[0]?.categoryId || ""
+            )
         });
 
         setIsModalOpen(true);
@@ -518,12 +537,15 @@ function AdminProducts() {
                         >
                             <option value="Tất cả">Tất cả danh mục</option>
 
-                            {productCategories.map((category) => (
+                            {categories.map((category) => (
                                 <option
                                     key={category.categoryId}
                                     value={String(category.categoryId)}
                                 >
                                     {category.categoryName}
+                                    {!category.status
+                                        ? " (Ngừng sử dụng)"
+                                        : ""}
                                 </option>
                             ))}
                         </select>
@@ -623,7 +645,10 @@ function AdminProducts() {
 
                                         <td>
                                             <span className="admin-product-category">
-                                                {getCategoryName(product.categoryId)}
+                                                {getCategoryName(
+                                                    product.categoryId,
+                                                    categories
+                                                )}
                                             </span>
                                         </td>
 
@@ -813,14 +838,22 @@ function AdminProducts() {
                                             Chọn danh mục
                                         </option>
 
-                                        {productCategories
-                                            .filter((category) => category.status)
+                                        {categories
+                                            .filter(
+                                                (category) =>
+                                                    category.status ||
+                                                    String(category.categoryId) ===
+                                                    String(formData.categoryId)
+                                            )
                                             .map((category) => (
                                                 <option
                                                     key={category.categoryId}
                                                     value={category.categoryId}
                                                 >
                                                     {category.categoryName}
+                                                    {!category.status
+                                                        ? " (Ngừng sử dụng)"
+                                                        : ""}
                                                 </option>
                                             ))}
                                     </select>
@@ -1082,7 +1115,8 @@ function AdminProducts() {
                                         <span>Danh mục</span>
                                         <strong>
                                             {getCategoryName(
-                                                detailProduct.categoryId
+                                                detailProduct.categoryId,
+                                                categories
                                             )}
                                         </strong>
                                     </div>

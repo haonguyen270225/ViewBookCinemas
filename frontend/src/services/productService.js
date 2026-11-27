@@ -1,6 +1,6 @@
 
 import productsData from "../data/products.js";
-import { productCategories } from "../data/productCategories.js";
+import { getCategoryById } from "./productCategoryService.js";
 
 const STORAGE_KEY = "viewbook-admin-products";
 
@@ -20,12 +20,12 @@ const saveProducts = (products) => {
 //=================== Kiểm tra danh mục ========================
 
 const validateCategory = (categoryId) => {
-    const category = productCategories.find(
-        (item) => Number(item.categoryId) === Number(categoryId)
-    );
+    const category = getCategoryById(categoryId);
 
     if (!category || !category.status) {
-        throw new Error("Danh mục không tồn tại hoặc đang ngừng hoạt động.");
+        throw new Error(
+            "Danh mục không tồn tại hoặc đang ngừng hoạt động."
+        );
     }
 
     return category;
