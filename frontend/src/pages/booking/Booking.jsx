@@ -27,6 +27,10 @@ import {
     getBookedSeatIdsByShowtimeId
 } from "../../services/bookingService.js";
 
+import {
+    validatePromotionCode
+} from "../../services/promotionService.js";
+
 import "./Booking.css";
 
 //=================== Trang Đặt vé ========================
@@ -59,6 +63,13 @@ function Booking() {
     const [isSavingBooking, setIsSavingBooking] = useState(false);
 
     const [bookingSaveError, setBookingSaveError] = useState("");
+
+    //=================== Trạng thái khuyến mãi ========================
+
+    const [promotionCode, setPromotionCode] = useState("");
+    const [appliedPromotion, setAppliedPromotion] = useState(null);
+    const [promotionError, setPromotionError] = useState("");
+    const [isApplyingPromotion, setIsApplyingPromotion] = useState(false);
 
     //=================== Dữ liệu đặt vé ========================
 
@@ -106,8 +117,6 @@ function Booking() {
             setBookedSeatIds([]);
 
             try {
-                // 1. Lấy thông tin suất chiếu
-
                 const selectedShowtime = await getShowtimeById(id);
 
                 if (!selectedShowtime) {
@@ -119,8 +128,6 @@ function Booking() {
                         "Suất chiếu này hiện không khả dụng để đặt vé."
                     );
                 }
-
-                // 2. Lấy thông tin phim, rạp và phòng
 
                 const [
                     selectedMovie,
@@ -164,8 +171,6 @@ function Booking() {
                     );
                 }
 
-                // 3. Tải ghế, ghế đã đặt, Combo và sản phẩm đang kinh doanh
-
                 const [
                     seatsData,
                     bookedIds,
@@ -180,8 +185,6 @@ function Booking() {
 
                 if (!isMounted) return;
 
-                // 4. Chỉ lấy ghế đang hoạt động
-
                 const activeSeats = seatsData
                     .filter((seat) => seat.status === "Active")
                     .sort((a, b) => {
@@ -191,8 +194,6 @@ function Booking() {
 
                         return a.seatNumber - b.seatNumber;
                     });
-
-                // 5. Lưu dữ liệu đặt vé
 
                 setBookingData({
                     showtime: selectedShowtime,
@@ -219,10 +220,7 @@ function Booking() {
                         : []
                 );
             } catch (error) {
-                console.error(
-                    "Không thể tải dữ liệu đặt vé:",
-                    error
-                );
+                console.error("Không thể tải dữ liệu đặt vé:", error);
 
                 if (isMounted) {
                     setBookingError(
@@ -262,6 +260,11 @@ function Booking() {
         setIsSavingBooking(false);
 
         setBookingSaveError("");
+
+        setPromotionCode("");
+        setAppliedPromotion(null);
+        setPromotionError("");
+        setIsApplyingPromotion(false);
     }, [id]);
 
     //=================== Lấy danh sách ghế không khả dụng ========================
@@ -312,8 +315,7 @@ function Booking() {
 
     const handleChangeProductQuantity = (productId, change) => {
         const product = activeProducts.find(
-            (item) =>
-                String(item.productId) === String(productId)
+            (item) => String(item.productId) === String(productId)
         );
 
         if (!product || product.status !== "Active") {
@@ -330,15 +332,11 @@ function Booking() {
         }
 
         setSelectedProductQuantities((current) => {
-            const currentQuantity =
-                Number(current[productId]) || 0;
+            const currentQuantity = Number(current[productId]) || 0;
 
             const nextQuantity = Math.max(
                 0,
-                Math.min(
-                    stockQuantity,
-                    currentQuantity + change
-                )
+                Math.min(stockQuantity, currentQuantity + change)
             );
 
             return {
@@ -435,6 +433,95 @@ function Booking() {
 
     const totalPrice = seatTotal + productTotal + comboTotal;
 
+    const discountAmount = appliedPromotion?.discountAmount || 0;
+
+    const payableTotal = Math.max(0, totalPrice - discountAmount);
+
+    //=================== Áp dụng mã khuyến mãi ========================
+
+    const handleApplyPromotion = async () => {
+        const normalizedCode = promotionCode.trim().toUpperCase();
+
+        if (!normalizedCode) {
+            setPromotionError("Vui lòng nhập mã khuyến mãi.");
+            setAppliedPromotion(null);
+            return;
+        }
+
+        if (totalPrice <= 0) {
+            setPromotionError(
+                "Vui lòng chọn ghế hoặc sản phẩm trước khi áp dụng mã."
+            );
+            return;
+        }
+
+        setIsApplyingPromotion(true);
+        setPromotionError("");
+
+        try {
+            const result = await validatePromotionCode(
+                normalizedCode,
+                totalPrice
+            );
+
+            setAppliedPromotion(result);
+            setPromotionCode(result.promotion.promotionCode);
+            setPromotionError("");
+        } catch (error) {
+            setAppliedPromotion(null);
+            setPromotionError(
+                error.message || "Không thể áp dụng mã khuyến mãi."
+            );
+        } finally {
+            setIsApplyingPromotion(false);
+        }
+    };
+
+    //=================== Gỡ mã khuyến mãi ========================
+
+    const handleRemovePromotion = () => {
+        setAppliedPromotion(null);
+        setPromotionCode("");
+        setPromotionError("");
+    };
+
+    //=================== Kiểm tra lại mã khi tổng tiền thay đổi ========================
+
+    useEffect(() => {
+        if (!appliedPromotion) return;
+
+        let isMounted = true;
+
+        const revalidatePromotion = async () => {
+            try {
+                const result = await validatePromotionCode(
+                    appliedPromotion.promotion.promotionCode,
+                    totalPrice
+                );
+
+                if (isMounted) {
+                    setAppliedPromotion(result);
+                    setPromotionError("");
+                }
+            } catch (error) {
+                if (isMounted) {
+                    setAppliedPromotion(null);
+                    setPromotionCode("");
+                    setPromotionError(
+                        error.message ||
+                        "Mã khuyến mãi không còn đủ điều kiện áp dụng."
+                    );
+                }
+            }
+        };
+
+        revalidatePromotion();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [totalPrice]);
+
     //=================== Kiểm tra tồn kho mới nhất ========================
 
     const validateLatestProductStock = async () => {
@@ -452,8 +539,7 @@ function Booking() {
             }
 
             const product = latestProducts.find(
-                (item) =>
-                    String(item.productId) === String(productId)
+                (item) => String(item.productId) === String(productId)
             );
 
             if (!product || product.status !== "Active") {
@@ -542,21 +628,14 @@ function Booking() {
         setBookingSaveError("");
 
         try {
-            // 1. Kiểm tra tồn kho mới nhất trước khi tạo đơn
-
             await validateLatestProductStock();
-
-            // 2. Tạo đơn đặt vé và lưu thông tin vào Booking Service
 
             const booking = await createBooking({
                 showtimeId: showtime.id,
-
                 seatIds: selectedSeatIds,
-
                 selectedProductQuantities,
-
                 selectedComboQuantities,
-
+                promotionCode: appliedPromotion?.promotion?.promotionCode || null,
                 paymentResult: result
             });
 
@@ -566,17 +645,10 @@ function Booking() {
                 );
             }
 
-            // 3. Cập nhật giao diện sau khi lưu thành công
-
             setSavedBooking(booking);
-
             setPaymentResult(result);
-
             setIsPaymentCompleted(true);
-
             setActiveStep(4);
-
-            // 4. Cập nhật ghế đã đặt trong trạng thái hiện tại
 
             const updatedBookedSeatIds =
                 await getBookedSeatIdsByShowtimeId(showtime.id);
@@ -587,12 +659,7 @@ function Booking() {
                     : []
             );
         } catch (error) {
-            console.error(
-                "Không thể tạo đơn đặt vé:",
-                error
-            );
-
-            // Nếu tồn kho thay đổi, đưa khách về bước chọn sản phẩm
+            console.error("Không thể tạo đơn đặt vé:", error);
 
             if (
                 error.message?.toLowerCase().includes("sản phẩm") ||
@@ -621,9 +688,7 @@ function Booking() {
                 <main className="booking-error">
                     <div className="container">
                         <i className="bi bi-hourglass-split"></i>
-
                         <h2>Đang tải thông tin đặt vé...</h2>
-
                         <p>Vui lòng chờ trong giây lát.</p>
                     </div>
                 </main>
@@ -643,7 +708,6 @@ function Booking() {
                 <main className="booking-error">
                     <div className="container">
                         <i className="bi bi-exclamation-circle"></i>
-
                         <h2>Không thể tiếp tục đặt vé</h2>
 
                         <p>
@@ -672,7 +736,6 @@ function Booking() {
                 <main className="booking-error">
                     <div className="container">
                         <i className="bi bi-exclamation-circle"></i>
-
                         <h2>Không có ghế khả dụng</h2>
 
                         <p>
@@ -701,7 +764,6 @@ function Booking() {
                 <section className="booking-hero">
                     <div className="container">
                         <span>VIEWBOOKCINEMAS</span>
-
                         <h1>ĐẶT VÉ XEM PHIM</h1>
 
                         <p>
@@ -723,9 +785,7 @@ function Booking() {
 
                     <div
                         className={`booking-layout ${
-                            activeStep >= 3
-                                ? "booking-layout-full"
-                                : ""
+                            activeStep >= 3 ? "booking-layout-full" : ""
                         }`}
                     >
                         <div className="booking-main-area">
@@ -798,13 +858,23 @@ function Booking() {
                                                 className="spinner-border spinner-border-sm me-2"
                                                 aria-hidden="true"
                                             ></span>
-
                                             Đang lưu đơn đặt vé. Vui lòng chờ...
                                         </div>
                                     )}
 
                                     <PaymentSelection
-                                        totalPrice={totalPrice}
+                                        totalPrice={payableTotal}
+                                        originalPrice={totalPrice}
+                                        discountAmount={discountAmount}
+                                        promotionCode={
+                                            appliedPromotion?.promotion?.promotionCode || ""
+                                        }
+                                        promotionError={promotionError}
+                                        isApplyingPromotion={isApplyingPromotion}
+                                        isSavingBooking={isSavingBooking}
+                                        onPromotionCodeChange={setPromotionCode}
+                                        onApplyPromotion={handleApplyPromotion}
+                                        onRemovePromotion={handleRemovePromotion}
                                         selectedMethod={selectedPaymentMethod}
                                         onChangeMethod={setSelectedPaymentMethod}
                                         onBack={handleBackToProducts}
@@ -839,6 +909,22 @@ function Booking() {
                                                         : "Thẻ ngân hàng (Card)"}
                                                 </strong>
                                             </p>
+
+                                            {savedBooking.discountAmount > 0 && (
+                                                <p>
+                                                    Mã khuyến mãi:{" "}
+                                                    <strong>
+                                                        {savedBooking.promotion?.promotionCode}
+                                                    </strong>
+                                                    {" — Giảm "}
+                                                    <strong>
+                                                        {new Intl.NumberFormat("vi-VN").format(
+                                                            savedBooking.discountAmount
+                                                        )}
+                                                        đ
+                                                    </strong>
+                                                </p>
+                                            )}
 
                                             <h3>
                                                 {new Intl.NumberFormat("vi-VN").format(

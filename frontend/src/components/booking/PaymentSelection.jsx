@@ -7,6 +7,15 @@ import "./PaymentSelection.css";
 
 function PaymentSelection({
     totalPrice,
+    originalPrice = totalPrice,
+    discountAmount = 0,
+    promotionCode = "",
+    promotionError = "",
+    isApplyingPromotion = false,
+    isSavingBooking = false,
+    onPromotionCodeChange,
+    onApplyPromotion,
+    onRemovePromotion,
     selectedMethod,
     onChangeMethod,
     onBack,
@@ -15,30 +24,44 @@ function PaymentSelection({
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
     const formatPrice = (price) => {
-        return new Intl.NumberFormat("vi-VN").format(price) + "đ";
+        return new Intl.NumberFormat("vi-VN").format(
+            Number(price) || 0
+        ) + "đ";
     };
 
-    // Mở cửa sổ thanh toán theo phương thức đã chọn
     const handleOpenPayment = () => {
+        if (isSavingBooking || totalPrice <= 0) {
+            return;
+        }
+
         setIsPaymentModalOpen(true);
     };
 
-    // Chỉ gửi kết quả lên Booking khi thanh toán mô phỏng thành công
     const handlePaymentSuccess = (result) => {
         setIsPaymentModalOpen(false);
         onConfirm(result);
     };
 
-    // Đóng cửa sổ hoặc quay lại bước thanh toán
     const handleClosePayment = () => {
         setIsPaymentModalOpen(false);
     };
+
+    const handlePromotionInputChange = (event) => {
+        onPromotionCodeChange?.(
+            event.target.value.toUpperCase()
+        );
+    };
+
+    const hasAppliedPromotion =
+        Boolean(promotionCode) && Number(discountAmount) > 0;
 
     return (
         <>
             <section className="payment-section">
                 <div className="payment-heading">
-                    <span className="payment-eyebrow">VIEWBOOKCINEMAS</span>
+                    <span className="payment-eyebrow">
+                        VIEWBOOKCINEMAS
+                    </span>
 
                     <h2>Thanh toán đơn hàng</h2>
 
@@ -54,12 +77,17 @@ function PaymentSelection({
                             selectedMethod === "momo" ? "active" : ""
                         }`}
                         onClick={() => onChangeMethod("momo")}
+                        disabled={isSavingBooking}
                     >
-                        <span className="payment-method-icon momo-icon">M</span>
+                        <span className="payment-method-icon momo-icon">
+                            M
+                        </span>
 
                         <span className="payment-method-info">
                             <strong>Ví điện tử MoMo</strong>
-                            <small>Thanh toán mô phỏng bằng ví MoMo</small>
+                            <small>
+                                Thanh toán mô phỏng bằng ví MoMo
+                            </small>
                         </span>
 
                         <span className="payment-radio">
@@ -75,6 +103,7 @@ function PaymentSelection({
                             selectedMethod === "card" ? "active" : ""
                         }`}
                         onClick={() => onChangeMethod("card")}
+                        disabled={isSavingBooking}
                     >
                         <span className="payment-method-icon card-icon">
                             <i className="bi bi-credit-card-2-front-fill"></i>
@@ -82,7 +111,9 @@ function PaymentSelection({
 
                         <span className="payment-method-info">
                             <strong>Thẻ ngân hàng (Card)</strong>
-                            <small>Thanh toán mô phỏng bằng thẻ</small>
+                            <small>
+                                Thanh toán mô phỏng bằng thẻ
+                            </small>
                         </span>
 
                         <span className="payment-radio">
@@ -96,7 +127,9 @@ function PaymentSelection({
                 <div className="payment-preview">
                     {selectedMethod === "momo" ? (
                         <div className="payment-momo-preview">
-                            <div className="payment-momo-logo">MoMo</div>
+                            <div className="payment-momo-logo">
+                                MoMo
+                            </div>
 
                             <div className="payment-demo-qr">
                                 <div className="payment-qr-pattern">
@@ -107,7 +140,9 @@ function PaymentSelection({
                                 </div>
                             </div>
 
-                            <strong>Mã QR thanh toán mô phỏng</strong>
+                            <strong>
+                                Mã QR thanh toán mô phỏng
+                            </strong>
 
                             <p>
                                 Mã QR minh họa. Nhấn xác nhận để mở cửa sổ
@@ -132,7 +167,9 @@ function PaymentSelection({
                                 </div>
                             </div>
 
-                            <strong>Thanh toán bằng thẻ mô phỏng</strong>
+                            <strong>
+                                Thanh toán bằng thẻ mô phỏng
+                            </strong>
 
                             <p>
                                 Nhấn xác nhận để mở biểu mẫu nhập thông tin
@@ -142,9 +179,112 @@ function PaymentSelection({
                     )}
                 </div>
 
+                {/*=================== Mã khuyến mãi ===================*/}
+
+                <div className="payment-promotion">
+                    <div className="payment-promotion-heading">
+                        <h3>
+                            <i className="bi bi-ticket-perforated"></i>
+                            Mã khuyến mãi
+                        </h3>
+
+                        <span>
+                            Nhập mã ưu đãi nếu bạn có
+                        </span>
+                    </div>
+
+                    <div className="payment-promotion-input">
+                        <input
+                            type="text"
+                            value={promotionCode}
+                            onChange={handlePromotionInputChange}
+                            placeholder="Nhập mã khuyến mãi"
+                            maxLength={20}
+                            autoComplete="off"
+                            disabled={
+                                hasAppliedPromotion ||
+                                isApplyingPromotion ||
+                                isSavingBooking
+                            }
+                        />
+
+                        {hasAppliedPromotion ? (
+                            <button
+                                type="button"
+                                className="payment-promotion-remove"
+                                onClick={onRemovePromotion}
+                                disabled={isSavingBooking}
+                            >
+                                <i className="bi bi-x-circle"></i>
+                                Gỡ mã
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={onApplyPromotion}
+                                disabled={
+                                    isApplyingPromotion ||
+                                    isSavingBooking ||
+                                    !promotionCode.trim()
+                                }
+                            >
+                                {isApplyingPromotion ? (
+                                    <>
+                                        <span
+                                            className="spinner-border spinner-border-sm"
+                                            aria-hidden="true"
+                                        ></span>
+                                        Đang kiểm tra
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="bi bi-check2-circle"></i>
+                                        Áp dụng
+                                    </>
+                                )}
+                            </button>
+                        )}
+                    </div>
+
+                    {promotionError && (
+                        <p className="payment-promotion-error">
+                            <i className="bi bi-exclamation-circle"></i>
+                            {promotionError}
+                        </p>
+                    )}
+
+                    {hasAppliedPromotion && (
+                        <p className="payment-promotion-success">
+                            <i className="bi bi-check-circle-fill"></i>
+                            Đã áp dụng mã {promotionCode} thành công.
+                        </p>
+                    )}
+                </div>
+
+                {/*=================== Chi tiết thanh toán ===================*/}
+
                 <div className="payment-total">
-                    <span>Tổng tiền cần thanh toán</span>
-                    <strong>{formatPrice(totalPrice)}</strong>
+                    <div className="payment-total-row">
+                        <span>Tạm tính</span>
+                        <strong>{formatPrice(originalPrice)}</strong>
+                    </div>
+
+                    {hasAppliedPromotion && (
+                        <div className="payment-total-row payment-discount">
+                            <span>
+                                Khuyến mãi ({promotionCode})
+                            </span>
+
+                            <strong>
+                                -{formatPrice(discountAmount)}
+                            </strong>
+                        </div>
+                    )}
+
+                    <div className="payment-total-row payment-final-total">
+                        <span>Tổng tiền cần thanh toán</span>
+                        <strong>{formatPrice(totalPrice)}</strong>
+                    </div>
                 </div>
 
                 <div className="payment-actions">
@@ -152,6 +292,7 @@ function PaymentSelection({
                         type="button"
                         className="payment-back-button"
                         onClick={onBack}
+                        disabled={isSavingBooking}
                     >
                         <i className="bi bi-arrow-left"></i>
                         Quay lại bắp nước
@@ -161,9 +302,26 @@ function PaymentSelection({
                         type="button"
                         className="payment-confirm-button"
                         onClick={handleOpenPayment}
+                        disabled={
+                            isSavingBooking ||
+                            isApplyingPromotion ||
+                            totalPrice <= 0
+                        }
                     >
-                        Xác nhận thanh toán
-                        <i className="bi bi-shield-check"></i>
+                        {isSavingBooking ? (
+                            <>
+                                <span
+                                    className="spinner-border spinner-border-sm"
+                                    aria-hidden="true"
+                                ></span>
+                                Đang xử lý...
+                            </>
+                        ) : (
+                            <>
+                                Xác nhận thanh toán
+                                <i className="bi bi-shield-check"></i>
+                            </>
+                        )}
                     </button>
                 </div>
 
