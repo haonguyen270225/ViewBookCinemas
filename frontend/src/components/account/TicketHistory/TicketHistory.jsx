@@ -1,145 +1,383 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Ticket, Film } from "lucide-react";
 
+import { useAuth } from "../../../contexts/AuthContext.jsx";
+
+import {
+    getBookingsByUserId
+} from "../../../services/bookingService.js";
+
+import {
+    getMovieById
+} from "../../../services/movieService.js";
+
 import TicketCard from "./TicketCard";
-import "./TicketHistory.css";
 import TicketPagination from "./TicketPagination";
 
-//========================= Temporary Ticket Data ========================//
-// Dữ liệu mẫu để kiểm tra giao diện.
-// Sau này sẽ thay bằng dữ liệu lấy từ Backend API.
+import "./TicketHistory.css";
 
-const sampleTickets = [
-  {
-    ticketId: 1001,
-    movieId: 1,
-    ticketCode: "VBC-20261110-A001",
-    qrCode: "VBC-20261110-A001",
-    status: "valid",
-    movieTitle: "Avengers: Secret Wars",
-    genre: "Hành động, Khoa học viễn tưởng",
-    duration: 150,
-    showDate: "15/11/2026",
-    showTime: "19:30",
-    cinema: "VBC Cinema - Cần Thơ",
-    room: "Phòng 03",
-    seat: "G05",
-    price: 95000,
-    purchaseDate: "10/11/2026",
-    posterUrl: "",
-  },
-  {
-    ticketId: 1002,
-    movieId: 2,
-    ticketCode: "VBC-20261105-B002",
-    qrCode: "VBC-20261105-B002",
-    status: "used",
-    movieTitle: "Doraemon: Nobita và cuộc phiêu lưu",
-    genre: "Hoạt hình, Phiêu lưu",
-    duration: 105,
-    showDate: "07/11/2026",
-    showTime: "14:00",
-    cinema: "VBC Cinema - Cần Thơ",
-    room: "Phòng 02",
-    seat: "F06",
-    price: 75000,
-    purchaseDate: "05/11/2026",
-    checkedInAt: "07/11/2026 - 13:42",
-    posterUrl: "",
-  },
-  {
-    ticketId: 1003,
-    movieId: 3,
-    ticketCode: "VBC-20261028-C003",
-    qrCode: "VBC-20261028-C003",
-    status: "expired",
-    movieTitle: "The Conjuring: Last Rites",
-    genre: "Kinh dị, Bí ẩn",
-    duration: 112,
-    showDate: "30/10/2026",
-    showTime: "20:00",
-    cinema: "VBC Cinema - Cần Thơ",
-    room: "Phòng 01",
-    seat: "H08",
-    price: 90000,
-    purchaseDate: "28/10/2026",
-    posterUrl: "",
-  },
+const ITEMS_PER_PAGE = 5;
+
+const FILTERS = [
+    { value: "all", label: "Tất cả" },
+    { value: "valid", label: "Còn hiệu lực" },
+    { value: "used", label: "Đã sử dụng" },
+    { value: "expired", label: "Đã hết hạn" },
+    { value: "cancelled", label: "Đã hủy" }
 ];
 
-//========================= Ticket History ========================
+//====================================================
+// Định dạng ngày giờ
+//====================================================
 
+const formatDate = (value) => {
+    if (!value) return "--";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "--";
+    }
+
+    return date.toLocaleDateString("vi-VN");
+};
+
+const formatTime = (value) => {
+    if (!value) return "--";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "--";
+    }
+
+    return date.toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    });
+};
+
+//====================================================
+// Xác định trạng thái vé
+//====================================================
+
+const getTicketStatus = (booking) => {
+    if (booking.bookingStatus === "Cancelled") {
+        return "cancelled";
+    }
+
+    if (booking.bookingStatus === "Completed") {
+        return "used";
+    }
+
+    const endTime = booking.showtime?.endTime;
+
+    if (endTime) {
+        const endDate = new Date(endTime);
+
+        if (
+            !Number.isNaN(endDate.getTime()) &&
+            endDate.getTime() < Date.now()
+        ) {
+            return "expired";
+        }
+    }
+
+    return "valid";
+};
+
+//====================================================
+// Chuyển Booking thành dữ liệu TicketCard
+//====================================================
+
+const mapBookingToTicket = (booking, movieDetail) => {
+    const movie = movieDetail || {};
+
+    const showtime = booking.showtime || {};
+    const seats = Array.isArray(booking.seats)
+        ? booking.seats
+        : [];
+
+    const originalPrice = Number(
+        booking.originalTotalPrice ??
+        booking.totalPrice ??
+        0
+    );
+
+    const discountAmount = Number(
+        booking.discountAmount || 0
+    );
+
+    const paidAmount = Number(
+        booking.actualPaidAmount ??
+        booking.totalPrice ??
+        originalPrice - discountAmount
+    );
+
+    const movieId =
+        booking.movie?.movieId ??
+        booking.movieId ??
+        null;
+
+    return {
+        ticketId: booking.bookingId,
+
+        movieId,
+
+        ticketCode: booking.bookingCode,
+
+        qrCode: booking.bookingCode,
+
+        status: getTicketStatus(booking),
+
+        movieTitle:
+            booking.movie?.title ||
+            movie.title ||
+            "Phim không xác định",
+
+        genre: Array.isArray(movie.genres)
+            ? movie.genres.join(", ")
+            : "Chưa cập nhật thể loại",
+
+        duration: Number(movie.duration) || 0,
+
+        showDate: formatDate(showtime.startTime),
+
+        showTime: formatTime(showtime.startTime),
+
+        cinema:
+            booking.cinema?.name ||
+            "Chưa xác định rạp",
+
+        room:
+            booking.room?.roomName ||
+            "Chưa xác định phòng",
+
+        seat: seats.length > 0
+            ? seats.map((seat) => seat.seatCode).join(", ")
+            : "--",
+
+        // Thông tin thanh toán.
+        price: originalPrice,
+        originalPrice,
+        promotionCode:
+            booking.promotion?.promotionCode || null,
+        discountAmount,
+        paidAmount,
+
+        purchaseDate: formatDate(booking.bookingDate),
+
+        posterUrl:
+            booking.movie?.poster ||
+            movie.poster ||
+            "",
+
+        paymentMethod: booking.paymentMethod || "--"
+    };
+};
+
+//====================================================
+// Ticket History
+//====================================================
 
 function TicketHistory() {
+    const { user } = useAuth();
+
+    const [tickets, setTickets] = useState([]);
 
     const [activeFilter, setActiveFilter] = useState("all");
+
     const [currentPage, setCurrentPage] = useState(1);
 
-    //========================= Pagination Configuration ========================
+    const [isLoading, setIsLoading] = useState(true);
 
-    const ITEMS_PER_PAGE = 5;
+    const [errorMessage, setErrorMessage] = useState("");
 
-    //========================= Filters ========================
+    //====================================================
+    // Tải lịch sử đặt vé của tài khoản hiện tại
+    //====================================================
 
-    const filters = [
-        { value: "all", label: "Tất cả" },
-        { value: "valid", label: "Còn hiệu lực" },
-        { value: "used", label: "Đã sử dụng" },
-        { value: "expired", label: "Đã hết hạn" }
-    ];
+    useEffect(() => {
+        let isMounted = true;
 
-    //========================= Filter Tickets ========================
+        const loadTicketHistory = async () => {
+            if (!user?.userId) {
+                setTickets([]);
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                setIsLoading(true);
+                setErrorMessage("");
+
+                const bookings = await getBookingsByUserId(
+                    user.userId
+                );
+
+                // Lấy thông tin phim để bổ sung thể loại,
+                // thời lượng và poster cho lịch sử đặt vé.
+
+                const movieIds = [
+                    ...new Set(
+                        bookings
+                            .map((booking) =>
+                                booking.movie?.movieId
+                            )
+                            .filter((id) => id !== null && id !== undefined)
+                            .map(String)
+                    )
+                ];
+
+                const movieResults = await Promise.all(
+                    movieIds.map(async (movieId) => {
+                        try {
+                            const movie = await getMovieById(movieId);
+
+                            return [String(movieId), movie];
+                        } catch (error) {
+                            console.error(
+                                `Không thể tải thông tin phim ${movieId}:`,
+                                error
+                            );
+
+                            return [String(movieId), null];
+                        }
+                    })
+                );
+
+                const movieMap = new Map(movieResults);
+
+                const mappedTickets = bookings
+                    .map((booking) => {
+                        const movieId =
+                            booking.movie?.movieId ??
+                            booking.movieId;
+
+                        const movieDetail = movieMap.get(
+                            String(movieId)
+                        );
+
+                        return mapBookingToTicket(
+                            booking,
+                            movieDetail
+                        );
+                    })
+                    .sort((a, b) => {
+                        const bookingA = bookings.find(
+                            (item) =>
+                                String(item.bookingId) ===
+                                String(a.ticketId)
+                        );
+
+                        const bookingB = bookings.find(
+                            (item) =>
+                                String(item.bookingId) ===
+                                String(b.ticketId)
+                        );
+
+                        return (
+                            new Date(
+                                bookingB?.bookingDate || 0
+                            ).getTime() -
+                            new Date(
+                                bookingA?.bookingDate || 0
+                            ).getTime()
+                        );
+                    });
+
+                if (isMounted) {
+                    setTickets(mappedTickets);
+                }
+            } catch (error) {
+                console.error(
+                    "Không thể tải lịch sử đặt vé:",
+                    error
+                );
+
+                if (isMounted) {
+                    setErrorMessage(
+                        error.message ||
+                        "Không thể tải lịch sử đặt vé."
+                    );
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        loadTicketHistory();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [user?.userId]);
+
+    //====================================================
+    // Lọc vé
+    //====================================================
 
     const filteredTickets = useMemo(() => {
-
         if (activeFilter === "all") {
-            return sampleTickets;
+            return tickets;
         }
 
-        return sampleTickets.filter(
+        return tickets.filter(
             (ticket) => ticket.status === activeFilter
         );
+    }, [tickets, activeFilter]);
 
-    }, [activeFilter]);
-
-    //========================= Pagination ========================
+    //====================================================
+    // Phân trang
+    //====================================================
 
     const totalPages = Math.ceil(
         filteredTickets.length / ITEMS_PER_PAGE
     );
 
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const startIndex =
+        (currentPage - 1) * ITEMS_PER_PAGE;
 
     const currentTickets = filteredTickets.slice(
         startIndex,
         startIndex + ITEMS_PER_PAGE
     );
 
-    //========================= Change Filter ========================
+    //====================================================
+    // Thay đổi bộ lọc
+    //====================================================
 
     const handleFilterChange = (filter) => {
         setActiveFilter(filter);
         setCurrentPage(1);
     };
 
-    //========================= Change Page ========================
+    //====================================================
+    // Thay đổi trang
+    //====================================================
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
 
-        document.querySelector(".ticket-history-section")
+        document
+            .querySelector(".ticket-history-section")
             ?.scrollIntoView({
                 behavior: "smooth",
                 block: "start"
             });
     };
 
-    //========================= Render ========================
+    //====================================================
+    // Render
+    //====================================================
 
     return (
         <section className="ticket-history-section">
 
-            {/*========================= Header ========================*/}
+            {/* Header */}
 
             <div className="ticket-history-header">
 
@@ -165,40 +403,61 @@ function TicketHistory() {
 
             </div>
 
-            {/*========================= Filters ========================*/}
+            {/* Filters */}
 
             <div className="ticket-history-filters">
 
-                {filters.map((filter) => (
-
+                {FILTERS.map((filter) => (
                     <button
                         key={filter.value}
                         type="button"
                         className={`ticket-filter-btn ${
-                            activeFilter === filter.value ? "active" : ""
+                            activeFilter === filter.value
+                                ? "active"
+                                : ""
                         }`}
-                        onClick={() => handleFilterChange(filter.value)}
+                        onClick={() =>
+                            handleFilterChange(filter.value)
+                        }
                     >
                         {filter.label}
                     </button>
-
                 ))}
 
             </div>
 
-            {/*========================= Ticket List ========================*/}
+            {/* Ticket List */}
 
             <div className="ticket-history-list">
 
-                {currentTickets.length > 0 ? (
+                {isLoading ? (
+
+                    <div className="ticket-history-empty">
+                        <div
+                            className="spinner-border text-danger"
+                            role="status"
+                        />
+
+                        <p>Đang tải lịch sử đặt vé...</p>
+                    </div>
+
+                ) : errorMessage ? (
+
+                    <div className="ticket-history-empty">
+                        <Film size={42} />
+
+                        <h3>Không thể tải dữ liệu</h3>
+
+                        <p>{errorMessage}</p>
+                    </div>
+
+                ) : currentTickets.length > 0 ? (
 
                     currentTickets.map((ticket) => (
-
                         <TicketCard
                             key={ticket.ticketId}
                             ticket={ticket}
                         />
-
                     ))
 
                 ) : (
@@ -207,10 +466,16 @@ function TicketHistory() {
 
                         <Film size={42} />
 
-                        <h3>Chưa có vé nào</h3>
+                        <h3>
+                            {tickets.length === 0
+                                ? "Bạn chưa có lịch sử đặt vé"
+                                : "Không tìm thấy vé nào"}
+                        </h3>
 
                         <p>
-                            Không tìm thấy vé trong danh mục bạn đang chọn.
+                            {tickets.length === 0
+                                ? "Các vé bạn đặt thành công sẽ xuất hiện tại đây."
+                                : "Không tìm thấy vé trong danh mục bạn đang chọn."}
                         </p>
 
                     </div>
@@ -219,17 +484,18 @@ function TicketHistory() {
 
             </div>
 
-            {/*========================= Pagination ========================*/}
+            {/* Pagination */}
 
-            <TicketPagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-            />
+            {!isLoading && !errorMessage && totalPages > 1 && (
+                <TicketPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                />
+            )}
 
         </section>
     );
 }
-
 
 export default TicketHistory;
