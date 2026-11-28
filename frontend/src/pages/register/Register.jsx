@@ -1,6 +1,8 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+
 //=================== Import Components ========================
 
 import Navbar from "../../components/layout/Navbar.jsx";
@@ -14,8 +16,8 @@ import "./Register.css";
 
 function Register() {
   const navigate = useNavigate();
-
   const { register, showNotification } = useAuth();
+
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
@@ -30,6 +32,7 @@ function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [notice, setNotice] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   //=================== Cập nhật dữ liệu Form ========================
 
@@ -54,57 +57,109 @@ function Register() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.fullName.trim()) {
+    const fullName = formData.fullName.trim();
+    const username = formData.username.trim();
+    const email = formData.email.trim();
+    const phoneNumber = formData.phoneNumber.trim();
+    const password = formData.password;
+
+    if (!fullName) {
       newErrors.fullName = "Vui lòng nhập họ và tên.";
-    } else if (formData.fullName.trim().length > 100) {
-      newErrors.fullName = "Họ và tên không được vượt quá 100 ký tự.";
+    } else if (fullName.length < 2 || fullName.length > 100) {
+      newErrors.fullName =
+        "Họ và tên phải có từ 2 đến 100 ký tự.";
     }
 
-    if (!formData.username.trim()) {
+    if (!username) {
       newErrors.username = "Vui lòng nhập tên đăng nhập.";
-    } else if (!/^[a-zA-Z0-9_]{3,50}$/.test(formData.username)) {
+    } else if (!/^[a-zA-Z0-9_]{3,50}$/.test(username)) {
       newErrors.username =
         "Tên đăng nhập từ 3–50 ký tự, chỉ gồm chữ, số và dấu gạch dưới.";
     }
 
-    if (!formData.email.trim()) {
+    if (!email) {
       newErrors.email = "Vui lòng nhập địa chỉ email.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = "Địa chỉ email không hợp lệ.";
-    } else if (formData.email.length > 150) {
+    } else if (email.length > 150) {
       newErrors.email = "Email không được vượt quá 150 ký tự.";
     }
 
     if (
-      formData.phoneNumber &&
-      !/^[0-9+().\-\s]{8,15}$/.test(formData.phoneNumber)
+      phoneNumber &&
+      !/^[0-9+().\-\s]{8,15}$/.test(phoneNumber)
     ) {
       newErrors.phoneNumber = "Số điện thoại không hợp lệ.";
     }
 
-    if (!formData.password) {
+    if (!password) {
       newErrors.password = "Vui lòng nhập mật khẩu.";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự.";
+    } else if (password.length < 8 || password.length > 100) {
+      newErrors.password =
+        "Mật khẩu phải có từ 8 đến 100 ký tự.";
+    } else if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).+$/.test(password)
+    ) {
+      newErrors.password =
+        "Mật khẩu phải có chữ hoa, chữ thường, số và ký tự đặc biệt.";
     }
 
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu.";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Mật khẩu xác nhận không trùng khớp.";
+    } else if (password !== formData.confirmPassword) {
+      newErrors.confirmPassword =
+        "Mật khẩu xác nhận không trùng khớp.";
     }
 
     if (!formData.agreeTerms) {
-      newErrors.agreeTerms = "Bạn cần đồng ý với điều khoản sử dụng.";
+      newErrors.agreeTerms =
+        "Bạn cần đồng ý với điều khoản sử dụng.";
     }
 
     return newErrors;
   };
 
+  //=================== Xử lý lỗi từ Backend ========================
+
+  const handleRegisterError = (error) => {
+    const message = error.message || "";
+
+    if (
+      message.toLowerCase().includes("username") ||
+      message.includes("Tên đăng nhập")
+    ) {
+      setErrors((previous) => ({
+        ...previous,
+        username: "Tên đăng nhập đã được sử dụng.",
+      }));
+
+      return;
+    }
+
+    if (
+      message.toLowerCase().includes("email") ||
+      message.includes("Email")
+    ) {
+      setErrors((previous) => ({
+        ...previous,
+        email: "Email đã được sử dụng.",
+      }));
+
+      return;
+    }
+
+    showNotification(
+      message || "Đăng ký tài khoản thất bại. Vui lòng thử lại.",
+      "danger"
+    );
+  };
+
   //=================== Xử lý đăng ký ========================
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (isSubmitting) return;
 
     const validationErrors = validateForm();
 
@@ -114,40 +169,29 @@ function Register() {
       return;
     }
 
+    setIsSubmitting(true);
+    setNotice("");
+
     try {
-      // Tạo tài khoản demo
-      register({
-        fullName: formData.fullName,
-        username: formData.username,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
+      // Gửi thông tin đăng ký đến Backend API.
+      await register({
+        fullName: formData.fullName.trim(),
+        username: formData.username.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phoneNumber: formData.phoneNumber.trim(),
         password: formData.password,
       });
 
-      // Hiển thị thông báo thành công
       showNotification(
         "Đăng ký tài khoản thành công! Vui lòng đăng nhập.",
-        "success",
+        "success"
       );
 
-      // Chuyển sang trang đăng nhập
       navigate("/login");
     } catch (error) {
-      const message = error.message;
-
-      if (message.includes("Tên đăng nhập")) {
-        setErrors((previous) => ({
-          ...previous,
-          username: message,
-        }));
-      } else if (message.includes("Email")) {
-        setErrors((previous) => ({
-          ...previous,
-          email: message,
-        }));
-      } else {
-        showNotification(message || "Đăng ký tài khoản thất bại.", "danger");
-      }
+      handleRegisterError(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -159,6 +203,7 @@ function Register() {
 
       <main className="register-page">
         <div className="register-container">
+
           {/*=================== Register Introduction ========================*/}
 
           <div className="register-introduction">
@@ -205,6 +250,7 @@ function Register() {
 
           <div className="register-form-section">
             <div className="register-form-wrapper">
+
               <div className="register-heading">
                 <span>CHÀO MỪNG BẠN ĐẾN VỚI VBC</span>
                 <h2>Tạo tài khoản</h2>
@@ -216,6 +262,7 @@ function Register() {
                 onSubmit={handleSubmit}
                 noValidate
               >
+
                 {/*=================== Full Name ========================*/}
 
                 <div className="register-form-group">
@@ -234,12 +281,16 @@ function Register() {
                       value={formData.fullName}
                       onChange={handleChange}
                       maxLength={100}
+                      autoComplete="name"
+                      disabled={isSubmitting}
                       className={errors.fullName ? "is-invalid" : ""}
                     />
                   </div>
 
                   {errors.fullName && (
-                    <small className="register-error">{errors.fullName}</small>
+                    <small className="register-error">
+                      {errors.fullName}
+                    </small>
                   )}
                 </div>
 
@@ -262,12 +313,15 @@ function Register() {
                       onChange={handleChange}
                       maxLength={50}
                       autoComplete="username"
+                      disabled={isSubmitting}
                       className={errors.username ? "is-invalid" : ""}
                     />
                   </div>
 
                   {errors.username && (
-                    <small className="register-error">{errors.username}</small>
+                    <small className="register-error">
+                      {errors.username}
+                    </small>
                   )}
                 </div>
 
@@ -290,12 +344,15 @@ function Register() {
                       onChange={handleChange}
                       maxLength={150}
                       autoComplete="email"
+                      disabled={isSubmitting}
                       className={errors.email ? "is-invalid" : ""}
                     />
                   </div>
 
                   {errors.email && (
-                    <small className="register-error">{errors.email}</small>
+                    <small className="register-error">
+                      {errors.email}
+                    </small>
                   )}
                 </div>
 
@@ -304,7 +361,9 @@ function Register() {
                 <div className="register-form-group">
                   <label htmlFor="phoneNumber">
                     Số điện thoại
-                    <span className="register-optional">(Không bắt buộc)</span>
+                    <span className="register-optional">
+                      (Không bắt buộc)
+                    </span>
                   </label>
 
                   <div className="register-input-wrapper">
@@ -319,6 +378,7 @@ function Register() {
                       onChange={handleChange}
                       maxLength={15}
                       autoComplete="tel"
+                      disabled={isSubmitting}
                       className={errors.phoneNumber ? "is-invalid" : ""}
                     />
                   </div>
@@ -347,7 +407,9 @@ function Register() {
                       placeholder="Tối thiểu 8 ký tự"
                       value={formData.password}
                       onChange={handleChange}
+                      maxLength={100}
                       autoComplete="new-password"
+                      disabled={isSubmitting}
                       className={errors.password ? "is-invalid" : ""}
                     />
 
@@ -355,6 +417,7 @@ function Register() {
                       type="button"
                       className="register-password-toggle"
                       onClick={() => setShowPassword(!showPassword)}
+                      disabled={isSubmitting}
                       title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                     >
                       <i
@@ -366,7 +429,9 @@ function Register() {
                   </div>
 
                   {errors.password && (
-                    <small className="register-error">{errors.password}</small>
+                    <small className="register-error">
+                      {errors.password}
+                    </small>
                   )}
                 </div>
 
@@ -388,7 +453,10 @@ function Register() {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       autoComplete="new-password"
-                      className={errors.confirmPassword ? "is-invalid" : ""}
+                      disabled={isSubmitting}
+                      className={
+                        errors.confirmPassword ? "is-invalid" : ""
+                      }
                     />
 
                     <button
@@ -397,11 +465,18 @@ function Register() {
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
                       }
-                      title="Hiện hoặc ẩn mật khẩu"
+                      disabled={isSubmitting}
+                      title={
+                        showConfirmPassword
+                          ? "Ẩn mật khẩu"
+                          : "Hiện mật khẩu"
+                      }
                     >
                       <i
                         className={
-                          showConfirmPassword ? "bi bi-eye-slash" : "bi bi-eye"
+                          showConfirmPassword
+                            ? "bi bi-eye-slash"
+                            : "bi bi-eye"
                         }
                       ></i>
                     </button>
@@ -423,11 +498,14 @@ function Register() {
                       name="agreeTerms"
                       checked={formData.agreeTerms}
                       onChange={handleChange}
+                      disabled={isSubmitting}
                     />
 
                     <span>
-                      Tôi đồng ý với <Link to="/terms">Điều khoản sử dụng</Link>{" "}
-                      và <Link to="/privacy">Chính sách bảo mật</Link>.
+                      Tôi đồng ý với{" "}
+                      <Link to="/terms">Điều khoản sử dụng</Link>{" "}
+                      và{" "}
+                      <Link to="/privacy">Chính sách bảo mật</Link>.
                     </span>
                   </label>
 
@@ -449,9 +527,26 @@ function Register() {
 
                 {/*=================== Submit Button ========================*/}
 
-                <button type="submit" className="register-submit-button">
-                  Đăng ký tài khoản
-                  <i className="bi bi-arrow-right"></i>
+                <button
+                  type="submit"
+                  className="register-submit-button"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      Đang đăng ký...
+                    </>
+                  ) : (
+                    <>
+                      Đăng ký tài khoản
+                      <i className="bi bi-arrow-right"></i>
+                    </>
+                  )}
                 </button>
 
                 {/*=================== Login Link ========================*/}
@@ -460,6 +555,7 @@ function Register() {
                   Đã có tài khoản?
                   <Link to="/login"> Đăng nhập ngay</Link>
                 </div>
+
               </form>
             </div>
           </div>

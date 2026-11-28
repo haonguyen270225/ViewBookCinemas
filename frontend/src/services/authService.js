@@ -177,43 +177,74 @@ export const getCurrentUser = () => {
     }
 };
 
-//========================= Đăng ký tài khoản DEMO ========================
-// Chức năng này vẫn sử dụng localStorage.
-// Sẽ kết nối Register API ở bước tích hợp tiếp theo.
+//========================= Đăng ký tài khoản bằng Backend API ========================
 
-export const registerUser = (formData) => {
-    const users = getStoredUsers();
+export const registerUser = async (formData) => {
+    try {
+        const response = await api.post("/auth/register", {
+            username: formData.username.trim(),
+            email: formData.email.trim().toLowerCase(),
+            password: formData.password,
+            fullName: formData.fullName.trim(),
+            phoneNumber: formData.phoneNumber?.trim() || null
+        });
 
-    const username = validateUsername(formData.username, users);
-    const email = formData.email.trim().toLowerCase();
+        const registeredUser = response.data?.user;
 
-    const isEmailExists = users.some(
-        user => user.email?.toLowerCase() === email
-    );
+        if (!registeredUser) {
+            throw new Error(
+                "Dữ liệu đăng ký từ máy chủ không hợp lệ."
+            );
+        }
 
-    if (isEmailExists) {
-        throw new Error("Email đã được sử dụng.");
+        return registeredUser;
+
+    } catch (error) {
+        const status = error.response?.status;
+
+        if (status === 409) {
+            throw new Error(
+                "Tên đăng nhập hoặc email đã được sử dụng. Vui lòng kiểm tra lại."
+            );
+        }
+
+        if (status === 400) {
+            const validationErrors = error.response?.data?.errors;
+
+            if (validationErrors) {
+                const messages = Object.values(validationErrors)
+                    .flat()
+                    .filter(Boolean);
+
+                if (messages.length > 0) {
+                    throw new Error(messages.join(" "));
+                }
+            }
+
+            throw new Error(
+                error.response?.data?.message ||
+                "Thông tin đăng ký không hợp lệ. Vui lòng kiểm tra lại."
+            );
+        }
+
+        if (error.code === "ERR_NETWORK") {
+            throw new Error(
+                "Không thể kết nối máy chủ. Vui lòng kiểm tra Backend và cấu hình CORS."
+            );
+        }
+
+        if (error.code === "ECONNABORTED") {
+            throw new Error(
+                "Máy chủ phản hồi quá lâu. Vui lòng thử lại."
+            );
+        }
+
+        throw new Error(
+            error.response?.data?.message ||
+            error.message ||
+            "Đăng ký tài khoản thất bại. Vui lòng thử lại."
+        );
     }
-
-    const newUser = {
-        userId: Date.now(),
-        fullName: formData.fullName.trim(),
-        username,
-        email,
-        phoneNumber: formData.phoneNumber?.trim() || "",
-        dateOfBirth: "",
-        gender: "",
-        avatarUrl: "",
-        password: formData.password,
-        status: "Active",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    };
-
-    users.push(newUser);
-    saveUsers(users);
-
-    return getPublicUser(newUser);
 };
 
 //========================= Đăng nhập bằng Backend API ========================
@@ -237,19 +268,14 @@ export const loginUser = async (account, password, rememberMe = false) => {
             );
         }
 
-        // Chuẩn hóa dữ liệu người dùng từ Backend.
         const sessionData = {
             ...user,
             role: user.roleName || user.role || "",
             expiresAt
         };
 
-        // Xóa phiên cũ trước khi tạo phiên mới.
         clearAuthStorage();
 
-        // Ghi nhớ đăng nhập:
-        // Có chọn: localStorage.
-        // Không chọn: sessionStorage.
         const storage = rememberMe
             ? localStorage
             : sessionStorage;
@@ -381,7 +407,6 @@ export const updateUserProfile = (formData) => {
 };
 
 //========================= Đổi mật khẩu khách hàng DEMO ========================
-// Chức năng này chưa kết nối Change Password API.
 
 export const changePassword = (oldPassword, newPassword) => {
     const currentUser = getCurrentUser();
