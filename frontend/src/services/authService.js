@@ -1,8 +1,11 @@
 
+import api from "./api";
+
 //========================= Cấu hình lưu trữ ========================
 
 const USERS_STORAGE_KEY = "vbc_demo_users";
 const SESSION_STORAGE_KEY = "vbc_demo_session";
+const ACCESS_TOKEN_KEY = "vbc_access_token";
 
 const MAX_AVATAR_DATA_LENGTH = 3 * 1024 * 1024;
 
@@ -25,6 +28,28 @@ const saveUsers = (users) => {
         USERS_STORAGE_KEY,
         JSON.stringify(users)
     );
+};
+
+//========================= Quản lý nơi lưu phiên đăng nhập ========================
+
+const getSessionStorage = () => {
+    if (sessionStorage.getItem(SESSION_STORAGE_KEY)) {
+        return sessionStorage;
+    }
+
+    if (localStorage.getItem(SESSION_STORAGE_KEY)) {
+        return localStorage;
+    }
+
+    return null;
+};
+
+const clearAuthStorage = () => {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+
+    localStorage.removeItem(SESSION_STORAGE_KEY);
+    sessionStorage.removeItem(SESSION_STORAGE_KEY);
 };
 
 //========================= Thông tin người dùng công khai ========================
@@ -52,10 +77,14 @@ const syncCurrentSession = (user) => {
         currentUser &&
         String(currentUser.userId) === String(user.userId)
     ) {
-        localStorage.setItem(
-            SESSION_STORAGE_KEY,
-            JSON.stringify(getPublicUser(user))
-        );
+        const storage = getSessionStorage();
+
+        if (storage) {
+            storage.setItem(
+                SESSION_STORAGE_KEY,
+                JSON.stringify(getPublicUser(user))
+            );
+        }
     }
 };
 
@@ -135,7 +164,12 @@ const generateTemporaryPassword = (length = 12) => {
 
 export const getCurrentUser = () => {
     try {
-        const session = localStorage.getItem(SESSION_STORAGE_KEY);
+        const storage = getSessionStorage();
+
+        if (!storage) return null;
+
+        const session = storage.getItem(SESSION_STORAGE_KEY);
+
         return session ? JSON.parse(session) : null;
     } catch (error) {
         console.error("Không thể đọc phiên đăng nhập:", error);
@@ -143,7 +177,9 @@ export const getCurrentUser = () => {
     }
 };
 
-//========================= Đăng ký tài khoản ========================
+//========================= Đăng ký tài khoản DEMO ========================
+// Chức năng này vẫn sử dụng localStorage.
+// Sẽ kết nối Register API ở bước tích hợp tiếp theo.
 
 export const registerUser = (formData) => {
     const users = getStoredUsers();
@@ -180,47 +216,107 @@ export const registerUser = (formData) => {
     return getPublicUser(newUser);
 };
 
-//========================= Đăng nhập ========================
+//========================= Đăng nhập bằng Backend API ========================
 
-export const loginUser = (account, password) => {
-    const users = getStoredUsers();
-    const normalizedAccount = account.trim().toLowerCase();
+export const loginUser = async (account, password, rememberMe = false) => {
+    try {
+        const response = await api.post("/auth/login", {
+            account: account.trim(),
+            password
+        });
 
-    const user = users.find(
-        item =>
-            item.username?.toLowerCase() === normalizedAccount ||
-            item.email?.toLowerCase() === normalizedAccount
-    );
+        const {
+            token,
+            expiresAt,
+            user
+        } = response.data;
 
-    if (!user || user.password !== password) {
+        if (!token || !user) {
+            throw new Error(
+                "Dữ liệu đăng nhập từ máy chủ không hợp lệ."
+            );
+        }
+
+        // Chuẩn hóa dữ liệu người dùng từ Backend.
+        const sessionData = {
+            ...user,
+            role: user.roleName || user.role || "",
+            expiresAt
+        };
+
+        // Xóa phiên cũ trước khi tạo phiên mới.
+        clearAuthStorage();
+
+        // Ghi nhớ đăng nhập:
+        // Có chọn: localStorage.
+        // Không chọn: sessionStorage.
+        const storage = rememberMe
+            ? localStorage
+            : sessionStorage;
+
+        storage.setItem(ACCESS_TOKEN_KEY, token);
+
+        storage.setItem(
+            SESSION_STORAGE_KEY,
+            JSON.stringify(sessionData)
+        );
+
+        return sessionData;
+
+    } catch (error) {
+        if (error.response?.status === 401) {
+            throw new Error(
+                "Tên đăng nhập, Email hoặc mật khẩu không chính xác."
+            );
+        }
+
+        if (error.response?.status === 400) {
+            throw new Error(
+                "Thông tin đăng nhập không hợp lệ."
+            );
+        }
+
+        if (error.code === "ERR_NETWORK") {
+            throw new Error(
+                "Không thể kết nối máy chủ. Vui lòng kiểm tra Backend và cấu hình CORS."
+            );
+        }
+
+        if (error.code === "ECONNABORTED") {
+            throw new Error(
+                "Máy chủ phản hồi quá lâu. Vui lòng thử lại."
+            );
+        }
+
         throw new Error(
-            "Tên đăng nhập, Email hoặc mật khẩu không chính xác."
+            error.response?.data?.message ||
+            error.message ||
+            "Đăng nhập thất bại. Vui lòng thử lại."
         );
     }
+};
 
-    if ((user.status || "Active") !== "Active") {
-        throw new Error(
-            "Tài khoản của bạn hiện đang bị khóa. Vui lòng liên hệ quản trị viên."
-        );
+//========================= Kiểm tra người dùng bằng Backend API ========================
+
+export const verifyCurrentUser = async () => {
+    try {
+        const response = await api.get("/auth/me");
+
+        return response.data;
+    } catch (error) {
+        clearAuthStorage();
+        throw error;
     }
-
-    const publicUser = getPublicUser(user);
-
-    localStorage.setItem(
-        SESSION_STORAGE_KEY,
-        JSON.stringify(publicUser)
-    );
-
-    return publicUser;
 };
 
 //========================= Đăng xuất ========================
 
 export const logoutUser = () => {
-    localStorage.removeItem(SESSION_STORAGE_KEY);
+    clearAuthStorage();
 };
 
-//========================= Cập nhật thông tin cá nhân ========================
+//========================= Cập nhật thông tin cá nhân DEMO ========================
+// Chức năng này hiện vẫn sử dụng dữ liệu localStorage.
 
 export const updateUserProfile = (formData) => {
     const currentUser = getCurrentUser();
@@ -236,7 +332,7 @@ export const updateUserProfile = (formData) => {
     );
 
     if (userIndex === -1) {
-        throw new Error("Không tìm thấy tài khoản.");
+        throw new Error("Không tìm thấy tài khoản trong dữ liệu demo.");
     }
 
     if ((users[userIndex].status || "Active") !== "Active") {
@@ -279,15 +375,13 @@ export const updateUserProfile = (formData) => {
 
     const publicUser = getPublicUser(updatedUser);
 
-    localStorage.setItem(
-        SESSION_STORAGE_KEY,
-        JSON.stringify(publicUser)
-    );
+    syncCurrentSession(publicUser);
 
     return publicUser;
 };
 
-//========================= Đổi mật khẩu khách hàng ========================
+//========================= Đổi mật khẩu khách hàng DEMO ========================
+// Chức năng này chưa kết nối Change Password API.
 
 export const changePassword = (oldPassword, newPassword) => {
     const currentUser = getCurrentUser();
@@ -303,7 +397,7 @@ export const changePassword = (oldPassword, newPassword) => {
     );
 
     if (userIndex === -1) {
-        throw new Error("Không tìm thấy tài khoản.");
+        throw new Error("Không tìm thấy tài khoản trong dữ liệu demo.");
     }
 
     if ((users[userIndex].status || "Active") !== "Active") {
@@ -329,13 +423,13 @@ export const changePassword = (oldPassword, newPassword) => {
     return true;
 };
 
-//========================= Lấy danh sách tài khoản cho Admin ========================
+//========================= Lấy danh sách tài khoản cho Admin DEMO ========================
 
 export const getAllUsers = () => {
     return getStoredUsers().map(getPublicUser);
 };
 
-//========================= Lấy tài khoản theo ID ========================
+//========================= Lấy tài khoản theo ID DEMO ========================
 
 export const getUserById = (id) => {
     const user = getStoredUsers().find(
@@ -345,7 +439,7 @@ export const getUserById = (id) => {
     return getPublicUser(user);
 };
 
-//========================= Admin cập nhật thông tin khách hàng ========================
+//========================= Admin cập nhật thông tin khách hàng DEMO ========================
 
 export const updateUserByAdmin = (id, formData) => {
     const users = getStoredUsers();
@@ -379,7 +473,6 @@ export const updateUserByAdmin = (id, formData) => {
         throw new Error("Email đã được sử dụng bởi tài khoản khác.");
     }
 
-    // Nếu không truyền username thì giữ nguyên tên đăng nhập hiện tại.
     const username = formData.username !== undefined
         ? validateUsername(formData.username, users, userIndex)
         : users[userIndex].username;
@@ -406,7 +499,7 @@ export const updateUserByAdmin = (id, formData) => {
     return getPublicUser(updatedUser);
 };
 
-//========================= Admin đặt lại tên đăng nhập ========================
+//========================= Admin đặt lại tên đăng nhập DEMO ========================
 
 export const resetCustomerUsername = (id, newUsername) => {
     const users = getStoredUsers();
@@ -439,7 +532,7 @@ export const resetCustomerUsername = (id, newUsername) => {
     return getPublicUser(updatedUser);
 };
 
-//========================= Admin tạo mật khẩu tạm thời ========================
+//========================= Admin tạo mật khẩu tạm thời DEMO ========================
 
 export const resetCustomerPassword = (id) => {
     const users = getStoredUsers();
@@ -469,14 +562,13 @@ export const resetCustomerPassword = (id) => {
     users[userIndex] = updatedUser;
     saveUsers(users);
 
-    // Chỉ trả mật khẩu tạm thời ở lần thực hiện này.
     return {
         customer: getPublicUser(updatedUser),
         temporaryPassword
     };
 };
 
-//========================= Admin cập nhật trạng thái tài khoản ========================
+//========================= Admin cập nhật trạng thái tài khoản DEMO ========================
 
 export const updateUserStatus = (id, status) => {
     const validStatuses = ["Active", "Inactive"];
@@ -511,7 +603,7 @@ export const updateUserStatus = (id, status) => {
         String(currentUser.userId) === String(id) &&
         status === "Inactive"
     ) {
-        localStorage.removeItem(SESSION_STORAGE_KEY);
+        clearAuthStorage();
     } else {
         syncCurrentSession(updatedUser);
     }

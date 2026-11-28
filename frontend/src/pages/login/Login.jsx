@@ -1,7 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 //=================== Import Components ========================
@@ -24,6 +23,7 @@ function Login() {
         login,
         showNotification
     } = useAuth();
+
     const [formData, setFormData] = useState({
         account: "",
         password: "",
@@ -33,6 +33,7 @@ function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});
     const [notice, setNotice] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     //=================== Cập nhật dữ liệu Form ========================
 
@@ -71,8 +72,11 @@ function Login() {
 
     //========================= Xử lý đăng nhập ========================
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+
+        // Không cho phép gửi nhiều yêu cầu cùng lúc.
+        if (isSubmitting) return;
 
         const validationErrors = validateForm();
 
@@ -83,9 +87,13 @@ function Login() {
         }
 
         try {
-            login(
+            setIsSubmitting(true);
+
+            // Gọi Backend API thông qua AuthContext.
+            await login(
                 formData.account,
-                formData.password
+                formData.password,
+                formData.rememberMe
             );
 
             showNotification(
@@ -100,6 +108,8 @@ function Login() {
                 error.message || "Đăng nhập thất bại. Vui lòng thử lại.",
                 "danger"
             );
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -195,6 +205,7 @@ function Login() {
                                             className={
                                                 errors.account ? "is-invalid" : ""
                                             }
+                                            disabled={isSubmitting}
                                         />
                                     </div>
 
@@ -229,6 +240,7 @@ function Login() {
                                             className={
                                                 errors.password ? "is-invalid" : ""
                                             }
+                                            disabled={isSubmitting}
                                         />
 
                                         <button
@@ -242,6 +254,7 @@ function Login() {
                                                     ? "Ẩn mật khẩu"
                                                     : "Hiện mật khẩu"
                                             }
+                                            disabled={isSubmitting}
                                         >
                                             <i
                                                 className={
@@ -269,6 +282,7 @@ function Login() {
                                             name="rememberMe"
                                             checked={formData.rememberMe}
                                             onChange={handleChange}
+                                            disabled={isSubmitting}
                                         />
 
                                         <span>Ghi nhớ đăng nhập</span>
@@ -296,9 +310,23 @@ function Login() {
                                 <button
                                     type="submit"
                                     className="login-submit-button"
+                                    disabled={isSubmitting}
                                 >
-                                    Đăng nhập
-                                    <i className="bi bi-arrow-right"></i>
+                                    {isSubmitting ? (
+                                        <>
+                                            <span
+                                                className="spinner-border spinner-border-sm me-2"
+                                                role="status"
+                                                aria-hidden="true"
+                                            ></span>
+                                            Đang đăng nhập...
+                                        </>
+                                    ) : (
+                                        <>
+                                            Đăng nhập
+                                            <i className="bi bi-arrow-right"></i>
+                                        </>
+                                    )}
                                 </button>
 
                                 {/*=================== Register Link ========================*/}

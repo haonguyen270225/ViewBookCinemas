@@ -21,78 +21,72 @@ const AuthContext = createContext(null);
 //========================= Auth Provider ========================
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(() => getCurrentUser());
-    const [notification, setNotification] = useState(null);
+  const [user, setUser] = useState(() => getCurrentUser());
+  const [notification, setNotification] = useState(null);
 
-    //========================= Đăng ký ========================
+  //========================= Đăng ký ========================
 
-    const register = (formData) => {
-        return registerUser(formData);
-    };
+  const register = (formData) => {
+    return registerUser(formData);
+  };
 
-    //========================= Đăng nhập ========================
+  //========================= Đăng nhập ========================
 
-    const login = (account, password) => {
-        const loggedInUser = loginUser(account, password);
+  const login = async (account, password, rememberMe = false) => {
+    const loggedInUser = await loginUser(account, password, rememberMe);
 
-        setUser(loggedInUser);
+    setUser(loggedInUser);
+    return loggedInUser;
+  };
+  //========================= Đăng xuất ========================
 
-        return loggedInUser;
-    };
+  const logout = () => {
+    logoutUser();
+    setUser(null);
+  };
 
-    //========================= Đăng xuất ========================
+  //========================= Cập nhật thông tin cá nhân ========================
 
-    const logout = () => {
-        logoutUser();
-        setUser(null);
-    };
+  const updateProfile = (formData) => {
+    const updatedUser = updateUserProfile(formData);
 
-    //========================= Cập nhật thông tin cá nhân ========================
+    setUser(updatedUser);
 
-    const updateProfile = (formData) => {
-        const updatedUser = updateUserProfile(formData);
+    return updatedUser;
+  };
 
-        setUser(updatedUser);
+  //========================= Đổi mật khẩu ========================
 
-        return updatedUser;
-    };
+  const updatePassword = (oldPassword, newPassword) => {
+    return changePassword(oldPassword, newPassword);
+  };
 
-    //========================= Đổi mật khẩu ========================
+  //========================= Thông báo ========================
 
-    const updatePassword = (oldPassword, newPassword) => {
-        return changePassword(oldPassword, newPassword);
-    };
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+  };
 
-    //========================= Thông báo ========================
+  const clearNotification = () => {
+    setNotification(null);
+  };
 
-    const showNotification = (message, type = "success") => {
-        setNotification({ message, type });
-    };
+  //========================= Context Value ========================
 
-    const clearNotification = () => {
-        setNotification(null);
-    };
+  const value = {
+    user,
+    isAuthenticated: Boolean(user),
+    register,
+    login,
+    logout,
+    updateProfile,
+    updatePassword,
+    notification,
+    showNotification,
+    clearNotification,
+  };
 
-    //========================= Context Value ========================
-
-    const value = {
-        user,
-        isAuthenticated: Boolean(user),
-        register,
-        login,
-        logout,
-        updateProfile,
-        updatePassword,
-        notification,
-        showNotification,
-        clearNotification
-    };
-
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
-    );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 //========================= Custom Hook ========================
