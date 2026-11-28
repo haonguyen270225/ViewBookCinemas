@@ -1,0 +1,6 @@
+@ViewBookCinemas.API_HostAddress = http://localhost:5047
+
+GET {{ViewBookCinemas.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
