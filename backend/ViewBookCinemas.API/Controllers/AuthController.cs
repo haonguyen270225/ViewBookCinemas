@@ -55,6 +55,30 @@ namespace ViewBookCinemas.API.Controllers
                 role
             });
         }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(
+    [FromBody] RegisterRequest request,
+    CancellationToken cancellationToken)
+        {
+            var result = await _authService.RegisterAsync(
+                request,
+                cancellationToken);
+
+            if (result == null)
+            {
+                return Conflict(new
+                {
+                    message = "Username or email already exists."
+                });
+            }
+
+            return Ok(new
+            {
+                message = "Registration successful.",
+                user = result
+            });
+        }
 
     }
+
 }

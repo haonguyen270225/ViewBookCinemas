@@ -147,5 +147,89 @@ namespace ViewBookCinemas.API.Services.Implementations
                 }
             };
         }
+
+        public async Task<RegisterResponse?> RegisterAsync(
+    RegisterRequest request,
+    CancellationToken cancellationToken)
+        {
+            string username = request.Username.Trim();
+            string email = request.Email.Trim();
+
+            // 1. Kiểm tra Username đã tồn tại.
+            bool usernameExists = await _context.Users
+                .AnyAsync(
+                    user => user.Username == username,
+                    cancellationToken);
+
+            if (usernameExists)
+            {
+                return null;
+            }
+
+            // 2. Kiểm tra Email đã tồn tại.
+            bool emailExists = await _context.Users
+                .AnyAsync(
+                    user => user.Email == email,
+                    cancellationToken);
+
+            if (emailExists)
+            {
+                return null;
+            }
+
+            // 3. Tìm Role Customer.
+            var customerRole = await _context.Roles
+                .FirstOrDefaultAsync(
+                    role => role.RoleName == "Customer"
+                            && role.Status,
+                    cancellationToken);
+
+            if (customerRole == null)
+            {
+                throw new InvalidOperationException(
+                    "Active Customer role was not found.");
+            }
+
+            // 4. Khởi tạo tài khoản mới.
+            var user = new User
+            {
+                RoleId = customerRole.RoleId,
+
+                Username = username,
+                Email = email,
+
+                FullName = request.FullName.Trim(),
+                PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber)
+                    ? null
+                    : request.PhoneNumber.Trim(),
+
+                Status = "Active",
+                IsEmailVerified = false,
+
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // 5. Hash mật khẩu.
+            user.PasswordHash = _passwordHasher.HashPassword(
+                user,
+                request.Password);
+
+            // 6. Lưu vào database.
+            _context.Users.Add(user);
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // 7. Trả thông tin tài khoản.
+            return new RegisterResponse
+            {
+                UserId = user.UserId,
+                Username = user.Username,
+                Email = user.Email,
+                FullName = user.FullName,
+                RoleName = customerRole.RoleName,
+                Status = user.Status,
+                CreatedAt = user.CreatedAt
+            };
+        }
     }
 }
